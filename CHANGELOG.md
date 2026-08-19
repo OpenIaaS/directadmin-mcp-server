@@ -32,6 +32,12 @@ Complete rewrite of the half-finished OpenIaaS / omryatia fork.
 - Sanitised CSF comments; rejected `0.0.0.0/0`
 - Docker: non-root, dropped caps, read-only FS, loopback publish
 
+### CI
+
+- GitHub Actions on 3.10 + 3.12 (`ruff` + `pytest`)
+- Least-privilege `contents: read`, concurrency cancel, SHA-pinned actions
+- Dependabot for pip and GitHub Actions
+
 ### Breaking
 
 - `DA_LOGIN_KEY` is required (no silent empty default)

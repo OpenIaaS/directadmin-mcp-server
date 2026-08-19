@@ -1,6 +1,3 @@
-# Canonical copy lives at .github/workflows/ci.yml
-# (kept here so the workflow is visible even if a PAT without
-# the `workflow` scope cannot push the real Actions path).
 name: ci
 
 on:
@@ -8,6 +5,7 @@ on:
     branches: [main, master]
   pull_request:
 
+# Least privilege — this job only reads the tree and runs tests.
 permissions:
   contents: read
 
