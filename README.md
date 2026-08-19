@@ -27,6 +27,8 @@ Read [docs/agent.md](docs/agent.md) and [docs/tokens.md](docs/tokens.md)
 before pointing a model at production.
 
 
+<div align="center">
+
 ```
 ┌───────────┐ stdio/SSE ┌─────────────────┐ HTTPS ┌─────────────┐
 │ Claude /  │ ────────► │ directadmin-mcp │ ────► │ DirectAdmin │
@@ -34,6 +36,8 @@ before pointing a model at production.
 │ any MCP   │ ◄──────── │                 │       │             │
 └───────────┘           └─────────────────┘       └─────────────┘
 ```
+
+</div>
 
 ## What you can ask
 
