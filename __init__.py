@@ -1,1 +1,3 @@
-__version__ = "0.1.0"
+"""DirectAdmin MCP Server."""
+
+__version__ = "2.0.0"

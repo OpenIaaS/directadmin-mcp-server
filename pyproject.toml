@@ -1,27 +1,48 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
-[tool.black]
-line-length = 88
-target-version = ['py311']
-include = '\.py$'
+[project]
+name = "directadmin-mcp"
+version = "2.0.0"
+description = "Model Context Protocol server for DirectAdmin admin operations (SSL reissue, CSF unblock, full New API)."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "OpenIaaS" }]
+keywords = ["directadmin", "mcp", "ssl", "letsencrypt", "csf", "firewall"]
+dependencies = [
+  "fastapi>=0.110.0",
+  "uvicorn[standard]>=0.27.0",
+  "starlette>=0.36.0",
+  "pydantic>=2.6.0",
+  "pydantic-settings>=2.2.0",
+  "python-dotenv>=1.0.1",
+  "httpx>=0.27.0",
+  "mcp>=1.6.0,<2.0.0",
+  "python-multipart>=0.0.9",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0.0", "pytest-asyncio>=0.23.0", "ruff>=0.4.0"]
+
+[project.scripts]
+directadmin-mcp = "server:main"
+
+[tool.setuptools]
+py-modules = ["config", "da", "security", "mcp_instance", "main", "server"]
+
+[tool.setuptools.packages.find]
+include = ["tools*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
 
 [tool.ruff]
-line-length = 88
-target-version = "py311"
-select = ["E", "F", "B", "I"]
-exclude = ["migrations"]
+line-length = 110
+target-version = "py310"
 
-[tool.bumpver]
-current_version = "0.1.0"
-version_pattern = "MAJOR.MINOR.PATCH"
-commit_message = "bump: {old_version} → {new_version}"
-tag_message = "Release {new_version}"
-tag_scope = "repo"
-commit = true
-tag = true
-
-[tool.bumpver.file_patterns]
-"README.md" = ["{version}"]
-"directadmin_mcp/__init__.py" = ['__version__ = "{version}"']
+[tool.ruff.lint]
+select = ["E", "F", "I", "B"]
+ignore = ["E501", "B008"]

@@ -1,0 +1,6179 @@
+{
+  "title": "Swagger DirectAdmin API",
+  "version": "1.0",
+  "count": 320,
+  "operations": [
+    {
+      "method": "GET",
+      "path": "/api/admin-usage",
+      "summary": "Get admin's usage",
+      "description": "Get admin's usage (read-only).",
+      "params": [],
+      "tags": [
+        "Admin"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/change-password",
+      "summary": "Change password",
+      "description": "Change system user's unix, mail and FTP password.",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.chpasswdRequest"
+        }
+      ],
+      "tags": [
+        "Password"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/change-user-creator",
+      "summary": "Change user creator (move user between resellers)",
+      "description": "Change user account creator effectively moving user account from one admin/reseller to other admin/reseller.",
+      "params": [
+        {
+          "in": "body",
+          "name": "payload",
+          "required": true,
+          "type": "object",
+          "description": "Request parameters",
+          "ref": "#/definitions/web.changeUserCreatorRequest"
+        }
+      ],
+      "tags": [
+        "Migrate"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/clamav",
+      "summary": "Get clamAV processes",
+      "description": "",
+      "params": [],
+      "tags": [
+        "ClamAV"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/clamav",
+      "summary": "Scan directories in the specified path",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "params",
+          "required": true,
+          "type": "object",
+          "description": "ClamAV params",
+          "ref": "#/definitions/web.clamAVRequest"
+        }
+      ],
+      "tags": [
+        "ClamAV"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/clamav/{pid}",
+      "summary": "Cancel the clamAV process by PID",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "pid",
+          "required": true,
+          "type": "string",
+          "description": "PID"
+        }
+      ],
+      "tags": [
+        "ClamAV"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/convert-reseller-to-user",
+      "summary": "Change reseller to user type.",
+      "description": "Change user of reseller type to user type. Admins only CMD.",
+      "params": [
+        {
+          "in": "body",
+          "name": "payload",
+          "required": true,
+          "type": "object",
+          "description": "User conversion parameters.",
+          "ref": "#/definitions/web.resellerToUserRequest"
+        }
+      ],
+      "tags": [
+        "Migrate"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/convert-user-to-reseller",
+      "summary": "Change user to reseller type.",
+      "description": "Change user of user type to reseller type. Admins only CMD.",
+      "params": [
+        {
+          "in": "body",
+          "name": "payload",
+          "required": true,
+          "type": "object",
+          "description": "Account conversion parameters.",
+          "ref": "#/definitions/web.userToResellerRequest"
+        }
+      ],
+      "tags": [
+        "Migrate"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/cpanel-import/check-remote",
+      "summary": "Checks SSH connection to remote cPanel server and returns list of remote users",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "params",
+          "required": true,
+          "type": "object",
+          "description": "Remote cPanel server credentials",
+          "ref": "#/definitions/web.cpanelCheckRequest"
+        }
+      ],
+      "tags": [
+        "Cpanel"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/cpanel-import/tasks",
+      "summary": "List all cPanel import tasks",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Cpanel"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/cpanel-import/tasks/start",
+      "summary": "Starts remote cPanel account import to local DirectAdmin server",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "params",
+          "required": true,
+          "type": "object",
+          "description": "Remote cPanel server credentials and list of accounts to import",
+          "ref": "#/definitions/web.cpanelImportStart"
+        }
+      ],
+      "tags": [
+        "Cpanel"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/cpanel-import/tasks/{id}",
+      "summary": "Get single cPanel import task",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "Task ID"
+        }
+      ],
+      "tags": [
+        "Cpanel"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/cpanel-import/tasks/{id}",
+      "summary": "Delete single pending cPanel import task",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "Task ID"
+        }
+      ],
+      "tags": [
+        "Cpanel"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/cpanel-import/tasks/{id}/log",
+      "summary": "Retrieve single import task log",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "Task ID"
+        }
+      ],
+      "tags": [
+        "Cpanel"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/cpanel-import/tasks/{id}/log-sse",
+      "summary": "Stream import task log",
+      "description": "Connection is closed when import task ends.",
+      "params": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "Task ID"
+        },
+        {
+          "in": "header",
+          "name": "lastSeen",
+          "required": false,
+          "type": "string",
+          "description": "Last-Event-Id"
+        }
+      ],
+      "tags": [
+        "Cpanel"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/custombuild/actions",
+      "summary": "Get available custombuild actions",
+      "description": "Report available custombuild actions (cached until restart).",
+      "params": [],
+      "tags": [
+        "Custombuild"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/custombuild/compile-scripts",
+      "summary": "Get all custombuild's apps' compile scripts metadata",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Custombuild"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/custombuild/compile-scripts-custom/{app}",
+      "summary": "Get custombuild's app's customized compile script",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "app",
+          "required": true,
+          "type": "string",
+          "description": "Application name"
+        }
+      ],
+      "tags": [
+        "Custombuild"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/custombuild/compile-scripts-custom/{app}",
+      "summary": "Set custombuild's app's custom compile script",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "app",
+          "required": true,
+          "type": "string",
+          "description": "Application name"
+        },
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.cbCompileConfigRequest"
+        }
+      ],
+      "tags": [
+        "Custombuild"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/custombuild/compile-scripts-custom/{app}",
+      "summary": "Delete custombuild's app's custom compile script (reset to default)",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "app",
+          "required": true,
+          "type": "string",
+          "description": "Application name"
+        }
+      ],
+      "tags": [
+        "Custombuild"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/custombuild/compile-scripts/{app}",
+      "summary": "Get custombuild's app's default compile script",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "app",
+          "required": true,
+          "type": "string",
+          "description": "Application name"
+        }
+      ],
+      "tags": [
+        "Custombuild"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/custombuild/kill",
+      "summary": "Kill custombuild",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Custombuild"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/custombuild/logs",
+      "summary": "Get all custombuild log files metadata",
+      "description": "Get a list of custombuild log files with timestamps and sizes.",
+      "params": [],
+      "tags": [
+        "Custombuild"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/custombuild/logs/{logname}",
+      "summary": "Delete custombuild log",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "logname",
+          "required": true,
+          "type": "string",
+          "description": "Log file name."
+        }
+      ],
+      "tags": [
+        "Custombuild"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/custombuild/logs/{logname}/sse",
+      "summary": "Stream custombuild log file",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "logname",
+          "required": true,
+          "type": "string",
+          "description": "Log file name"
+        },
+        {
+          "in": "header",
+          "name": "Last-Event-Id",
+          "required": false,
+          "type": "string",
+          "description": "Read from position."
+        }
+      ],
+      "tags": [
+        "Custombuild"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/custombuild/options",
+      "summary": "Get custombuild options",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Custombuild"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/custombuild/options",
+      "summary": "Patch custombuild options",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.cbOptionsRequest"
+        }
+      ],
+      "tags": [
+        "Custombuild"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/custombuild/options-v2",
+      "summary": "Get custombuild options",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Custombuild"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/custombuild/options-v2",
+      "summary": "Patch custombuild options",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "List of key and value pairs to change",
+          "ref": ""
+        }
+      ],
+      "tags": [
+        "Custombuild"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/custombuild/options/validate",
+      "summary": "Get custombuild options validation message",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Custombuild"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/custombuild/removals",
+      "summary": "List of custombuild commands to remove no longer needed software",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Custombuild"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/custombuild/run",
+      "summary": "Run Custombuild",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.cbRunRequest"
+        }
+      ],
+      "tags": [
+        "Custombuild"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/custombuild/software",
+      "summary": "Get available custombuild software",
+      "description": "Report available custombuild software.",
+      "params": [],
+      "tags": [
+        "Custombuild"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/custombuild/state",
+      "summary": "Get custombuild state",
+      "description": "Get number of available updates and whether custombuild is currently running.",
+      "params": [],
+      "tags": [
+        "Custombuild"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/custombuild/state/sse",
+      "summary": "Get custombuild state stream",
+      "description": "Get events about number of available updates and whether custombuild is currently running.",
+      "params": [],
+      "tags": [
+        "Custombuild"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/custombuild/updates",
+      "summary": "Get available custombuild updates",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Custombuild"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/custombuild/versions",
+      "summary": "Get all custombuild's apps default versions",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Custombuild"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/custombuild/versions-custom",
+      "summary": "Get all custombuild's apps custom versions",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Custombuild"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/custombuild/versions-custom/{app}",
+      "summary": "Set custombuild's app's custom version",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "app",
+          "required": true,
+          "type": "string",
+          "description": "Application name"
+        },
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.cbVersionsCustomRequest"
+        }
+      ],
+      "tags": [
+        "Custombuild"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/custombuild/versions-custom/{app}",
+      "summary": "Delete custombuild's app's custom version",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "app",
+          "required": true,
+          "type": "string",
+          "description": "Application name"
+        }
+      ],
+      "tags": [
+        "Custombuild"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/db-manage/clone-db",
+      "summary": "Clone database",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Data.",
+          "ref": "#/definitions/web.dbCloneDatabaseRequest"
+        }
+      ],
+      "tags": [
+        "Database"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/db-manage/clone-dbuser",
+      "summary": "Clone database user",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Data.",
+          "ref": "#/definitions/web.dbCloneDbuserRequest"
+        }
+      ],
+      "tags": [
+        "Database"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/db-manage/create-db",
+      "summary": "Create empty database",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Data.",
+          "ref": "#/definitions/web.dbCreateDatabaseRequest"
+        }
+      ],
+      "tags": [
+        "Database"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/db-manage/create-db-with-user",
+      "summary": "Create database with user",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Data.",
+          "ref": "#/definitions/web.dbCreateDatabaseWithUserRequest"
+        }
+      ],
+      "tags": [
+        "Database"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/db-manage/create-user",
+      "summary": "Create database user",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Data.",
+          "ref": "#/definitions/web.dbCreateUserRequest"
+        }
+      ],
+      "tags": [
+        "Database"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/db-manage/databases/{database}",
+      "summary": "Delete database",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "database",
+          "required": true,
+          "type": "string",
+          "description": "Database."
+        },
+        {
+          "in": "query",
+          "name": "drop-orphan-users",
+          "required": false,
+          "type": "boolean",
+          "description": "Delete users which had access only to the deleted database."
+        }
+      ],
+      "tags": [
+        "Database"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/db-manage/databases/{database}/check",
+      "summary": "Check database",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "database",
+          "required": true,
+          "type": "string",
+          "description": "Database."
+        }
+      ],
+      "tags": [
+        "Database"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/db-manage/databases/{database}/export",
+      "summary": "Export database",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "database",
+          "required": true,
+          "type": "string",
+          "description": "Database."
+        },
+        {
+          "in": "query",
+          "name": "gzip",
+          "required": false,
+          "type": "boolean",
+          "description": "Gzipped export."
+        }
+      ],
+      "tags": [
+        "Database"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/db-manage/databases/{database}/export-definition",
+      "summary": "Export database and related users definition",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "database",
+          "required": true,
+          "type": "string",
+          "description": "Database name."
+        }
+      ],
+      "tags": [
+        "Database"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/db-manage/databases/{database}/fix-definers",
+      "summary": "Fix broken database definers",
+      "description": "Fix broken definers for views, events, routines and triggers in the database. Broken definers include non-existing dbusers or dbusers directadmin user does not have access to.",
+      "params": [
+        {
+          "in": "path",
+          "name": "database",
+          "required": true,
+          "type": "string",
+          "description": "Database."
+        }
+      ],
+      "tags": [
+        "Database"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/db-manage/databases/{database}/import",
+      "summary": "Import database backup",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "database",
+          "required": true,
+          "type": "string",
+          "description": "Database."
+        },
+        {
+          "in": "query",
+          "name": "clean",
+          "required": false,
+          "type": "boolean",
+          "description": "Clean database before importing."
+        },
+        {
+          "in": "formData",
+          "name": "sqlfile",
+          "required": true,
+          "type": "file",
+          "description": "SQL file to import (can be gzipped)."
+        }
+      ],
+      "tags": [
+        "Database"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/db-manage/databases/{database}/import-definition",
+      "summary": "Import database and related users definition",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "database",
+          "required": true,
+          "type": "string",
+          "description": "Database name."
+        },
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Database definition",
+          "ref": "#/definitions/web.dbDatabaseBackup"
+        }
+      ],
+      "tags": [
+        "Database"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/db-manage/databases/{database}/optimize",
+      "summary": "Optimize database",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "database",
+          "required": true,
+          "type": "string",
+          "description": "Database."
+        }
+      ],
+      "tags": [
+        "Database"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/db-manage/databases/{database}/repair",
+      "summary": "Repair database",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "database",
+          "required": true,
+          "type": "string",
+          "description": "Database."
+        }
+      ],
+      "tags": [
+        "Database"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/db-manage/users/{dbuser}",
+      "summary": "Delete database user",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "dbuser",
+          "required": true,
+          "type": "string",
+          "description": "Database user."
+        }
+      ],
+      "tags": [
+        "Database"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/db-manage/users/{dbuser}/change-hosts",
+      "summary": "Change database user hosts",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "dbuser",
+          "required": true,
+          "type": "string",
+          "description": "Database user."
+        },
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "New user's host patterns. Valid values include wildcard '%', 'localhost', IPv4 and IPv6 addresses. At least one host pattern must exist but no more than 30.",
+          "ref": ""
+        }
+      ],
+      "tags": [
+        "Database"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/db-manage/users/{dbuser}/change-password",
+      "summary": "Change database user password",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "dbuser",
+          "required": true,
+          "type": "string",
+          "description": "Database user."
+        },
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Data.",
+          "ref": "#/definitions/web.dbUserChangePasswordRequest"
+        }
+      ],
+      "tags": [
+        "Database"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/db-manage/users/{dbuser}/databases/{database}/change-privs",
+      "summary": "Set database privileges for dbuser",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "database",
+          "required": true,
+          "type": "string",
+          "description": "Database."
+        },
+        {
+          "in": "path",
+          "name": "dbuser",
+          "required": true,
+          "type": "string",
+          "description": "Database user."
+        },
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Data.",
+          "ref": "#/definitions/web.dbUserChangePrivsRequest"
+        }
+      ],
+      "tags": [
+        "Database"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/db-monitor/processes",
+      "summary": "Get database processes list",
+      "description": "Exposes MySQL/MariaDB `information_schema.PROCESSLIST` contents.",
+      "params": [],
+      "tags": [
+        "Database monitor"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/db-monitor/processes/{id}/kill",
+      "summary": "Kill database thread",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "integer",
+          "description": "Thread ID."
+        }
+      ],
+      "tags": [
+        "Database monitor"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/db-show/databases",
+      "summary": "Get Databases list",
+      "description": "",
+      "params": [
+        {
+          "in": "query",
+          "name": "no-size",
+          "required": false,
+          "type": "boolean",
+          "description": "Do not compute size for the databases."
+        }
+      ],
+      "tags": [
+        "Database"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/db-show/databases/{database}",
+      "summary": "Get Database metadata",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "database",
+          "required": true,
+          "type": "string",
+          "description": "Database."
+        }
+      ],
+      "tags": [
+        "Database"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/db-show/databases/{database}/users",
+      "summary": "Get Database info",
+      "description": "",
+      "params": [
+        {
+          "in": "query",
+          "name": "include-temporary",
+          "required": false,
+          "type": "boolean",
+          "description": "Include temporary users in the result."
+        },
+        {
+          "in": "path",
+          "name": "database",
+          "required": true,
+          "type": "string",
+          "description": "Database."
+        }
+      ],
+      "tags": [
+        "Database"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/db-show/info",
+      "summary": "Database server info",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Database"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/db-show/users",
+      "summary": "Get Users",
+      "description": "",
+      "params": [
+        {
+          "in": "query",
+          "name": "include-temporary",
+          "required": false,
+          "type": "boolean",
+          "description": "Include temporary users in the result."
+        }
+      ],
+      "tags": [
+        "Database"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/db-show/users/{dbuser}",
+      "summary": "Get User",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "dbuser",
+          "required": true,
+          "type": "string",
+          "description": "Database user."
+        }
+      ],
+      "tags": [
+        "Database"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/db-show/users/{dbuser}/databases",
+      "summary": "Get user databases",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "dbuser",
+          "required": true,
+          "type": "string",
+          "description": "Database user."
+        }
+      ],
+      "tags": [
+        "Database"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/domain-tls/{domain}/acme-config",
+      "summary": "Get ACME configuration for domain",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "domain",
+          "required": true,
+          "type": "string",
+          "description": "User owned domain"
+        }
+      ],
+      "tags": [
+        "TLS"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/domain-tls/{domain}/acme-config",
+      "summary": "Set ACME configuration for domain",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "domain",
+          "required": true,
+          "type": "string",
+          "description": "User owned domain"
+        },
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "New key and certificate file contents",
+          "ref": "#/definitions/web.domainACMEConfig"
+        }
+      ],
+      "tags": [
+        "TLS"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/domain-tls/{domain}/certs",
+      "summary": "List user domain certificates",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "domain",
+          "required": true,
+          "type": "string",
+          "description": "User owned domain"
+        }
+      ],
+      "tags": [
+        "TLS"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/domain-tls/{domain}/certs/{id}",
+      "summary": "Delete single user domain certificate",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "domain",
+          "required": true,
+          "type": "string",
+          "description": "User owned domain"
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "Certificate ID"
+        },
+        {
+          "in": "query",
+          "name": "update-acme-skiplist",
+          "required": false,
+          "type": "boolean",
+          "description": "Update ACME skip list so DNS name can be managed automatically"
+        }
+      ],
+      "tags": [
+        "TLS"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/domain-tls/{domain}/certs/{id}/create-csr",
+      "summary": "Create a certificate signing request file",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "domain",
+          "required": true,
+          "type": "string",
+          "description": "User owned domain"
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "Certificate ID"
+        },
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.domainTLSPostCreateCSR.request"
+        }
+      ],
+      "tags": [
+        "TLS"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/domain-tls/{domain}/certs/{id}/files",
+      "summary": "Retrieve single user domain TLS certificate",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "domain",
+          "required": true,
+          "type": "string",
+          "description": "User owned domain"
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "Certificate ID"
+        }
+      ],
+      "tags": [
+        "TLS"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/domain-tls/{domain}/certs/{id}/files",
+      "summary": "Replace single user domain TLS certificates",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "domain",
+          "required": true,
+          "type": "string",
+          "description": "User owned domain"
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "Certificate ID"
+        },
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "New key and certificate file contents",
+          "ref": "#/definitions/web.domainTLSPutCertFiles.request"
+        },
+        {
+          "in": "query",
+          "name": "dry-run",
+          "required": false,
+          "type": "boolean",
+          "description": "Do not save the certificate"
+        },
+        {
+          "in": "query",
+          "name": "force",
+          "required": false,
+          "type": "boolean",
+          "description": "Allow invalid tls certificate to be uploaded"
+        },
+        {
+          "in": "query",
+          "name": "update-acme-skiplist",
+          "required": false,
+          "type": "boolean",
+          "description": "Update ACME skip list so certificate is exempt from auto management"
+        }
+      ],
+      "tags": [
+        "TLS"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/domain-tls/{domain}/certs/{id}/install-self-signed",
+      "summary": "Install self signed TLS certificate",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "domain",
+          "required": true,
+          "type": "string",
+          "description": "User owned domain"
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "Certificate ID"
+        },
+        {
+          "in": "query",
+          "name": "overwrite",
+          "required": false,
+          "type": "boolean",
+          "description": "Overwrite existing certificate"
+        },
+        {
+          "in": "query",
+          "name": "update-acme-skiplist",
+          "required": false,
+          "type": "boolean",
+          "description": "Update ACME skip list so certificate is exempt from auto management"
+        },
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.domainTLSPostInstallSelfSigned.request"
+        }
+      ],
+      "tags": [
+        "TLS"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/domain-tls/{domain}/provision-certs",
+      "summary": "Provision certificates for domain",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "domain",
+          "required": true,
+          "type": "string",
+          "description": "User owned domain"
+        }
+      ],
+      "tags": [
+        "TLS"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/domain-tls/{domain}/provision-certs-dry-run",
+      "summary": "Provision certificates for domain (dry run)",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "domain",
+          "required": true,
+          "type": "string",
+          "description": "User owned domain"
+        }
+      ],
+      "tags": [
+        "TLS"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/email-config/mobileconfig",
+      "summary": "Download Apple Mail Configuration Profile",
+      "description": "Installing the Configuration Profile will setup mail account on an Apple device.",
+      "params": [
+        {
+          "in": "query",
+          "name": "email",
+          "required": true,
+          "type": "string",
+          "description": "Email address."
+        },
+        {
+          "in": "query",
+          "name": "format",
+          "required": false,
+          "type": "string",
+          "description": "Configuration Profile encoding format."
+        }
+      ],
+      "tags": [
+        "Email"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/email-logs",
+      "summary": "Get email logs",
+      "description": "Get structured info about emails from logs.",
+      "params": [
+        {
+          "in": "query",
+          "name": "from",
+          "required": true,
+          "type": "string",
+          "description": "Time frame start."
+        },
+        {
+          "in": "query",
+          "name": "to",
+          "required": false,
+          "type": "string",
+          "description": "Time frame end (defaults to 1 day)."
+        },
+        {
+          "in": "query",
+          "name": "limit",
+          "required": false,
+          "type": "integer",
+          "description": "Response entries limit (0 disables limit)."
+        },
+        {
+          "in": "query",
+          "name": "address",
+          "required": false,
+          "type": "string",
+          "description": "Addresses filter."
+        },
+        {
+          "in": "query",
+          "name": "domain",
+          "required": false,
+          "type": "string",
+          "description": "Domains filter."
+        },
+        {
+          "in": "query",
+          "name": "state",
+          "required": false,
+          "type": "string",
+          "description": "Email state filter."
+        },
+        {
+          "in": "query",
+          "name": "type",
+          "required": false,
+          "type": "string",
+          "description": "Mail type (direction) filter."
+        }
+      ],
+      "tags": [
+        "Email"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/email-logs-summary",
+      "summary": "Get emails log summary",
+      "description": "Get summarized emails in time frame.",
+      "params": [
+        {
+          "in": "query",
+          "name": "from",
+          "required": true,
+          "type": "string",
+          "description": "Time frame start."
+        },
+        {
+          "in": "query",
+          "name": "to",
+          "required": false,
+          "type": "string",
+          "description": "Time frame end (defaults to 1 day)."
+        }
+      ],
+      "tags": [
+        "Email"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/email-logs/user",
+      "summary": "Get user email logs",
+      "description": "Get structured info about emails from logs.",
+      "params": [
+        {
+          "in": "query",
+          "name": "from",
+          "required": true,
+          "type": "string",
+          "description": "Time frame start."
+        },
+        {
+          "in": "query",
+          "name": "to",
+          "required": false,
+          "type": "string",
+          "description": "Time frame end (defaults to 1 day)."
+        },
+        {
+          "in": "query",
+          "name": "limit",
+          "required": false,
+          "type": "integer",
+          "description": "Response entries limit (0 disables limit)."
+        },
+        {
+          "in": "query",
+          "name": "address",
+          "required": false,
+          "type": "string",
+          "description": "Addresses filter."
+        },
+        {
+          "in": "query",
+          "name": "domain",
+          "required": false,
+          "type": "string",
+          "description": "Domains filter."
+        },
+        {
+          "in": "query",
+          "name": "state",
+          "required": false,
+          "type": "string",
+          "description": "Email state filter."
+        },
+        {
+          "in": "query",
+          "name": "type",
+          "required": false,
+          "type": "string",
+          "description": "Mail type (direction) filter."
+        }
+      ],
+      "tags": [
+        "Email"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/emailvacation/{domain}",
+      "summary": "List vacation schedules for all mail users in domain",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "domain",
+          "required": true,
+          "type": "string",
+          "description": "Domain"
+        }
+      ],
+      "tags": [
+        "Vacation"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/emailvacation/{domain}/{user}",
+      "summary": "List detailed vacation configuration for user.",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "domain",
+          "required": true,
+          "type": "string",
+          "description": "Domain"
+        },
+        {
+          "in": "path",
+          "name": "user",
+          "required": true,
+          "type": "string",
+          "description": "Email user"
+        }
+      ],
+      "tags": [
+        "Vacation"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/emailvacation/{domain}/{user}",
+      "summary": "create or modify vacation configuration for user.",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "domain",
+          "required": true,
+          "type": "string",
+          "description": "Domain"
+        },
+        {
+          "in": "path",
+          "name": "user",
+          "required": true,
+          "type": "string",
+          "description": "Email user"
+        },
+        {
+          "in": "body",
+          "name": "details",
+          "required": true,
+          "type": "object",
+          "description": "Email user",
+          "ref": "#/definitions/web.EmailVacationDetail"
+        }
+      ],
+      "tags": [
+        "Vacation"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/emailvacation/{domain}/{user}",
+      "summary": "delete vacation configuration for user.",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "domain",
+          "required": true,
+          "type": "string",
+          "description": "Domain"
+        },
+        {
+          "in": "path",
+          "name": "user",
+          "required": true,
+          "type": "string",
+          "description": "Email user"
+        }
+      ],
+      "tags": [
+        "Vacation"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/execute",
+      "summary": "Executes command with options under user privileges",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "payload",
+          "required": true,
+          "type": "object",
+          "description": "command to execute",
+          "ref": "#/definitions/web.execPayload"
+        }
+      ],
+      "tags": [
+        "Exec"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/filemanager-actions/chmod",
+      "summary": "Change permission.",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.fmChmod.request"
+        }
+      ],
+      "tags": [
+        "Filemanager"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/filemanager-actions/copy",
+      "summary": "Copy file or directory.",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.fmCopy.request"
+        }
+      ],
+      "tags": [
+        "Filemanager"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/filemanager-actions/copy-to",
+      "summary": "Copy multiple items to a directory.",
+      "description": "Copies multiple files and/or directories from source into destination directory.",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.fmCopyTo.request"
+        }
+      ],
+      "tags": [
+        "Filemanager"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/filemanager-actions/create-archive",
+      "summary": "Create archive.",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.fmCreateArchive.request"
+        }
+      ],
+      "tags": [
+        "Filemanager"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/filemanager-actions/extract-archive",
+      "summary": "Extract archive.",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.fmExtractArchive.request"
+        }
+      ],
+      "tags": [
+        "Filemanager"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/filemanager-actions/mkdir",
+      "summary": "Create directory with any missing parents.",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.fmMkdir.request"
+        }
+      ],
+      "tags": [
+        "Filemanager"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/filemanager-actions/move",
+      "summary": "Move file or directory.",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.fmMove.request"
+        }
+      ],
+      "tags": [
+        "Filemanager"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/filemanager-actions/move-to",
+      "summary": "Move multiple items to a directory.",
+      "description": "Move multiple files and/or directories from source into destination directory.",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.fmMoveTo.request"
+        }
+      ],
+      "tags": [
+        "Filemanager"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/filemanager-actions/remove",
+      "summary": "Remove files and/or directories.",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.fmRemove.request"
+        }
+      ],
+      "tags": [
+        "Filemanager"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/filemanager-actions/trash",
+      "summary": "Remove all trashed items",
+      "description": "Permanently delete all trashed files and directories.",
+      "params": [],
+      "tags": [
+        "Filemanager"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/filemanager-actions/trash/{id}",
+      "summary": "Remove trashed item",
+      "description": "Permanently delete trashed file or directory.",
+      "params": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "Trashed item identifier."
+        }
+      ],
+      "tags": [
+        "Filemanager"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/filemanager-actions/trash/{id}/restore",
+      "summary": "Restore trashed item",
+      "description": "Restore trashed file or directory to its original location.",
+      "params": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "Trashed item identifier."
+        },
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.fmRestoreTrash.request"
+        }
+      ],
+      "tags": [
+        "Filemanager"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/filemanager-actions/upload",
+      "summary": "Upload file.",
+      "description": "Upload file to the system.",
+      "params": [
+        {
+          "in": "query",
+          "name": "dir",
+          "required": false,
+          "type": "string",
+          "description": "Destination directory, chrooted to user's home dir. Defaults to root."
+        },
+        {
+          "in": "query",
+          "name": "name",
+          "required": false,
+          "type": "string",
+          "description": "Filename, defaults to formData filename."
+        },
+        {
+          "in": "query",
+          "name": "perm",
+          "required": false,
+          "type": "integer",
+          "description": "File permissions as a decimal number or octal if starts with 0, defaults according to umask."
+        },
+        {
+          "in": "query",
+          "name": "overwrite",
+          "required": false,
+          "type": "boolean",
+          "description": "Overwrite if file exists."
+        },
+        {
+          "in": "formData",
+          "name": "dir",
+          "required": false,
+          "type": "string",
+          "description": "Destination directory, chrooted to user's home dir. Defaults to root."
+        },
+        {
+          "in": "formData",
+          "name": "name",
+          "required": false,
+          "type": "string",
+          "description": "Filename, defaults to formData filename."
+        },
+        {
+          "in": "formData",
+          "name": "perm",
+          "required": false,
+          "type": "integer",
+          "description": "File permissions as a decimal number or octal if starts with 0, defaults according to umask."
+        },
+        {
+          "in": "formData",
+          "name": "overwrite",
+          "required": false,
+          "type": "boolean",
+          "description": "Overwrite if file exists."
+        },
+        {
+          "in": "formData",
+          "name": "file",
+          "required": true,
+          "type": "file",
+          "description": "File to upload."
+        }
+      ],
+      "tags": [
+        "Filemanager"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/filemanager/disk-usage",
+      "summary": "Disk usage.",
+      "description": "Get disk usage about a file or a directory.",
+      "params": [
+        {
+          "in": "query",
+          "name": "path",
+          "required": false,
+          "type": "string",
+          "description": "File path, chrooted to user's home dir."
+        }
+      ],
+      "tags": [
+        "Filemanager"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/filemanager/download",
+      "summary": "Download file.",
+      "description": "Download content of a regular file from the system.",
+      "params": [
+        {
+          "in": "query",
+          "name": "path",
+          "required": true,
+          "type": "string",
+          "description": "File path, chrooted to user's home dir."
+        }
+      ],
+      "tags": [
+        "Filemanager"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/filemanager/download-archive",
+      "summary": "Download archived file or directory.",
+      "description": "Download content of a regular file from the system.",
+      "params": [
+        {
+          "in": "query",
+          "name": "path",
+          "required": true,
+          "type": "string",
+          "description": "File path, chrooted to user's home dir."
+        },
+        {
+          "in": "query",
+          "name": "type",
+          "required": false,
+          "type": "string",
+          "description": "Archive type."
+        }
+      ],
+      "tags": [
+        "Filemanager"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/filemanager/list",
+      "summary": "List directory contents.",
+      "description": "",
+      "params": [
+        {
+          "in": "query",
+          "name": "path",
+          "required": false,
+          "type": "string",
+          "description": "Directory path, chrooted to user's home dir."
+        },
+        {
+          "in": "query",
+          "name": "query",
+          "required": false,
+          "type": "string",
+          "description": "File name query."
+        },
+        {
+          "in": "query",
+          "name": "limit",
+          "required": false,
+          "type": "integer",
+          "description": "Files limit (0 disables it)."
+        },
+        {
+          "in": "query",
+          "name": "offset",
+          "required": false,
+          "type": "integer",
+          "description": "Files offset."
+        }
+      ],
+      "tags": [
+        "Filemanager"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/filemanager/list-archive",
+      "summary": "List archive contents.",
+      "description": "",
+      "params": [
+        {
+          "in": "query",
+          "name": "path",
+          "required": false,
+          "type": "string",
+          "description": "Archive path, chrooted to user's home dir."
+        },
+        {
+          "in": "query",
+          "name": "limit",
+          "required": false,
+          "type": "integer",
+          "description": "Files limit (0 disables it)."
+        }
+      ],
+      "tags": [
+        "Filemanager"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/filemanager/search-files",
+      "summary": "Search for files and directories",
+      "description": "",
+      "params": [
+        {
+          "in": "query",
+          "name": "path",
+          "required": false,
+          "type": "string",
+          "description": "Directory path from which to search, chrooted to user's home dir."
+        },
+        {
+          "in": "query",
+          "name": "query",
+          "required": true,
+          "type": "string",
+          "description": "Filename query."
+        },
+        {
+          "in": "query",
+          "name": "ignore-case",
+          "required": false,
+          "type": "boolean",
+          "description": "Make search case insensitive."
+        },
+        {
+          "in": "query",
+          "name": "limit",
+          "required": false,
+          "type": "integer",
+          "description": "Files limit (0 disables it)."
+        }
+      ],
+      "tags": [
+        "Filemanager"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/filemanager/search-text",
+      "summary": "Search for files containing given text",
+      "description": "",
+      "params": [
+        {
+          "in": "query",
+          "name": "path",
+          "required": false,
+          "type": "string",
+          "description": "Path from which to search, chrooted to user's home dir."
+        },
+        {
+          "in": "query",
+          "name": "query",
+          "required": true,
+          "type": "string",
+          "description": "Text to search for."
+        },
+        {
+          "in": "query",
+          "name": "binary",
+          "required": false,
+          "type": "boolean",
+          "description": "Search binary files."
+        },
+        {
+          "in": "query",
+          "name": "limit",
+          "required": false,
+          "type": "integer",
+          "description": "Files limit (0 disables it)."
+        },
+        {
+          "in": "query",
+          "name": "positions",
+          "required": false,
+          "type": "integer",
+          "description": "Positions limit per file (0 disables it)."
+        }
+      ],
+      "tags": [
+        "Filemanager"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/filemanager/trash",
+      "summary": "Get trashed items",
+      "description": "List trashed files and directories.",
+      "params": [],
+      "tags": [
+        "Filemanager"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/filemanager/tree",
+      "summary": "Directories tree.",
+      "description": "Get directories and symlinks pointing to directories tree.\nSymlinks that point to directories are not followed any further.\nDirectories marked with `incomplete` flag report that directory wasn't fully traversed, this could happen due to either `rooted` or `filelimit` query params.",
+      "params": [
+        {
+          "in": "query",
+          "name": "path",
+          "required": false,
+          "type": "string",
+          "description": "Directory path, chrooted to user's home dir."
+        },
+        {
+          "in": "query",
+          "name": "depth",
+          "required": false,
+          "type": "integer",
+          "description": "Tree depth limit (0 disables it)."
+        },
+        {
+          "in": "query",
+          "name": "filelimit",
+          "required": false,
+          "type": "integer",
+          "description": "Directory files limit: directories that exceed this limit are not traversed (0 disables it)."
+        },
+        {
+          "in": "query",
+          "name": "rooted",
+          "required": false,
+          "type": "boolean",
+          "description": "Return a full tree starting from root, with directories before path marked with `incomplete` flag."
+        }
+      ],
+      "tags": [
+        "Filemanager"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/git/domain/{domain}",
+      "summary": "Returns information about all the repositories under the user's domain",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "domain",
+          "required": true,
+          "type": "string",
+          "description": "Domain"
+        }
+      ],
+      "tags": [
+        "Git"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/git/domain/{domain}",
+      "summary": "Initializes a repository or clones a remote one",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "domain",
+          "required": true,
+          "type": "string",
+          "description": "Domain"
+        },
+        {
+          "in": "body",
+          "name": "payload",
+          "required": true,
+          "type": "object",
+          "description": "payload",
+          "ref": "#/definitions/web.gitCreateParameters"
+        }
+      ],
+      "tags": [
+        "Git"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/git/user/{username}/uuid/{uuid}/webhook",
+      "summary": "fetches and deploys repository",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "uuid",
+          "required": true,
+          "type": "string",
+          "description": "UUID"
+        },
+        {
+          "in": "path",
+          "name": "username",
+          "required": true,
+          "type": "string",
+          "description": "Username"
+        }
+      ],
+      "tags": [
+        "Git"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/git/uuid/{uuid}",
+      "summary": "Returns information about one repository under user domain",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "uuid",
+          "required": true,
+          "type": "string",
+          "description": "UUID"
+        }
+      ],
+      "tags": [
+        "Git"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/git/uuid/{uuid}",
+      "summary": "Updates repository settings",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "uuid",
+          "required": true,
+          "type": "string",
+          "description": "UUID"
+        },
+        {
+          "in": "body",
+          "name": "payload",
+          "required": true,
+          "type": "object",
+          "description": "payload",
+          "ref": "#/definitions/web.gitUpdateParameters"
+        }
+      ],
+      "tags": [
+        "Git"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/git/uuid/{uuid}",
+      "summary": "Removes repository",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "uuid",
+          "required": true,
+          "type": "string",
+          "description": "UUID"
+        }
+      ],
+      "tags": [
+        "Git"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/git/uuid/{uuid}/branch/{branch}",
+      "summary": "Returns repository's branch log history",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "uuid",
+          "required": true,
+          "type": "string",
+          "description": "UUID"
+        },
+        {
+          "in": "path",
+          "name": "branch",
+          "required": true,
+          "type": "string",
+          "description": "Branch"
+        },
+        {
+          "in": "query",
+          "name": "skip",
+          "required": false,
+          "type": "integer",
+          "description": "Skip N commits"
+        },
+        {
+          "in": "query",
+          "name": "limit",
+          "required": false,
+          "type": "integer",
+          "description": "Limit"
+        }
+      ],
+      "tags": [
+        "Git"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/git/uuid/{uuid}/commit/{commit}",
+      "summary": "Returns commit information",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "uuid",
+          "required": true,
+          "type": "string",
+          "description": "UUID"
+        },
+        {
+          "in": "path",
+          "name": "commit",
+          "required": true,
+          "type": "string",
+          "description": "commit"
+        }
+      ],
+      "tags": [
+        "Git"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/git/uuid/{uuid}/deploy",
+      "summary": "Deploys bare repository to a working tree",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "uuid",
+          "required": true,
+          "type": "string",
+          "description": "UUID"
+        }
+      ],
+      "tags": [
+        "Git"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/git/uuid/{uuid}/fetch",
+      "summary": "Fetches latest repository changes from the remote",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "uuid",
+          "required": true,
+          "type": "string",
+          "description": "UUID"
+        }
+      ],
+      "tags": [
+        "Git"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/global-resource-usage/history/{user}",
+      "summary": "Fetch historical metrics data",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "user",
+          "required": true,
+          "type": "string",
+          "description": "Username of the user to fetch"
+        },
+        {
+          "in": "query",
+          "name": "metric",
+          "required": false,
+          "type": "array",
+          "description": "Select which metrics to return. When empty will return all the available metrics."
+        },
+        {
+          "in": "query",
+          "name": "from",
+          "required": false,
+          "type": "string",
+          "description": "Time frame start"
+        },
+        {
+          "in": "query",
+          "name": "to",
+          "required": false,
+          "type": "string",
+          "description": "Time frame end (defaults to 1 day)"
+        },
+        {
+          "in": "query",
+          "name": "agg",
+          "required": false,
+          "type": "string",
+          "description": "Datapoint aggregation function"
+        },
+        {
+          "in": "query",
+          "name": "n",
+          "required": false,
+          "type": "integer",
+          "description": "Number of data points to return"
+        }
+      ],
+      "tags": [
+        "Resource metrics"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/global-resource-usage/latest",
+      "summary": "Get latest resource usage",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Resource metrics"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/imapsync/export",
+      "summary": "Export emails over IMAP from DirecTadmin server to external server",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "params",
+          "required": true,
+          "type": "object",
+          "description": "Export parameters",
+          "ref": "#/definitions/web.imapsyncExportRequest"
+        }
+      ],
+      "tags": [
+        "Imapsync"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/imapsync/import",
+      "summary": "Import emails over IMAP from external server to DirectAdmin server",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "params",
+          "required": true,
+          "type": "object",
+          "description": "Import parameters",
+          "ref": "#/definitions/web.imapsyncImportRequest"
+        }
+      ],
+      "tags": [
+        "Imapsync"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/imapsync/migrations",
+      "summary": "List all running imapsync migrations",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Imapsync"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/imapsync/migrations/{id}",
+      "summary": "Cancel imapsync migration",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "Migration ID"
+        }
+      ],
+      "tags": [
+        "Imapsync"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/info",
+      "summary": "Get basic server info",
+      "description": "Fetch basic server information.",
+      "params": [],
+      "tags": [
+        "Info"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/license",
+      "summary": "Get license info",
+      "description": "Get license info (admins only).",
+      "params": [],
+      "tags": [
+        "Licensing"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/license/proof",
+      "summary": "Get license session proof",
+      "description": "Generate license session proof for independent verification.",
+      "params": [],
+      "tags": [
+        "Licensing"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/license/update-key",
+      "summary": "Change license key",
+      "description": "Verify new license key is valid, switch to it and restart DirectAdmin.\nVerification is skipped if `force` is set to `true`.",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.licenseUpdateRequest"
+        }
+      ],
+      "tags": [
+        "Licensing"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/login",
+      "summary": "Create Login session",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "params",
+          "required": true,
+          "type": "object",
+          "description": "Authentication attributes",
+          "ref": "#/definitions/web.LoginRequest"
+        }
+      ],
+      "tags": [
+        "Session control"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/login-history",
+      "summary": "Get login history",
+      "description": "Get authenticated user's login history.",
+      "params": [],
+      "tags": [
+        "Users"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/login-keys/commands",
+      "summary": "Get all commands available for login keys",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Login keys"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/login-keys/keys",
+      "summary": "Get all login keys",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Login keys"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/login-keys/keys",
+      "summary": "Create login key",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.loginKeyCreateRequest"
+        }
+      ],
+      "tags": [
+        "Login keys"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/login-keys/keys/{id}",
+      "summary": "Get login key",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "Login key ID"
+        }
+      ],
+      "tags": [
+        "Login keys"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/login-keys/keys/{id}",
+      "summary": "Delete login key",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "Login key ID"
+        }
+      ],
+      "tags": [
+        "Login keys"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/login-keys/keys/{id}",
+      "summary": "Update login key",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "Login key ID"
+        },
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.loginKeyUpdateRequest"
+        }
+      ],
+      "tags": [
+        "Login keys"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/login-keys/keys/{id}/history",
+      "summary": "Get login key history",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "Login key ID"
+        }
+      ],
+      "tags": [
+        "Login keys"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/login-keys/urls",
+      "summary": "Get all login URLs",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Login keys"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/login-keys/urls",
+      "summary": "Create login URL",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.loginURLCreateRequest"
+        }
+      ],
+      "tags": [
+        "Login keys"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/login-keys/urls/{id}",
+      "summary": "Delete login URL",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "Login key ID"
+        }
+      ],
+      "tags": [
+        "Login keys"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/login/url",
+      "summary": "Create Login session using OTP",
+      "description": "Endpoint intended to handle login urls.",
+      "params": [
+        {
+          "in": "query",
+          "name": "key",
+          "required": true,
+          "type": "string",
+          "description": "One time password."
+        }
+      ],
+      "tags": [
+        "Session control"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/logout",
+      "summary": "Create Login session",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Session control"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/lost-password/confirm",
+      "summary": "Reset lost password",
+      "description": "Confirms password reset action. On success sends an email with a new password.",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request data",
+          "ref": "#/definitions/web.lostPasswordConfirmRequest"
+        }
+      ],
+      "tags": [
+        "lost password"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/lost-password/request",
+      "summary": "Request to reset account password",
+      "description": "Sends an email to the username with the link to reset password.",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request data",
+          "ref": "#/definitions/web.lostPasswordRequest"
+        }
+      ],
+      "tags": [
+        "lost password"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/maintenance",
+      "summary": "List maintenance tasks",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Maintenance"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/maintenance/{task}/check",
+      "summary": "run task checks",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "task",
+          "required": true,
+          "type": "string",
+          "description": "task to check"
+        }
+      ],
+      "tags": [
+        "Maintenance"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/maintenance/{task}/fix",
+      "summary": "run task automatic fix action",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "task",
+          "required": true,
+          "type": "string",
+          "description": "task to fix"
+        }
+      ],
+      "tags": [
+        "Maintenance"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/messages",
+      "summary": "Get messages list",
+      "description": "Fetch messages list.",
+      "params": [
+        {
+          "in": "query",
+          "name": "limit",
+          "required": false,
+          "type": "integer",
+          "description": "Limit"
+        },
+        {
+          "in": "query",
+          "name": "offset",
+          "required": false,
+          "type": "integer",
+          "description": "Offset"
+        }
+      ],
+      "tags": [
+        "Messages"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/messages/delete",
+      "summary": "Delete multiple messages",
+      "description": "Accepts a list of message IDs and removes them if they are present.",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "List if message IDs",
+          "ref": ""
+        }
+      ],
+      "tags": [
+        "Messages"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/messages/id/{id}",
+      "summary": "Read single message",
+      "description": "Returns contents and metadate for a single message. Returned message will be automatically marked it as read.",
+      "params": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "integer",
+          "description": "Message ID"
+        }
+      ],
+      "tags": [
+        "Messages"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/messages/list",
+      "summary": "List messages",
+      "description": "Returns a list of messages available for this user. Optional query paramaters allows iterating over full message list in pages.",
+      "params": [
+        {
+          "in": "query",
+          "name": "limit",
+          "required": false,
+          "type": "integer",
+          "description": "Maximum number of messages to return, value 0 disables the limit and returns all messages"
+        },
+        {
+          "in": "query",
+          "name": "offset",
+          "required": false,
+          "type": "integer",
+          "description": "Offset, number of messages to skip, can be used for results pagination"
+        },
+        {
+          "in": "query",
+          "name": "query",
+          "required": false,
+          "type": "string",
+          "description": "Show only messages that contain given string in subject or in message body"
+        }
+      ],
+      "tags": [
+        "Messages"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/messages/read",
+      "summary": "Mark multiple messages as read",
+      "description": "Accepts a list of message IDs and marks them as read if they are present.",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "List if message IDs",
+          "ref": ""
+        }
+      ],
+      "tags": [
+        "Messages"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/modsecurity-audit-log/entry",
+      "summary": "get unparsed log entry with the given refence",
+      "description": "",
+      "params": [
+        {
+          "in": "query",
+          "name": "reference",
+          "required": true,
+          "type": "string",
+          "description": "reference string provided by `web.auditEntry`"
+        }
+      ],
+      "tags": [
+        "Modsecurity"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/modsecurity-audit-log/summary",
+      "summary": "Read and parse modsecurity audit log",
+      "description": "",
+      "params": [
+        {
+          "in": "query",
+          "name": "lines",
+          "required": false,
+          "type": "integer",
+          "description": "Log lines limit"
+        },
+        {
+          "in": "query",
+          "name": "hostname",
+          "required": false,
+          "type": "string",
+          "description": "Domain or subdomain"
+        }
+      ],
+      "tags": [
+        "Modsecurity"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/modsecurity/all-configs",
+      "summary": "ModSecurity configuration for all domains and subdomains.",
+      "description": "This endpoint is only accessible for the administrator access level user accounts.",
+      "params": [],
+      "tags": [
+        "Modsecurity"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/modsecurity/configs/{hostname}",
+      "summary": "ModSecurity configuration for a single hostname (domain or subdomain).",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "hostname",
+          "required": true,
+          "type": "string",
+          "description": "Domain or subdomain."
+        }
+      ],
+      "tags": [
+        "Modsecurity"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/modsecurity/configs/{hostname}",
+      "summary": "Replace ModSecurity configuration for a single hostname (domain or subdomain).",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "hostname",
+          "required": true,
+          "type": "string",
+          "description": "Domain or subdomain."
+        },
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "New ModSecurity configuration",
+          "ref": "#/definitions/web.putModsecurityConfig.request"
+        }
+      ],
+      "tags": [
+        "Modsecurity"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/modsecurity/configs/{hostname}",
+      "summary": "Revert to default ModSecurity configuration for a single hostname (domain or subdomain).",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "hostname",
+          "required": true,
+          "type": "string",
+          "description": "Domain or subdomain."
+        }
+      ],
+      "tags": [
+        "Modsecurity"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/modsecurity/global-config",
+      "summary": "Global ModSecurity configuration.",
+      "description": "Global configuration is used by all virtual hosts that does not have an explicit ModSecurity configuration.\nThis endpoint is only accessible for the administrator access level user accounts.",
+      "params": [],
+      "tags": [
+        "Modsecurity"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/modsecurity/global-config",
+      "summary": "Replace global ModSecurity configuration.",
+      "description": "This endpoint is only accessible for the administrator access level user accounts.",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "New ModSecurity configuration",
+          "ref": "#/definitions/web.putModsecurityGlobalConfig.request"
+        }
+      ],
+      "tags": [
+        "Modsecurity"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/modsecurity/user-configs",
+      "summary": "ModSecurity configuration for user-owned domains and subdomains.",
+      "description": "",
+      "params": [
+        {
+          "in": "query",
+          "name": "domain",
+          "required": false,
+          "type": "string",
+          "description": "Limit results to a single domain and its subdomains."
+        }
+      ],
+      "tags": [
+        "Modsecurity"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/multi-factor-auth/disable",
+      "summary": "Disable two-step authentication",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Two-step authentication"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/multi-factor-auth/enable",
+      "summary": "Enable two-step authentication with OTP code",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "body",
+          "required": true,
+          "type": "object",
+          "description": "validation request fields",
+          "ref": "#/definitions/web.validateCodeRequest"
+        }
+      ],
+      "tags": [
+        "Two-step authentication"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/multi-factor-auth/otp/generate-secret",
+      "summary": "Generate new Time-based one-time password secret",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Two-step authentication"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/multi-factor-auth/recovery-codes",
+      "summary": "Show two-step authentication recovery codes",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Two-step authentication"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/multi-factor-auth/recovery-codes",
+      "summary": "Generate new two-step authentication recovery codes",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Two-step authentication"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/multi-factor-auth/settings",
+      "summary": "Update user twostep authentication settings",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "body",
+          "required": true,
+          "type": "object",
+          "description": "twostep authentication settings to change",
+          "ref": "#/definitions/web.totpModifySettings"
+        }
+      ],
+      "tags": [
+        "Two-step authentication"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/phpmyadmin-sso/account-access",
+      "summary": "Create PhpMyAdmin single sign-on URL for user account access.",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Database"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/phpmyadmin-sso/database-access/{database}",
+      "summary": "Create PhpMyAdmin single sign-on URL for single DB access.",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "database",
+          "required": true,
+          "type": "string",
+          "description": "Database name"
+        }
+      ],
+      "tags": [
+        "Database"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/plugin-manager/plugins",
+      "summary": "Gets info about all plugins",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Plugin manager"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/plugin-manager/plugins/install-file",
+      "summary": "Upload plugin from file",
+      "description": "",
+      "params": [
+        {
+          "in": "formData",
+          "name": "file",
+          "required": true,
+          "type": "file",
+          "description": "File needs to be in `.tar.gz` format. The name of the file may contain only the following symbols: letters (a-z, A-Z), digits (0-9), hyphens (-), and underscore"
+        },
+        {
+          "in": "formData",
+          "name": "password",
+          "required": false,
+          "type": "string",
+          "description": "User password. Required when using session based authentication"
+        }
+      ],
+      "tags": [
+        "Plugin manager"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/plugin-manager/plugins/install-url",
+      "summary": "Upload plugin from url",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.pluginManagerInstallUrlRequest"
+        }
+      ],
+      "tags": [
+        "Plugin manager"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/plugin-manager/plugins/{id}/activate",
+      "summary": "Sets active=yes in plugin.conf",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "plugin ID"
+        },
+        {
+          "in": "body",
+          "name": "body",
+          "required": true,
+          "type": "object",
+          "description": "User credentials, required when using session based authentication",
+          "ref": "#/definitions/web.pluginManagerRequest"
+        }
+      ],
+      "tags": [
+        "Plugin manager"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/plugin-manager/plugins/{id}/deactivate",
+      "summary": "Sets active=no in plugin.conf",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "plugin ID"
+        },
+        {
+          "in": "body",
+          "name": "body",
+          "required": true,
+          "type": "object",
+          "description": "User credentials, required when using session based authentication",
+          "ref": "#/definitions/web.pluginManagerRequest"
+        }
+      ],
+      "tags": [
+        "Plugin manager"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/plugin-manager/plugins/{id}/delete",
+      "summary": "Run plugin's uninstall script and remove plugin",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "plugin ID"
+        },
+        {
+          "in": "body",
+          "name": "body",
+          "required": true,
+          "type": "object",
+          "description": "User credentials, required when using session based authentication",
+          "ref": "#/definitions/web.pluginManagerRequest"
+        }
+      ],
+      "tags": [
+        "Plugin manager"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/plugin-manager/plugins/{id}/update",
+      "summary": "Uses url from `update_url` plugin.conf field to extract (replace) files and runs `update.sh` script",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "plugin ID"
+        },
+        {
+          "in": "body",
+          "name": "body",
+          "required": true,
+          "type": "object",
+          "description": "User credentials, required when using session based authentication",
+          "ref": "#/definitions/web.pluginManagerRequest"
+        }
+      ],
+      "tags": [
+        "Plugin manager"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/plugins/list",
+      "summary": "Get plugins list",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Plugins"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/profile/settings",
+      "summary": "Get user profile settings",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Profile"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/profile/settings",
+      "summary": "Patch user profile settings",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.profileRequest"
+        }
+      ],
+      "tags": [
+        "Profile"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/redis/disable",
+      "summary": "Disable/Stop Redis",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Redis"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/redis/enable",
+      "summary": "Enable/Start Redis",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Redis"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/redis/status",
+      "summary": "Get Redis status",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Redis"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/reseller-packages",
+      "summary": "Get reseller package list",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Reseller packages"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/reseller-packages/{package}",
+      "summary": "Get reseller package config",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "package",
+          "required": true,
+          "type": "string",
+          "description": "package name"
+        }
+      ],
+      "tags": [
+        "Reseller packages"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/resellers/{username}/config",
+      "summary": "Get reseller config",
+      "description": "This endpoint returns reseller configuration.",
+      "params": [
+        {
+          "in": "path",
+          "name": "username",
+          "required": true,
+          "type": "string",
+          "description": "Username of the user to fetch"
+        }
+      ],
+      "tags": [
+        "Resellers"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/resellers/{username}/usage",
+      "summary": "Get reseller and his users usage",
+      "description": "This endpoint returns combined reseller and his users resource usage and reseller limits.",
+      "params": [
+        {
+          "in": "path",
+          "name": "username",
+          "required": true,
+          "type": "string",
+          "description": "Username of the user to fetch"
+        }
+      ],
+      "tags": [
+        "Resellers"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/resource-usage/history",
+      "summary": "Fetch historical metrics data",
+      "description": "",
+      "params": [
+        {
+          "in": "query",
+          "name": "metric",
+          "required": false,
+          "type": "array",
+          "description": "Select which metrics to return. When empty will return all the available metrics."
+        },
+        {
+          "in": "query",
+          "name": "from",
+          "required": false,
+          "type": "string",
+          "description": "Time frame start"
+        },
+        {
+          "in": "query",
+          "name": "to",
+          "required": false,
+          "type": "string",
+          "description": "Time frame end (defaults to 1 day)"
+        },
+        {
+          "in": "query",
+          "name": "agg",
+          "required": false,
+          "type": "string",
+          "description": "Datapoint aggregation function"
+        },
+        {
+          "in": "query",
+          "name": "n",
+          "required": false,
+          "type": "integer",
+          "description": "Number of data points to return"
+        }
+      ],
+      "tags": [
+        "Resource metrics"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/resource-usage/latest",
+      "summary": "Get latest resource usage",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Resource metrics"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/restart",
+      "summary": "Restart Directadmin",
+      "description": "Calling this endpoint will make DirectAdmin web server to restart.",
+      "params": [],
+      "tags": [
+        "Misc"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/search/resources",
+      "summary": "Searches for single user account owned resources.",
+      "description": "query searches for user owned resources that contain query `q`",
+      "params": [
+        {
+          "in": "query",
+          "name": "q",
+          "required": false,
+          "type": "string",
+          "description": "query"
+        }
+      ],
+      "tags": [
+        "Backend search"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/search/users",
+      "summary": "List accessible users",
+      "description": "This endpoint returns a list of users this account can manage, results can be limited with a search query parameter.",
+      "params": [
+        {
+          "in": "query",
+          "name": "q",
+          "required": false,
+          "type": "string",
+          "description": "Search query"
+        },
+        {
+          "in": "query",
+          "name": "limit",
+          "required": false,
+          "type": "number",
+          "description": "Limit the amount of results to return"
+        }
+      ],
+      "tags": [
+        "Backend search"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/search/users-extended",
+      "summary": "Search for users",
+      "description": "This endpoint searches for user accounts that has a name or own a domain containing a search query `q`",
+      "params": [
+        {
+          "in": "query",
+          "name": "q",
+          "required": false,
+          "type": "string",
+          "description": "query"
+        },
+        {
+          "in": "query",
+          "name": "limit",
+          "required": false,
+          "type": "number",
+          "description": "Query limit"
+        }
+      ],
+      "tags": [
+        "Backend search"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/security-txt/status",
+      "summary": "Check security.txt",
+      "description": "",
+      "params": [],
+      "tags": [
+        "security.txt"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/server-settings/change-hostname",
+      "summary": "Change server hostname",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.changeHostnameRequest"
+        }
+      ],
+      "tags": [
+        "Server settings",
+        "Hostname"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/server-settings/db-config",
+      "summary": "Get database config",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Server settings",
+        "Database"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/server-settings/db-config",
+      "summary": "Set database config",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.dbConfig"
+        }
+      ],
+      "tags": [
+        "Server settings",
+        "Database"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/server-settings/db-config-test",
+      "summary": "Test database config",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.dbConfig"
+        }
+      ],
+      "tags": [
+        "Server settings",
+        "Database"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/server-settings/directadmin-conf/active",
+      "summary": "Get active DirectAdmin config",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Server settings",
+        "DirectAdmin config"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/server-settings/directadmin-conf/default",
+      "summary": "Get default DirectAdmin config",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Server settings",
+        "DirectAdmin config"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/server-settings/directadmin-conf/local",
+      "summary": "Get local DirectAdmin config",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Server settings",
+        "DirectAdmin config"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/server-settings/directadmin-conf/local",
+      "summary": "Replace local DirectAdmin config",
+      "description": "",
+      "params": [
+        {
+          "in": "query",
+          "name": "skip-unknown",
+          "required": false,
+          "type": "boolean",
+          "description": "Skip unknown fields"
+        },
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.daConfPartial"
+        }
+      ],
+      "tags": [
+        "Server settings",
+        "DirectAdmin config"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/server-settings/directadmin-conf/local",
+      "summary": "Patch local DirectAdmin config",
+      "description": "",
+      "params": [
+        {
+          "in": "query",
+          "name": "skip-unknown",
+          "required": false,
+          "type": "boolean",
+          "description": "Skip unknown fields"
+        },
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.daConfPartial"
+        }
+      ],
+      "tags": [
+        "Server settings",
+        "DirectAdmin config"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/server-settings/email/config",
+      "summary": "Get email settings",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Server settings"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/server-settings/email/config",
+      "summary": "Change email settings",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.emailSettings"
+        }
+      ],
+      "tags": [
+        "Server settings"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/server-settings/email/outbound-filter",
+      "summary": "Get outbound email blacklist",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Server settings"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/server-settings/email/outbound-filter",
+      "summary": "Change outbound email blacklist",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.emailBlacklists"
+        }
+      ],
+      "tags": [
+        "Server settings"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/server-settings/timezone/current",
+      "summary": "Get current timezone",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Server settings",
+        "Timezone"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/server-settings/timezone/list",
+      "summary": "List available timezones",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Server settings",
+        "Timezone"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/server-settings/timezone/set",
+      "summary": "Change server timezone",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.timezone"
+        }
+      ],
+      "tags": [
+        "Server settings",
+        "Timezone"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/server-tls/acme-config",
+      "summary": "Get main server's TLS ACME configuration",
+      "description": "",
+      "params": [],
+      "tags": [
+        "TLS"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/server-tls/acme-config",
+      "summary": "Set main server's TLS ACME configuration",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.acmeConfig"
+        }
+      ],
+      "tags": [
+        "TLS"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/server-tls/certificate",
+      "summary": "Get main server's TLS certificate",
+      "description": "",
+      "params": [],
+      "tags": [
+        "TLS"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/server-tls/enable",
+      "summary": "Enable SSL for main server",
+      "description": "Enables SSL and restarts main directadmin panel's server.",
+      "params": [
+        {
+          "in": "query",
+          "name": "force",
+          "required": false,
+          "type": "boolean",
+          "description": "Force enable SSL."
+        }
+      ],
+      "tags": [
+        "TLS"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/server-tls/files",
+      "summary": "Retrieve server TLS certificates",
+      "description": "",
+      "params": [],
+      "tags": [
+        "TLS"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/server-tls/files",
+      "summary": "Replace server TLS certificates",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "New key and certificate file contents",
+          "ref": "#/definitions/web.tlsFiles"
+        },
+        {
+          "in": "query",
+          "name": "force",
+          "required": false,
+          "type": "boolean",
+          "description": "Allow invalid tls certificate to be uploaded"
+        }
+      ],
+      "tags": [
+        "TLS"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/server-tls/obtain",
+      "summary": "Queues action to force obtain TLS certificate for main server",
+      "description": "",
+      "params": [],
+      "tags": [
+        "TLS"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/server-tls/status",
+      "summary": "Get main server's TLS certificate status",
+      "description": "",
+      "params": [],
+      "tags": [
+        "TLS"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/session",
+      "summary": "Get current session info",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Sessions"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/session/acme-dns-providers",
+      "summary": "Get ACME supported DNS providers",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Sessions"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/session/login-as/return",
+      "summary": "Drop out of Login-as session",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Session control"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/session/login-as/switch",
+      "summary": "Swich to a new session that impersonating another account",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "params",
+          "required": true,
+          "type": "object",
+          "description": "Authentication attributes",
+          "ref": "#/definitions/web.ImpersonateRequest"
+        }
+      ],
+      "tags": [
+        "Session control"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/session/login-as/user-list",
+      "summary": "Search for users when in login-as session",
+      "description": "query searches for user or domain that contains query `q`",
+      "params": [
+        {
+          "in": "query",
+          "name": "q",
+          "required": false,
+          "type": "string",
+          "description": "query"
+        },
+        {
+          "in": "query",
+          "name": "limit",
+          "required": false,
+          "type": "number",
+          "description": "Query limit"
+        }
+      ],
+      "tags": [
+        "User search"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/session/reseller-config",
+      "summary": "Get reseller config",
+      "description": "This endpoint returns reseller configuration. For non reseller accounts it will respond with 404 error.",
+      "params": [],
+      "tags": [
+        "Sessions"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/session/skin-customization/{skin}",
+      "summary": "Get list of active skin customizations",
+      "description": "Get list of active skin customizations.\nActive inherits creators' skin customizations per user basis, meaning if creator (e.g. reseller) has any customizations, admin customizations are ignored.",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/session/skin-customization/{skin}/images/favicon",
+      "summary": "Get skin favicon image",
+      "description": "Inherits creators' custom skin images per user basis, meaning if creator (e.g. reseller) has any customizations, admin customizations are ignored.",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/session/skin-customization/{skin}/images/logo",
+      "summary": "Get skin logo image",
+      "description": "Inherits creators' custom skin images per user basis, meaning if creator (e.g. reseller) has any customizations, admin customizations are ignored.",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/session/skin-customization/{skin}/images/logo2",
+      "summary": "Get skin logo2 image",
+      "description": "Inherits creators' custom skin images per user basis, meaning if creator (e.g. reseller) has any customizations, admin customizations are ignored.",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/session/skin-customization/{skin}/images/symbol",
+      "summary": "Get skin symbol image",
+      "description": "Inherits creators' custom skin images per user basis, meaning if creator (e.g. reseller) has any customizations, admin customizations are ignored.",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/session/skin-customization/{skin}/images/symbol2",
+      "summary": "Get skin symbol2 image",
+      "description": "Inherits creators' custom skin images per user basis, meaning if creator (e.g. reseller) has any customizations, admin customizations are ignored.",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/session/skin-customization/{skin}/menu",
+      "summary": "Get current user menu customizations",
+      "description": "Returns menu customizations applicable to the current user.\nIf user is a regular user, it will return the customizations of the reseller who created the user. If reseller has no customizations, the customizations of the admin who created the reseller are used.\nIf user is a reseller, it will return reseller's customizations (customizations made by the currently active user). If reseller doesn't hav",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/session/skin-customization/{skin}/{filename}",
+      "summary": "Download active skin customization file",
+      "description": "Download active skin customization file.\nActive inherits creators' skin customizations per user basis, meaning if creator (e.g. reseller) has any customizations, admin customizations are ignored.",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        },
+        {
+          "in": "path",
+          "name": "filename",
+          "required": true,
+          "type": "string",
+          "description": "Skin customization file name"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/session/state",
+      "summary": "Get server state",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Sessions"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/session/switch-active-domain",
+      "summary": "Switch active domain for current session",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "request",
+          "required": true,
+          "type": "object",
+          "description": "Request data.",
+          "ref": "#/definitions/web.sessionSelectDomainRequest"
+        }
+      ],
+      "tags": [
+        "Sessions"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/session/user-config",
+      "summary": "Current user config",
+      "description": "Returns current user config. Same as `/api/users/{user}/config` but limited to this session user.",
+      "params": [],
+      "tags": [
+        "Sessions"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/session/user-usage",
+      "summary": "Get user's usage",
+      "description": "Returns current user usage and limits. Same as `/api/users/{username}/usage` but limited to this session user.",
+      "params": [],
+      "tags": [
+        "Sessions"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/sessions",
+      "summary": "List active user sessions",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Sessions"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/sessions/destroy-all-other",
+      "summary": "Destroy all active sessions except current",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Sessions"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/sessions/destroy/{public_id}",
+      "summary": "Destroy an active session",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "public_id",
+          "required": true,
+          "type": "string",
+          "description": "Session's public ID."
+        }
+      ],
+      "tags": [
+        "Sessions"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/skin-customization/{skin}/creator",
+      "summary": "Get list of creator's skin customizations",
+      "description": "Get list of creator's skin customizations.\nAdmin & Reseller only.",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/skin-customization/{skin}/creator/{filename}",
+      "summary": "Download creator's skin customization file",
+      "description": "Download creator's skin customization file.\nAdmin & Reseller only.",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        },
+        {
+          "in": "path",
+          "name": "filename",
+          "required": true,
+          "type": "string",
+          "description": "Skin customization file name"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/skin-customization/{skin}/images",
+      "summary": "Delete custom skin images",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/skin-customization/{skin}/images/favicon",
+      "summary": "Upload custom skin favicon image",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        },
+        {
+          "in": "formData",
+          "name": "image",
+          "required": true,
+          "type": "file",
+          "description": "Custom skin image"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/skin-customization/{skin}/images/favicon",
+      "summary": "Delete custom skin favicon image",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/skin-customization/{skin}/images/logo",
+      "summary": "Upload custom skin logo image",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        },
+        {
+          "in": "formData",
+          "name": "image",
+          "required": true,
+          "type": "file",
+          "description": "Custom skin image"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/skin-customization/{skin}/images/logo",
+      "summary": "Delete custom skin logo image",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/skin-customization/{skin}/images/logo2",
+      "summary": "Upload custom skin logo2 image",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        },
+        {
+          "in": "formData",
+          "name": "image",
+          "required": true,
+          "type": "file",
+          "description": "Custom skin image"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/skin-customization/{skin}/images/logo2",
+      "summary": "Delete custom skin logo2 image",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/skin-customization/{skin}/images/symbol",
+      "summary": "Upload custom skin symbol image",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        },
+        {
+          "in": "formData",
+          "name": "image",
+          "required": true,
+          "type": "file",
+          "description": "Custom skin image"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/skin-customization/{skin}/images/symbol",
+      "summary": "Delete custom skin symbol image",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/skin-customization/{skin}/images/symbol2",
+      "summary": "Upload custom skin symbol2 image",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        },
+        {
+          "in": "formData",
+          "name": "image",
+          "required": true,
+          "type": "file",
+          "description": "Custom skin image"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/skin-customization/{skin}/images/symbol2",
+      "summary": "Delete custom skin symbol2 image",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/skin-customization/{skin}/local",
+      "summary": "Get list of my skin customizations",
+      "description": "Get list of my skin customizations.\nAdmin & Reseller only.",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/skin-customization/{skin}/local",
+      "summary": "Upload skin customization file (overwrites if exists)",
+      "description": "This endpoint allows uploading multiple skin customization files using standard multipart/form-data encoding.\nForm field names are ignored, only file-names associated with file upload is used when storing the file.\nAdmin & Reseller only.",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        },
+        {
+          "in": "formData",
+          "name": "*",
+          "required": true,
+          "type": "file",
+          "description": "Skin customization file"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/skin-customization/{skin}/local",
+      "summary": "Delete all skin customization files",
+      "description": "Delete all skin customization files.\nAdmin & Reseller only.",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/skin-customization/{skin}/local/{filename}",
+      "summary": "Download my skin customization file",
+      "description": "Download my skin customization file.\nAdmin & Reseller only.",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        },
+        {
+          "in": "path",
+          "name": "filename",
+          "required": true,
+          "type": "string",
+          "description": "Skin customization file name"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/skin-customization/{skin}/local/{filename}",
+      "summary": "Upload skin customization file (overwrites if exists)",
+      "description": "Upload skin customization file (overwrites if exists).\nAdmin & Reseller only.",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        },
+        {
+          "in": "path",
+          "name": "filename",
+          "required": true,
+          "type": "string",
+          "description": "Skin customization file name"
+        },
+        {
+          "in": "body",
+          "name": "body",
+          "required": true,
+          "type": "object",
+          "description": "Skin customization file binary",
+          "ref": ""
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/skin-customization/{skin}/local/{filename}",
+      "summary": "Delete skin customization file",
+      "description": "Delete skin customization file.\nAdmin & Reseller only.",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        },
+        {
+          "in": "path",
+          "name": "filename",
+          "required": true,
+          "type": "string",
+          "description": "Skin customization file name"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/skin-customization/{skin}/menu",
+      "summary": "Get menu customizations made by user",
+      "description": "Returns menu customizations made by the currently effective user.\nAdmin & Reseller only.",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/skin-customization/{skin}/menu",
+      "summary": "Replace menu customizations",
+      "description": "Replaces menu customizations file contents with the body of this request. If no customization file is yet present, it will create one.\nAdmin & Reseller only.",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        },
+        {
+          "in": "body",
+          "name": "body",
+          "required": true,
+          "type": "object",
+          "description": "Menu customizations",
+          "ref": "#/definitions/config.Menu"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/skin-customization/{skin}/menu",
+      "summary": "Delete menu customizations",
+      "description": "Delete menu customizations file.\nAdmin & Reseller only.",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/skin-customization/{skin}/metadata",
+      "summary": "Get metadata for customized skin categories",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        }
+      ],
+      "tags": [
+        "Skin customization"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/skin-global-options/{skin}",
+      "summary": "Get skin global options",
+      "description": "Accessible to anyone.\nEmpty json object is returned if skin does not exist, skin options do not exist or skin options are malformed.",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        }
+      ],
+      "tags": [
+        "Skin options"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/skin-global-options/{skin}",
+      "summary": "Update skin global options",
+      "description": "Admin-only.",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        },
+        {
+          "in": "body",
+          "name": "body",
+          "required": true,
+          "type": "object",
+          "description": "Skin global options",
+          "ref": ""
+        }
+      ],
+      "tags": [
+        "Skin options"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/skin-global-options/{skin}",
+      "summary": "Delete skin global options",
+      "description": "Admin-only.\nNon-existing skins' options can also be deleted.",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        }
+      ],
+      "tags": [
+        "Skin options"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/skin-global-options/{skin}",
+      "summary": "Patch skin global options",
+      "description": "Admin-only. Follows RFC7396.",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        },
+        {
+          "in": "body",
+          "name": "body",
+          "required": true,
+          "type": "object",
+          "description": "Skin global options patch",
+          "ref": ""
+        }
+      ],
+      "tags": [
+        "Skin options"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/skin-options/{skin}",
+      "summary": "Get skin user options",
+      "description": "Skin options are user specific skin customizations.\nEach user can have its own options saved.\nEmpty json object is returned if demo is enabled, skin does not exist, skin options do not exist or skin options are malformed.",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        }
+      ],
+      "tags": [
+        "Skin options"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/skin-options/{skin}",
+      "summary": "Update skin user options",
+      "description": "This endpoint allows user to update his skin options for a given skin.",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        },
+        {
+          "in": "body",
+          "name": "body",
+          "required": true,
+          "type": "object",
+          "description": "Skin user options",
+          "ref": ""
+        }
+      ],
+      "tags": [
+        "Skin options"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/skin-options/{skin}",
+      "summary": "Delete skin user options",
+      "description": "This endpoint allows user specific skin options to be removed.\nGetting skin options after removal will return empty object.",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        }
+      ],
+      "tags": [
+        "Skin options"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/skin-options/{skin}",
+      "summary": "Patch skin user options",
+      "description": "Follows RFC7396.",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        },
+        {
+          "in": "body",
+          "name": "body",
+          "required": true,
+          "type": "object",
+          "description": "Skin user options patch",
+          "ref": ""
+        }
+      ],
+      "tags": [
+        "Skin options"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/skin-translation/{skin}/{lang}",
+      "summary": "Skin translations by a language code",
+      "description": "Get main skin translations merged with custom translations in JSON format following vue-gettext PO to JSON conversion rules.",
+      "params": [
+        {
+          "in": "path",
+          "name": "skin",
+          "required": true,
+          "type": "string",
+          "description": "Skin's name"
+        },
+        {
+          "in": "path",
+          "name": "lang",
+          "required": true,
+          "type": "string",
+          "description": "Language code"
+        }
+      ],
+      "tags": [
+        "Skin translations"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/system-info/cpu",
+      "summary": "Get system CPU",
+      "description": "Report server's CPU information.\nCan be disabled per user in `user.conf` with `sysinfo` field or adjusted globally in `directadmin.conf` with `cpu_in_system_info` field (`0` - disabled, `1` - count only, `2` - show all).",
+      "params": [],
+      "tags": [
+        "Info"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/system-info/fs",
+      "summary": "Get file system space usage",
+      "description": "Can be disabled per user in `user.conf` with `sysinfo` field or globally in `directadmin.conf` with `disk_in_system_info` field.",
+      "params": [],
+      "tags": [
+        "Info"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/system-info/load",
+      "summary": "Get system load",
+      "description": "Report server's last 1, 5 and 10 minutes loads.\nCan be disabled per user in `user.conf` with `sysinfo` field or globally in `directadmin.conf` with `load_in_system_info` field.",
+      "params": [],
+      "tags": [
+        "Info"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/system-info/memory",
+      "summary": "Get system memory",
+      "description": "Report server's memory information.\nCan be disabled per user in `user.conf` with `sysinfo` field or globally in `directadmin.conf` with `ram_in_system_info` field.",
+      "params": [],
+      "tags": [
+        "Info"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/system-info/services",
+      "summary": "Get system services",
+      "description": "Return server's used and running services information.\nCan be disabled per user in `user.conf` with `sysinfo` field.",
+      "params": [],
+      "tags": [
+        "Info"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/system-info/uptime",
+      "summary": "Get system uptime",
+      "description": "Report server's uptime.\nCan be disabled per user in `user.conf` with `sysinfo` field.",
+      "params": [],
+      "tags": [
+        "Info"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/system-packages/history",
+      "summary": "Get system package manager history",
+      "description": "",
+      "params": [],
+      "tags": [
+        "System Update"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/system-packages/history/{id}/log",
+      "summary": "Get system package manager history",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "id from systemupgrades.Transaction"
+        }
+      ],
+      "tags": [
+        "System Update"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/system-packages/history/{id}/sse",
+      "summary": "Get system package manager history",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "id from systemupgrades.Transaction"
+        }
+      ],
+      "tags": [
+        "System Update"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/system-packages/update-run",
+      "summary": "Start system packages upgrade task",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "args",
+          "required": true,
+          "type": "object",
+          "description": "request arguments",
+          "ref": "#/definitions/web.startSystemUpdateHandler.request"
+        }
+      ],
+      "tags": [
+        "System Update"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/system-packages/update-test",
+      "summary": "Simulate system package upgrade showing which packages will get updated, installed or removed",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "args",
+          "required": true,
+          "type": "object",
+          "description": "request arguments",
+          "ref": "#/definitions/web.testSystemUpdateHandler.request"
+        }
+      ],
+      "tags": [
+        "System Update"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/system-packages/updates",
+      "summary": "Fetch available system package upgrades",
+      "description": "",
+      "params": [],
+      "tags": [
+        "System Update"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/system-services-actions/service/{service}/reload",
+      "summary": "Reload system service",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "service",
+          "required": true,
+          "type": "string",
+          "description": "service name"
+        }
+      ],
+      "tags": [
+        "system services"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/system-services-actions/service/{service}/restart",
+      "summary": "Restart system service",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "service",
+          "required": true,
+          "type": "string",
+          "description": "service name"
+        }
+      ],
+      "tags": [
+        "system services"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/system-services-actions/service/{service}/start",
+      "summary": "Start system service",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "service",
+          "required": true,
+          "type": "string",
+          "description": "service name"
+        }
+      ],
+      "tags": [
+        "system services"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/system-services-actions/service/{service}/stop",
+      "summary": "Stop system service",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "service",
+          "required": true,
+          "type": "string",
+          "description": "service name"
+        }
+      ],
+      "tags": [
+        "system services"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/system-services-actions/service/{service}/watchdog",
+      "summary": "Toggle service watchdog",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "service",
+          "required": true,
+          "type": "string",
+          "description": "service name"
+        },
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.systemServicesPutWatchdog.request"
+        }
+      ],
+      "tags": [
+        "system services"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/system-services/list",
+      "summary": "Get services list",
+      "description": "",
+      "params": [],
+      "tags": [
+        "system services"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/system-services/service/{service}",
+      "summary": "Get service properties",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "service",
+          "required": true,
+          "type": "string",
+          "description": "service name"
+        }
+      ],
+      "tags": [
+        "system services"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/system-services/service/{service}/log",
+      "summary": "System service log",
+      "description": "Returns logs for a single system service, by default latest log messages are returned. Older messages can be retrieved by adding currsor paramter or by setting message time filters.",
+      "params": [
+        {
+          "in": "path",
+          "name": "service",
+          "required": true,
+          "type": "string",
+          "description": "service name"
+        },
+        {
+          "in": "query",
+          "name": "cursor",
+          "required": false,
+          "type": "string",
+          "description": "load more log entries"
+        },
+        {
+          "in": "query",
+          "name": "from",
+          "required": false,
+          "type": "string",
+          "description": "filter messages by time, return only messages logged at this timestamp or later"
+        },
+        {
+          "in": "query",
+          "name": "to",
+          "required": false,
+          "type": "string",
+          "description": "filter messages by time, return only messages logged at this timestamp or earlier"
+        },
+        {
+          "in": "query",
+          "name": "level",
+          "required": false,
+          "type": "array",
+          "description": "filter messages by log level, only messages in this log level will be returned, can be used multiple times to include messages from multiple levels"
+        },
+        {
+          "in": "query",
+          "name": "limit",
+          "required": false,
+          "type": "integer",
+          "description": "number of log entries to return"
+        }
+      ],
+      "tags": [
+        "system services"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/terminal",
+      "summary": "WebSocket endpoint to start new web terminal session",
+      "description": "Once connected it starts a new shell in a virtual terminal and emulates terminal communications over the WebSocket messages.",
+      "params": [
+        {
+          "in": "query",
+          "name": "cols",
+          "required": false,
+          "type": "string",
+          "description": "Number of columns for the initial terminal size, 80 by default"
+        },
+        {
+          "in": "query",
+          "name": "rows",
+          "required": false,
+          "type": "string",
+          "description": "Number of rows for the initial terminal size, 24 by default"
+        }
+      ],
+      "tags": [
+        "Xterm"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/ticket-requests",
+      "summary": "Get ticket requests list",
+      "description": "Fetch ticket requests list, i.e., tickets we created.",
+      "params": [
+        {
+          "in": "query",
+          "name": "limit",
+          "required": false,
+          "type": "integer",
+          "description": "Limit"
+        },
+        {
+          "in": "query",
+          "name": "offset",
+          "required": false,
+          "type": "integer",
+          "description": "Offset"
+        }
+      ],
+      "tags": [
+        "Tickets"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/tickets",
+      "summary": "Get received tickets list",
+      "description": "Fetch received tickets list (admin & reseller only).",
+      "params": [
+        {
+          "in": "query",
+          "name": "limit",
+          "required": false,
+          "type": "integer",
+          "description": "Limit"
+        },
+        {
+          "in": "query",
+          "name": "offset",
+          "required": false,
+          "type": "integer",
+          "description": "Offset"
+        }
+      ],
+      "tags": [
+        "Tickets"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/users/{username}/config",
+      "summary": "Get user config",
+      "description": "Get user config as is.\nNegative values for fields suffixed with `Lim` indicate no limit.",
+      "params": [
+        {
+          "in": "path",
+          "name": "username",
+          "required": true,
+          "type": "string",
+          "description": "Username of the user to fetch"
+        }
+      ],
+      "tags": [
+        "Users"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/users/{username}/login-history",
+      "summary": "Get user's login history",
+      "description": "Get user's login history (read-only).",
+      "params": [
+        {
+          "in": "path",
+          "name": "username",
+          "required": true,
+          "type": "string",
+          "description": "Username of the user to fetch"
+        }
+      ],
+      "tags": [
+        "Users"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/users/{username}/usage",
+      "summary": "Get user's usage",
+      "description": "Get user's usage and limits (read-only).",
+      "params": [
+        {
+          "in": "path",
+          "name": "username",
+          "required": true,
+          "type": "string",
+          "description": "Username of the user to fetch"
+        }
+      ],
+      "tags": [
+        "Users"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/version",
+      "summary": "Get versions info",
+      "description": "Get Directadmin versions info (admins only).",
+      "params": [],
+      "tags": [
+        "Versioning"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/version",
+      "summary": "Change update channel",
+      "description": "Change Directadmin update channel (admins only).",
+      "params": [
+        {
+          "in": "body",
+          "name": "Body",
+          "required": true,
+          "type": "object",
+          "description": "Update data.",
+          "ref": "#/definitions/web.versionRequest"
+        }
+      ],
+      "tags": [
+        "Versioning"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/version/update",
+      "summary": "Update Directadmin",
+      "description": "Start Directadmin update process (admins only).",
+      "params": [],
+      "tags": [
+        "Versioning"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/web-protect/add-dir",
+      "summary": "Protect a directory",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.webprotectAddDir.request"
+        }
+      ],
+      "tags": [
+        "Web Protect"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/web-protect/dirs/{id}",
+      "summary": "Get web protected directory",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "Directory ID"
+        }
+      ],
+      "tags": [
+        "Web Protect"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/web-protect/dirs/{id}",
+      "summary": "Remove web protected directory",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "Directory ID"
+        }
+      ],
+      "tags": [
+        "Web Protect"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/web-protect/dirs/{id}/delete-users",
+      "summary": "Delete web protected directory users",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "Directory ID"
+        },
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.webprotectDeleteUsers.request"
+        }
+      ],
+      "tags": [
+        "Web Protect"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/web-protect/dirs/{id}/update-realm",
+      "summary": "Update web protected directory realm",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "Directory ID"
+        },
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.webprotectUpdateRealm.request"
+        }
+      ],
+      "tags": [
+        "Web Protect"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/web-protect/dirs/{id}/update-user",
+      "summary": "Update web protected directory user",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "description": "Directory ID"
+        },
+        {
+          "in": "body",
+          "name": "data",
+          "required": true,
+          "type": "object",
+          "description": "Request Data",
+          "ref": "#/definitions/web.webprotectUpdateUser.request"
+        }
+      ],
+      "tags": [
+        "Web Protect"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/web-protect/list",
+      "summary": "List of web protect directories",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Web Protect"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/widgets/list",
+      "summary": "Get widgets list",
+      "description": "",
+      "params": [],
+      "tags": [
+        "Widgets"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/wordpress/install",
+      "summary": "Performs new wordpress installation in a given location",
+      "description": "",
+      "params": [
+        {
+          "in": "body",
+          "name": "payload",
+          "required": true,
+          "type": "object",
+          "description": "New wordpress installation configuration",
+          "ref": "#/definitions/web.wordpressInstallRequest"
+        }
+      ],
+      "tags": [
+        "WordPress"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/wordpress/install-quick",
+      "summary": "Performs quick new wordpress installation in a given location",
+      "description": "Quick install variant creates a new database.",
+      "params": [
+        {
+          "in": "body",
+          "name": "payload",
+          "required": true,
+          "type": "object",
+          "description": "New wordpress installation configuration",
+          "ref": "#/definitions/web.wordpressInstallQuickRequest"
+        }
+      ],
+      "tags": [
+        "WordPress"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/wordpress/locations",
+      "summary": "Returns list of known wordpress installations and potential installation locations.",
+      "description": "",
+      "params": [
+        {
+          "in": "query",
+          "name": "domain",
+          "required": false,
+          "type": "string",
+          "description": "Filter locations by domain name, sub-domains are not accepted"
+        }
+      ],
+      "tags": [
+        "WordPress"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/wordpress/locations/{location_id}",
+      "summary": "Remove wordpress installation.",
+      "description": "This endpoint will remove all DB tables and wordpress files, but database account and database will not be removed.",
+      "params": [
+        {
+          "in": "path",
+          "name": "location_id",
+          "required": true,
+          "type": "string",
+          "description": "WordPress location ID"
+        }
+      ],
+      "tags": [
+        "WordPress"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/wordpress/locations/{location_id}/config",
+      "summary": "Retrieve wordpress database configuration for a single installation.",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "location_id",
+          "required": true,
+          "type": "string",
+          "description": "WordPress location ID"
+        }
+      ],
+      "tags": [
+        "WordPress"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/wordpress/locations/{location_id}/config",
+      "summary": "Change wordpress database configuration for a single installation.",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "location_id",
+          "required": true,
+          "type": "string",
+          "description": "WordPress location ID"
+        },
+        {
+          "in": "body",
+          "name": "payload",
+          "required": true,
+          "type": "object",
+          "description": "New configuration",
+          "ref": "#/definitions/web.wordpressConfig"
+        }
+      ],
+      "tags": [
+        "WordPress"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/wordpress/locations/{location_id}/config/auto-update",
+      "summary": "Change wordpress core auto update state.",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "location_id",
+          "required": true,
+          "type": "string",
+          "description": "WordPress location ID"
+        },
+        {
+          "in": "body",
+          "name": "payload",
+          "required": true,
+          "type": "object",
+          "description": "New configuration",
+          "ref": "#/definitions/web.wordpressUpdateState"
+        }
+      ],
+      "tags": [
+        "WordPress"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/wordpress/locations/{location_id}/options",
+      "summary": "Retrieve all wordpress options for a single installation.",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "location_id",
+          "required": true,
+          "type": "string",
+          "description": "WordPress location ID"
+        }
+      ],
+      "tags": [
+        "WordPress"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/wordpress/locations/{location_id}/options",
+      "summary": "Change wordpress options for a given installation.",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "location_id",
+          "required": true,
+          "type": "string",
+          "description": "WordPress location ID"
+        },
+        {
+          "in": "body",
+          "name": "payload",
+          "required": true,
+          "type": "object",
+          "description": "Set of options to change, nil value deletes option",
+          "ref": ""
+        }
+      ],
+      "tags": [
+        "WordPress"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/wordpress/locations/{location_id}/users",
+      "summary": "Retrieve all wordpress user accounts",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "location_id",
+          "required": true,
+          "type": "string",
+          "description": "WordPress location ID"
+        }
+      ],
+      "tags": [
+        "WordPress"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/wordpress/locations/{location_id}/users/{user_id}/change-password",
+      "summary": "Change wordpress user account password",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "location_id",
+          "required": true,
+          "type": "string",
+          "description": "WordPress location ID"
+        },
+        {
+          "in": "path",
+          "name": "user_id",
+          "required": true,
+          "type": "integer",
+          "description": "User ID"
+        },
+        {
+          "in": "body",
+          "name": "payload",
+          "required": true,
+          "type": "object",
+          "description": "payload",
+          "ref": "#/definitions/web.wordpressUserPassword"
+        }
+      ],
+      "tags": [
+        "WordPress"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/wordpress/locations/{location_id}/users/{user_id}/sso-login",
+      "summary": "Create magic login URL.",
+      "description": "This endpoint will create a magic login link for specified user .",
+      "params": [
+        {
+          "in": "path",
+          "name": "location_id",
+          "required": true,
+          "type": "string",
+          "description": "WordPress location ID"
+        },
+        {
+          "in": "path",
+          "name": "user_id",
+          "required": true,
+          "type": "integer",
+          "description": "User ID"
+        }
+      ],
+      "tags": [
+        "WordPress"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/wordpress/locations/{location_id}/wordpress",
+      "summary": "Retrieve information about a single WordPress installation",
+      "description": "",
+      "params": [
+        {
+          "in": "path",
+          "name": "location_id",
+          "required": true,
+          "type": "string",
+          "description": "WordPress location ID"
+        }
+      ],
+      "tags": [
+        "WordPress"
+      ]
+    }
+  ]
+}

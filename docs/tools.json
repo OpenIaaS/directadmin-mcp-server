@@ -1,0 +1,1695 @@
+{
+  "count": 273,
+  "modules": {
+    "accounts": [
+      {
+        "name": "users_list_all",
+        "module": "accounts",
+        "summary": "List every user on the server (admin).",
+        "destructive": false
+      },
+      {
+        "name": "users_list",
+        "module": "accounts",
+        "summary": "List users owned by the current reseller, or by `reseller` if given.",
+        "destructive": false
+      },
+      {
+        "name": "resellers_list",
+        "module": "accounts",
+        "summary": "List all reseller accounts.",
+        "destructive": false
+      },
+      {
+        "name": "admins_list",
+        "module": "accounts",
+        "summary": "List all admin accounts.",
+        "destructive": false
+      },
+      {
+        "name": "users_search",
+        "module": "accounts",
+        "summary": "Search users via the New API.",
+        "destructive": false
+      },
+      {
+        "name": "users_get_config",
+        "module": "accounts",
+        "summary": "Get user.conf style configuration (limits, domains, suspended flag).",
+        "destructive": false
+      },
+      {
+        "name": "users_get_usage",
+        "module": "accounts",
+        "summary": "Get live usage + limits for a user.",
+        "destructive": false
+      },
+      {
+        "name": "users_login_history",
+        "module": "accounts",
+        "summary": "Login history for a specific user.",
+        "destructive": false
+      },
+      {
+        "name": "resellers_get_config",
+        "module": "accounts",
+        "summary": "Reseller configuration.",
+        "destructive": false
+      },
+      {
+        "name": "resellers_get_usage",
+        "module": "accounts",
+        "summary": "Combined reseller + owned-users usage.",
+        "destructive": false
+      },
+      {
+        "name": "users_create",
+        "module": "accounts",
+        "summary": "Create a user from a package (legacy CMD_API_ACCOUNT_USER).",
+        "destructive": true
+      },
+      {
+        "name": "resellers_create",
+        "module": "accounts",
+        "summary": "Create a reseller from a reseller package.",
+        "destructive": true
+      },
+      {
+        "name": "users_delete",
+        "module": "accounts",
+        "summary": "Permanently delete a user/reseller/admin account.",
+        "destructive": true
+      },
+      {
+        "name": "users_suspend",
+        "module": "accounts",
+        "summary": "Toggle suspend/unsuspend for an account (DirectAdmin toggle).",
+        "destructive": true
+      },
+      {
+        "name": "users_change_password",
+        "module": "accounts",
+        "summary": "Change another account's password (admin).",
+        "destructive": true
+      },
+      {
+        "name": "users_change_creator",
+        "module": "accounts",
+        "summary": "Move a user to a different reseller/creator.",
+        "destructive": true
+      },
+      {
+        "name": "users_convert_to_reseller",
+        "module": "accounts",
+        "summary": "Promote a user account to reseller.",
+        "destructive": true
+      },
+      {
+        "name": "resellers_convert_to_user",
+        "module": "accounts",
+        "summary": "Demote a reseller to a regular user.",
+        "destructive": true
+      },
+      {
+        "name": "admin_usage",
+        "module": "accounts",
+        "summary": "Current admin's resource usage.",
+        "destructive": false
+      },
+      {
+        "name": "users_exists",
+        "module": "accounts",
+        "summary": "Check whether an account name already exists (admin).",
+        "destructive": false
+      },
+      {
+        "name": "users_unsuspend",
+        "module": "accounts",
+        "summary": "Unsuspend an account (same toggle endpoint as users_suspend).",
+        "destructive": true
+      },
+      {
+        "name": "users_modify",
+        "module": "accounts",
+        "summary": "Customize limits on an existing user (CMD_API_MODIFY_USER).",
+        "destructive": true
+      },
+      {
+        "name": "admins_create",
+        "module": "accounts",
+        "summary": "Create another admin account.",
+        "destructive": true
+      }
+    ],
+    "backups": [
+      {
+        "name": "backups_admin_list",
+        "module": "backups",
+        "summary": "List admin-level backups / backup settings.",
+        "destructive": false
+      },
+      {
+        "name": "backups_create",
+        "module": "backups",
+        "summary": "Create a backup for one user.",
+        "destructive": true
+      },
+      {
+        "name": "backups_restore",
+        "module": "backups",
+        "summary": "Restore a user from a local backup file.",
+        "destructive": true
+      },
+      {
+        "name": "backups_admin_now",
+        "module": "backups",
+        "summary": "Kick an admin-level backup now.",
+        "destructive": false
+      }
+    ],
+    "brute_force": [
+      {
+        "name": "bfm_list",
+        "module": "brute_force",
+        "summary": "List Brute Force Monitor state (blocked IPs, failed logins).",
+        "destructive": false
+      },
+      {
+        "name": "bfm_unblock_ip",
+        "module": "brute_force",
+        "summary": "Remove an IP from DirectAdmin Brute Force Monitor blocks.",
+        "destructive": true
+      },
+      {
+        "name": "bfm_skip_ip",
+        "module": "brute_force",
+        "summary": "Add an IP to the BFM skip / never-block list.",
+        "destructive": false
+      },
+      {
+        "name": "firewall_unblock_everywhere",
+        "module": "brute_force",
+        "summary": "Unblock an IP in CSF *and* DirectAdmin Brute Force Monitor.",
+        "destructive": true
+      }
+    ],
+    "catalog": [
+      {
+        "name": "da_list_endpoints",
+        "module": "catalog",
+        "summary": "List New API operations bundled with this server (from official swagger).",
+        "destructive": false
+      },
+      {
+        "name": "da_describe_endpoint",
+        "module": "catalog",
+        "summary": "Show parameters for one New API operation.",
+        "destructive": false
+      },
+      {
+        "name": "da_api",
+        "module": "catalog",
+        "summary": "Call any documented DirectAdmin New API endpoint.",
+        "destructive": false
+      },
+      {
+        "name": "da_legacy",
+        "module": "catalog",
+        "summary": "Call a legacy CMD_API_* / CMD_* endpoint.",
+        "destructive": false
+      },
+      {
+        "name": "da_ping",
+        "module": "catalog",
+        "summary": "Connectivity check \u2014 hits /api/version.",
+        "destructive": false
+      }
+    ],
+    "csf_firewall": [
+      {
+        "name": "csf_search_ip",
+        "module": "csf_firewall",
+        "summary": "Search CSF/iptables/LFD for an IP (csf -g). Shows why it is blocked.",
+        "destructive": false
+      },
+      {
+        "name": "csf_unblock_ip",
+        "module": "csf_firewall",
+        "summary": "Unblock an IP in CSF/LFD (permanent deny + temporary ban).",
+        "destructive": true
+      },
+      {
+        "name": "csf_allow_ip",
+        "module": "csf_firewall",
+        "summary": "Whitelist an IP in CSF (csf -a / temporary allow).",
+        "destructive": true
+      },
+      {
+        "name": "csf_deny_ip",
+        "module": "csf_firewall",
+        "summary": "Block an IP in CSF (csf -d / temporary deny).",
+        "destructive": true
+      },
+      {
+        "name": "csf_ignore_ip",
+        "module": "csf_firewall",
+        "summary": "Add an IP to csf.ignore so LFD never blocks it.",
+        "destructive": true
+      },
+      {
+        "name": "csf_remove_allow",
+        "module": "csf_firewall",
+        "summary": "Remove an IP from the CSF allow list (csf -ar).",
+        "destructive": true
+      },
+      {
+        "name": "csf_flush_temp",
+        "module": "csf_firewall",
+        "summary": "Flush all CSF temporary allow/deny rules (csf -tf).",
+        "destructive": true
+      },
+      {
+        "name": "csf_restart",
+        "module": "csf_firewall",
+        "summary": "Restart CSF, and optionally LFD.",
+        "destructive": true
+      },
+      {
+        "name": "csf_enable",
+        "module": "csf_firewall",
+        "summary": "Enable CSF (csf -e).",
+        "destructive": false
+      },
+      {
+        "name": "csf_disable",
+        "module": "csf_firewall",
+        "summary": "Disable CSF (csf -x). Dangerous \u2014 the host is unprotected until re-enabled.",
+        "destructive": true
+      },
+      {
+        "name": "csf_status",
+        "module": "csf_firewall",
+        "summary": "Best-effort CSF plugin landing / status page (HTML or structured).",
+        "destructive": false
+      }
+    ],
+    "custombuild": [
+      {
+        "name": "cb_state",
+        "module": "custombuild",
+        "summary": "CustomBuild current state.",
+        "destructive": false
+      },
+      {
+        "name": "cb_software",
+        "module": "custombuild",
+        "summary": "Installed / available software.",
+        "destructive": false
+      },
+      {
+        "name": "cb_versions",
+        "module": "custombuild",
+        "summary": "Component versions.",
+        "destructive": false
+      },
+      {
+        "name": "cb_updates",
+        "module": "custombuild",
+        "summary": "Available CustomBuild updates.",
+        "destructive": false
+      },
+      {
+        "name": "cb_options",
+        "module": "custombuild",
+        "summary": "CustomBuild options (options.conf).",
+        "destructive": false
+      },
+      {
+        "name": "cb_options_update",
+        "module": "custombuild",
+        "summary": "Patch CustomBuild options.",
+        "destructive": false
+      },
+      {
+        "name": "cb_run",
+        "module": "custombuild",
+        "summary": "Start a CustomBuild run (build / update / rewrite).",
+        "destructive": false
+      },
+      {
+        "name": "cb_kill",
+        "module": "custombuild",
+        "summary": "Kill a running CustomBuild job.",
+        "destructive": true
+      },
+      {
+        "name": "cb_logs",
+        "module": "custombuild",
+        "summary": "CustomBuild log names.",
+        "destructive": false
+      },
+      {
+        "name": "cb_actions",
+        "module": "custombuild",
+        "summary": "Available CustomBuild actions.",
+        "destructive": false
+      },
+      {
+        "name": "cb_removals",
+        "module": "custombuild",
+        "summary": "Software CustomBuild can remove.",
+        "destructive": false
+      }
+    ],
+    "databases": [
+      {
+        "name": "db_info",
+        "module": "databases",
+        "summary": "Database server info.",
+        "destructive": false
+      },
+      {
+        "name": "db_list",
+        "module": "databases",
+        "summary": "List databases visible to the current/impersonated account.",
+        "destructive": false
+      },
+      {
+        "name": "db_get",
+        "module": "databases",
+        "summary": "Details for one database.",
+        "destructive": false
+      },
+      {
+        "name": "db_users",
+        "module": "databases",
+        "summary": "List database users.",
+        "destructive": false
+      },
+      {
+        "name": "db_user_get",
+        "module": "databases",
+        "summary": "One database user.",
+        "destructive": false
+      },
+      {
+        "name": "db_create",
+        "module": "databases",
+        "summary": "Create a database.",
+        "destructive": true
+      },
+      {
+        "name": "db_create_with_user",
+        "module": "databases",
+        "summary": "Create a database and a user in one call.",
+        "destructive": true
+      },
+      {
+        "name": "db_create_user",
+        "module": "databases",
+        "summary": "Create a database user.",
+        "destructive": true
+      },
+      {
+        "name": "db_delete",
+        "module": "databases",
+        "summary": "Drop a database.",
+        "destructive": true
+      },
+      {
+        "name": "db_delete_user",
+        "module": "databases",
+        "summary": "Drop a database user.",
+        "destructive": true
+      },
+      {
+        "name": "db_change_user_password",
+        "module": "databases",
+        "summary": "Change a database user password.",
+        "destructive": true
+      },
+      {
+        "name": "db_repair",
+        "module": "databases",
+        "summary": "Repair a database.",
+        "destructive": false
+      },
+      {
+        "name": "db_optimize",
+        "module": "databases",
+        "summary": "Optimize a database.",
+        "destructive": false
+      },
+      {
+        "name": "db_check",
+        "module": "databases",
+        "summary": "Check a database.",
+        "destructive": false
+      },
+      {
+        "name": "db_processes",
+        "module": "databases",
+        "summary": "Show process list (admin).",
+        "destructive": false
+      },
+      {
+        "name": "db_kill_process",
+        "module": "databases",
+        "summary": "Kill a database process.",
+        "destructive": true
+      }
+    ],
+    "dns_admin": [
+      {
+        "name": "dns_admin_list",
+        "module": "dns_admin",
+        "summary": "List DNS zones (admin).",
+        "destructive": false
+      },
+      {
+        "name": "dns_zone_get",
+        "module": "dns_admin",
+        "summary": "Get records for a zone.",
+        "destructive": false
+      },
+      {
+        "name": "dns_record_add",
+        "module": "dns_admin",
+        "summary": "Add a DNS record.",
+        "destructive": false
+      },
+      {
+        "name": "dns_record_delete",
+        "module": "dns_admin",
+        "summary": "Delete a DNS record.",
+        "destructive": true
+      }
+    ],
+    "domains": [
+      {
+        "name": "domains_list_user",
+        "module": "domains",
+        "summary": "List domains owned by a user (admin) or the current account.",
+        "destructive": false
+      },
+      {
+        "name": "domains_create",
+        "module": "domains",
+        "summary": "Create an additional domain on the current (or impersonated) user.",
+        "destructive": true
+      },
+      {
+        "name": "domains_delete",
+        "module": "domains",
+        "summary": "Delete a domain from an account.",
+        "destructive": true
+      },
+      {
+        "name": "subdomains_list",
+        "module": "domains",
+        "summary": "List subdomains of a domain.",
+        "destructive": false
+      },
+      {
+        "name": "subdomains_create",
+        "module": "domains",
+        "summary": "Create a subdomain.",
+        "destructive": true
+      },
+      {
+        "name": "subdomains_delete",
+        "module": "domains",
+        "summary": "Delete a subdomain.",
+        "destructive": true
+      },
+      {
+        "name": "domain_pointers_list",
+        "module": "domains",
+        "summary": "List domain pointers (aliases) for a domain.",
+        "destructive": false
+      },
+      {
+        "name": "domain_pointers_create",
+        "module": "domains",
+        "summary": "Add a domain pointer / alias.",
+        "destructive": true
+      },
+      {
+        "name": "domain_pointers_delete",
+        "module": "domains",
+        "summary": "Remove a domain pointer.",
+        "destructive": true
+      },
+      {
+        "name": "redirects_list",
+        "module": "domains",
+        "summary": "List site redirects for a domain.",
+        "destructive": false
+      },
+      {
+        "name": "redirects_create",
+        "module": "domains",
+        "summary": "Create a site redirect.",
+        "destructive": true
+      }
+    ],
+    "email": [
+      {
+        "name": "email_logs",
+        "module": "email",
+        "summary": "Global email logs (admin).",
+        "destructive": false
+      },
+      {
+        "name": "email_logs_summary",
+        "module": "email",
+        "summary": "Email log summary.",
+        "destructive": false
+      },
+      {
+        "name": "email_logs_user",
+        "module": "email",
+        "summary": "Current/impersonated user email logs.",
+        "destructive": false
+      },
+      {
+        "name": "email_vacation_list",
+        "module": "email",
+        "summary": "Vacation / autoresponder list for a domain.",
+        "destructive": false
+      },
+      {
+        "name": "email_vacation_get",
+        "module": "email",
+        "summary": "One vacation message.",
+        "destructive": false
+      },
+      {
+        "name": "email_vacation_set",
+        "module": "email",
+        "summary": "Create/update a vacation message.",
+        "destructive": false
+      },
+      {
+        "name": "email_vacation_delete",
+        "module": "email",
+        "summary": "Delete a vacation message.",
+        "destructive": true
+      },
+      {
+        "name": "email_mobileconfig",
+        "module": "email",
+        "summary": "Apple mobileconfig for the current email account.",
+        "destructive": false
+      },
+      {
+        "name": "imapsync_migrations",
+        "module": "email",
+        "summary": "IMAP migration tasks.",
+        "destructive": false
+      }
+    ],
+    "filemanager": [
+      {
+        "name": "fm_list",
+        "module": "filemanager",
+        "summary": "List a directory.",
+        "destructive": false
+      },
+      {
+        "name": "fm_tree",
+        "module": "filemanager",
+        "summary": "Directory tree.",
+        "destructive": false
+      },
+      {
+        "name": "fm_disk_usage",
+        "module": "filemanager",
+        "summary": "Disk usage for a path.",
+        "destructive": false
+      },
+      {
+        "name": "fm_search_files",
+        "module": "filemanager",
+        "summary": "Search file names.",
+        "destructive": false
+      },
+      {
+        "name": "fm_search_text",
+        "module": "filemanager",
+        "summary": "Search file contents.",
+        "destructive": false
+      },
+      {
+        "name": "fm_mkdir",
+        "module": "filemanager",
+        "summary": "Create a directory.",
+        "destructive": false
+      },
+      {
+        "name": "fm_remove",
+        "module": "filemanager",
+        "summary": "Move paths to trash (or delete, depending on panel settings).",
+        "destructive": true
+      },
+      {
+        "name": "fm_move",
+        "module": "filemanager",
+        "summary": "Move files.",
+        "destructive": false
+      },
+      {
+        "name": "fm_copy",
+        "module": "filemanager",
+        "summary": "Copy files.",
+        "destructive": false
+      },
+      {
+        "name": "fm_chmod",
+        "module": "filemanager",
+        "summary": "Change permissions.",
+        "destructive": false
+      },
+      {
+        "name": "fm_trash",
+        "module": "filemanager",
+        "summary": "List trash.",
+        "destructive": false
+      }
+    ],
+    "git_deploy": [
+      {
+        "name": "git_list",
+        "module": "git_deploy",
+        "summary": "List git applications on a domain.",
+        "destructive": false
+      },
+      {
+        "name": "git_get",
+        "module": "git_deploy",
+        "summary": "One git application.",
+        "destructive": false
+      },
+      {
+        "name": "git_deploy",
+        "module": "git_deploy",
+        "summary": "Trigger a git deploy.",
+        "destructive": false
+      },
+      {
+        "name": "git_fetch",
+        "module": "git_deploy",
+        "summary": "Fetch remotes for a git application.",
+        "destructive": false
+      }
+    ],
+    "hosting": [
+      {
+        "name": "ftp_list",
+        "module": "hosting",
+        "summary": "List FTP accounts for a domain.",
+        "destructive": false
+      },
+      {
+        "name": "ftp_create",
+        "module": "hosting",
+        "summary": "Create an FTP account.",
+        "destructive": true
+      },
+      {
+        "name": "ftp_delete",
+        "module": "hosting",
+        "summary": "Delete an FTP account.",
+        "destructive": true
+      },
+      {
+        "name": "cron_list",
+        "module": "hosting",
+        "summary": "List cron jobs for the current (or impersonated) user.",
+        "destructive": false
+      },
+      {
+        "name": "cron_create",
+        "module": "hosting",
+        "summary": "Create a cron job.",
+        "destructive": true
+      },
+      {
+        "name": "cron_delete",
+        "module": "hosting",
+        "summary": "Delete a cron job by its panel id / select key.",
+        "destructive": true
+      },
+      {
+        "name": "domains_set_php",
+        "module": "hosting",
+        "summary": "Set the PHP version selector for a domain.",
+        "destructive": false
+      }
+    ],
+    "ip_manager": [
+      {
+        "name": "ips_list",
+        "module": "ip_manager",
+        "summary": "List IPs visible to this reseller/admin.",
+        "destructive": false
+      },
+      {
+        "name": "ips_get",
+        "module": "ip_manager",
+        "summary": "Details for one IP.",
+        "destructive": false
+      },
+      {
+        "name": "ips_admin_list",
+        "module": "ip_manager",
+        "summary": "Admin-level IP list (CMD_API_IP_MANAGER).",
+        "destructive": false
+      },
+      {
+        "name": "ips_add",
+        "module": "ip_manager",
+        "summary": "Add an IP to the admin IP manager.",
+        "destructive": false
+      },
+      {
+        "name": "ips_remove",
+        "module": "ip_manager",
+        "summary": "Remove an IP from the admin IP manager.",
+        "destructive": true
+      },
+      {
+        "name": "ips_assign",
+        "module": "ip_manager",
+        "summary": "Assign an IP to a reseller/user.",
+        "destructive": true
+      }
+    ],
+    "login_keys": [
+      {
+        "name": "login_keys_list",
+        "module": "login_keys",
+        "summary": "List login keys on the current account.",
+        "destructive": false
+      },
+      {
+        "name": "login_keys_commands",
+        "module": "login_keys",
+        "summary": "Commands a login key can be restricted to.",
+        "destructive": false
+      },
+      {
+        "name": "login_keys_get",
+        "module": "login_keys",
+        "summary": "Get one login key.",
+        "destructive": false
+      },
+      {
+        "name": "login_keys_history",
+        "module": "login_keys",
+        "summary": "Usage history for a login key.",
+        "destructive": false
+      },
+      {
+        "name": "login_keys_create",
+        "module": "login_keys",
+        "summary": "Create a login key. Prefer IP-restricted, command-restricted keys.",
+        "destructive": true
+      },
+      {
+        "name": "login_keys_update",
+        "module": "login_keys",
+        "summary": "Update a login key.",
+        "destructive": false
+      },
+      {
+        "name": "login_keys_delete",
+        "module": "login_keys",
+        "summary": "Delete a login key.",
+        "destructive": true
+      },
+      {
+        "name": "login_urls_list",
+        "module": "login_keys",
+        "summary": "List one-time / login-as URLs.",
+        "destructive": false
+      },
+      {
+        "name": "login_urls_create",
+        "module": "login_keys",
+        "summary": "Create a login URL.",
+        "destructive": true
+      },
+      {
+        "name": "login_urls_delete",
+        "module": "login_keys",
+        "summary": "Delete a login URL.",
+        "destructive": true
+      },
+      {
+        "name": "login_url_one_shot",
+        "module": "login_keys",
+        "summary": "Create a one-shot panel login URL (POST /api/login/url).",
+        "destructive": false
+      }
+    ],
+    "mailboxes": [
+      {
+        "name": "email_pop_list",
+        "module": "mailboxes",
+        "summary": "List POP/IMAP accounts on a domain.",
+        "destructive": false
+      },
+      {
+        "name": "email_pop_create",
+        "module": "mailboxes",
+        "summary": "Create a mailbox (user@domain).",
+        "destructive": true
+      },
+      {
+        "name": "email_pop_delete",
+        "module": "mailboxes",
+        "summary": "Delete a mailbox.",
+        "destructive": true
+      },
+      {
+        "name": "email_pop_modify",
+        "module": "mailboxes",
+        "summary": "Change mailbox password and/or quota.",
+        "destructive": true
+      },
+      {
+        "name": "email_forwarders_list",
+        "module": "mailboxes",
+        "summary": "List forwarders on a domain.",
+        "destructive": false
+      },
+      {
+        "name": "email_forwarder_create",
+        "module": "mailboxes",
+        "summary": "Create an email forwarder.",
+        "destructive": true
+      },
+      {
+        "name": "email_forwarder_delete",
+        "module": "mailboxes",
+        "summary": "Delete a forwarder.",
+        "destructive": true
+      },
+      {
+        "name": "email_autoresponders_list",
+        "module": "mailboxes",
+        "summary": "List autoresponders on a domain.",
+        "destructive": false
+      }
+    ],
+    "packages": [
+      {
+        "name": "packages_user_list",
+        "module": "packages",
+        "summary": "List user packages, or show one package.",
+        "destructive": false
+      },
+      {
+        "name": "packages_reseller_list",
+        "module": "packages",
+        "summary": "List reseller packages (legacy), or one package.",
+        "destructive": false
+      },
+      {
+        "name": "packages_reseller_new_api",
+        "module": "packages",
+        "summary": "Reseller packages via the New API.",
+        "destructive": false
+      },
+      {
+        "name": "packages_user_delete",
+        "module": "packages",
+        "summary": "Delete a user package.",
+        "destructive": true
+      },
+      {
+        "name": "packages_user_save",
+        "module": "packages",
+        "summary": "Create or overwrite a user package.",
+        "destructive": false
+      }
+    ],
+    "plugins": [
+      {
+        "name": "plugins_list",
+        "module": "plugins",
+        "summary": "Installed plugins (user-facing list).",
+        "destructive": false
+      },
+      {
+        "name": "plugins_manager_list",
+        "module": "plugins",
+        "summary": "Plugin manager inventory (admin).",
+        "destructive": false
+      },
+      {
+        "name": "plugins_install_url",
+        "module": "plugins",
+        "summary": "Install a plugin from a URL.",
+        "destructive": false
+      },
+      {
+        "name": "plugins_activate",
+        "module": "plugins",
+        "summary": "Activate a plugin.",
+        "destructive": false
+      },
+      {
+        "name": "plugins_deactivate",
+        "module": "plugins",
+        "summary": "Deactivate a plugin.",
+        "destructive": false
+      },
+      {
+        "name": "plugins_update",
+        "module": "plugins",
+        "summary": "Update a plugin from its update_url.",
+        "destructive": false
+      },
+      {
+        "name": "plugins_delete",
+        "module": "plugins",
+        "summary": "Uninstall a plugin.",
+        "destructive": true
+      }
+    ],
+    "search": [
+      {
+        "name": "search_resources",
+        "module": "search",
+        "summary": "Search panel resources (domains, dbs, emails, \u2026).",
+        "destructive": false
+      },
+      {
+        "name": "widgets_list",
+        "module": "search",
+        "summary": "Dashboard widgets.",
+        "destructive": false
+      },
+      {
+        "name": "cpanel_import_tasks",
+        "module": "search",
+        "summary": "cPanel import tasks.",
+        "destructive": false
+      },
+      {
+        "name": "cpanel_import_check_remote",
+        "module": "search",
+        "summary": "Check a remote cPanel server before import.",
+        "destructive": false
+      },
+      {
+        "name": "phpmyadmin_sso",
+        "module": "search",
+        "summary": "Create a phpMyAdmin SSO session.",
+        "destructive": false
+      }
+    ],
+    "security_center": [
+      {
+        "name": "mfa_enable",
+        "module": "security_center",
+        "summary": "Enable multi-factor authentication on the current account.",
+        "destructive": false
+      },
+      {
+        "name": "mfa_disable",
+        "module": "security_center",
+        "summary": "Disable MFA.",
+        "destructive": true
+      },
+      {
+        "name": "mfa_generate_secret",
+        "module": "security_center",
+        "summary": "Generate a new TOTP secret (enrolment).",
+        "destructive": false
+      },
+      {
+        "name": "mfa_recovery_codes",
+        "module": "security_center",
+        "summary": "List MFA recovery codes.",
+        "destructive": false
+      },
+      {
+        "name": "security_txt_status",
+        "module": "security_center",
+        "summary": "security.txt status.",
+        "destructive": false
+      },
+      {
+        "name": "modsecurity_global",
+        "module": "security_center",
+        "summary": "Global ModSecurity configuration.",
+        "destructive": false
+      },
+      {
+        "name": "modsecurity_global_update",
+        "module": "security_center",
+        "summary": "Update global ModSecurity configuration.",
+        "destructive": false
+      },
+      {
+        "name": "modsecurity_all_configs",
+        "module": "security_center",
+        "summary": "All ModSecurity per-host configs.",
+        "destructive": false
+      },
+      {
+        "name": "modsecurity_user_configs",
+        "module": "security_center",
+        "summary": "Current user's ModSecurity configs.",
+        "destructive": false
+      },
+      {
+        "name": "modsecurity_host_config",
+        "module": "security_center",
+        "summary": "ModSecurity config for one hostname.",
+        "destructive": false
+      },
+      {
+        "name": "modsecurity_audit_summary",
+        "module": "security_center",
+        "summary": "ModSecurity audit log summary.",
+        "destructive": false
+      },
+      {
+        "name": "modsecurity_audit_entry",
+        "module": "security_center",
+        "summary": "One ModSecurity audit entry.",
+        "destructive": false
+      },
+      {
+        "name": "clamav_status",
+        "module": "security_center",
+        "summary": "ClamAV status / start a scan (GET).",
+        "destructive": false
+      },
+      {
+        "name": "clamav_scan",
+        "module": "security_center",
+        "summary": "Start a ClamAV scan.",
+        "destructive": false
+      },
+      {
+        "name": "clamav_kill",
+        "module": "security_center",
+        "summary": "Kill a running ClamAV scan.",
+        "destructive": true
+      },
+      {
+        "name": "redis_status",
+        "module": "security_center",
+        "summary": "Per-user Redis status.",
+        "destructive": false
+      },
+      {
+        "name": "redis_enable",
+        "module": "security_center",
+        "summary": "Enable Redis for the current/impersonated user.",
+        "destructive": false
+      },
+      {
+        "name": "redis_disable",
+        "module": "security_center",
+        "summary": "Disable Redis.",
+        "destructive": true
+      },
+      {
+        "name": "web_protect_list",
+        "module": "security_center",
+        "summary": "Directory password-protection list.",
+        "destructive": false
+      }
+    ],
+    "server_settings": [
+      {
+        "name": "hostname_change",
+        "module": "server_settings",
+        "summary": "Change the server hostname.",
+        "destructive": true
+      },
+      {
+        "name": "da_config_active",
+        "module": "server_settings",
+        "summary": "Currently applied directadmin.conf (merged).",
+        "destructive": false
+      },
+      {
+        "name": "da_config_default",
+        "module": "server_settings",
+        "summary": "Default directadmin.conf values.",
+        "destructive": false
+      },
+      {
+        "name": "da_config_local",
+        "module": "server_settings",
+        "summary": "Local overrides in directadmin.conf.",
+        "destructive": false
+      },
+      {
+        "name": "da_config_local_update",
+        "module": "server_settings",
+        "summary": "Replace local directadmin.conf overrides (PUT).",
+        "destructive": false
+      },
+      {
+        "name": "da_config_local_patch",
+        "module": "server_settings",
+        "summary": "Patch selected directadmin.conf keys.",
+        "destructive": false
+      },
+      {
+        "name": "timezone_current",
+        "module": "server_settings",
+        "summary": "Current server timezone.",
+        "destructive": false
+      },
+      {
+        "name": "timezone_list",
+        "module": "server_settings",
+        "summary": "Available timezones.",
+        "destructive": false
+      },
+      {
+        "name": "timezone_set",
+        "module": "server_settings",
+        "summary": "Set server timezone.",
+        "destructive": false
+      },
+      {
+        "name": "email_server_config",
+        "module": "server_settings",
+        "summary": "Global email / exim configuration.",
+        "destructive": false
+      },
+      {
+        "name": "email_server_config_update",
+        "module": "server_settings",
+        "summary": "Update global email configuration.",
+        "destructive": false
+      },
+      {
+        "name": "email_outbound_filter",
+        "module": "server_settings",
+        "summary": "Outbound email filter settings.",
+        "destructive": false
+      },
+      {
+        "name": "email_outbound_filter_update",
+        "module": "server_settings",
+        "summary": "Update outbound email filter.",
+        "destructive": false
+      },
+      {
+        "name": "db_server_config",
+        "module": "server_settings",
+        "summary": "SQL server connection settings used by the panel.",
+        "destructive": false
+      },
+      {
+        "name": "db_server_config_update",
+        "module": "server_settings",
+        "summary": "Update SQL server settings.",
+        "destructive": false
+      },
+      {
+        "name": "db_server_config_test",
+        "module": "server_settings",
+        "summary": "Test the configured SQL connection.",
+        "destructive": false
+      }
+    ],
+    "services": [
+      {
+        "name": "services_list",
+        "module": "services",
+        "summary": "List managed services (httpd, exim, dovecot, named, \u2026).",
+        "destructive": false
+      },
+      {
+        "name": "services_get",
+        "module": "services",
+        "summary": "Details for one service.",
+        "destructive": false
+      },
+      {
+        "name": "services_logs",
+        "module": "services",
+        "summary": "Read a service log.",
+        "destructive": false
+      },
+      {
+        "name": "services_start",
+        "module": "services",
+        "summary": "Start a service.",
+        "destructive": false
+      },
+      {
+        "name": "services_stop",
+        "module": "services",
+        "summary": "Stop a service.",
+        "destructive": true
+      },
+      {
+        "name": "services_restart",
+        "module": "services",
+        "summary": "Restart a service.",
+        "destructive": true
+      },
+      {
+        "name": "services_reload",
+        "module": "services",
+        "summary": "Reload a service configuration.",
+        "destructive": false
+      },
+      {
+        "name": "services_watchdog",
+        "module": "services",
+        "summary": "Toggle the service watchdog.",
+        "destructive": false
+      }
+    ],
+    "sessions": [
+      {
+        "name": "session_get",
+        "module": "sessions",
+        "summary": "Current session (who am I, level, selected domain).",
+        "destructive": false
+      },
+      {
+        "name": "session_state",
+        "module": "sessions",
+        "summary": "Session UI state.",
+        "destructive": false
+      },
+      {
+        "name": "session_user_config",
+        "module": "sessions",
+        "summary": "Current account user.conf.",
+        "destructive": false
+      },
+      {
+        "name": "session_user_usage",
+        "module": "sessions",
+        "summary": "Current account usage.",
+        "destructive": false
+      },
+      {
+        "name": "session_reseller_config",
+        "module": "sessions",
+        "summary": "Current reseller config (when logged in as reseller/admin).",
+        "destructive": false
+      },
+      {
+        "name": "session_switch_domain",
+        "module": "sessions",
+        "summary": "Switch the active domain in the session.",
+        "destructive": false
+      },
+      {
+        "name": "session_login_as",
+        "module": "sessions",
+        "summary": "Switch the session into another account (login-as).",
+        "destructive": false
+      },
+      {
+        "name": "session_login_as_return",
+        "module": "sessions",
+        "summary": "Leave a login-as session and return to the admin.",
+        "destructive": false
+      },
+      {
+        "name": "session_login_as_users",
+        "module": "sessions",
+        "summary": "Search users available for login-as.",
+        "destructive": false
+      },
+      {
+        "name": "sessions_list",
+        "module": "sessions",
+        "summary": "List active sessions for this account.",
+        "destructive": false
+      },
+      {
+        "name": "sessions_destroy",
+        "module": "sessions",
+        "summary": "Destroy one other session.",
+        "destructive": true
+      },
+      {
+        "name": "sessions_destroy_all_other",
+        "module": "sessions",
+        "summary": "Destroy every other session (force logout everywhere else).",
+        "destructive": true
+      },
+      {
+        "name": "login_history",
+        "module": "sessions",
+        "summary": "Current account login history.",
+        "destructive": false
+      },
+      {
+        "name": "profile_settings",
+        "module": "sessions",
+        "summary": "Current profile settings.",
+        "destructive": false
+      },
+      {
+        "name": "profile_settings_update",
+        "module": "sessions",
+        "summary": "Patch profile settings.",
+        "destructive": false
+      },
+      {
+        "name": "messages_list",
+        "module": "sessions",
+        "summary": "Message center list.",
+        "destructive": false
+      },
+      {
+        "name": "messages_get",
+        "module": "sessions",
+        "summary": "Read one message.",
+        "destructive": false
+      },
+      {
+        "name": "tickets_list",
+        "module": "sessions",
+        "summary": "Support tickets.",
+        "destructive": false
+      },
+      {
+        "name": "ticket_requests",
+        "module": "sessions",
+        "summary": "Ticket requests queue.",
+        "destructive": false
+      }
+    ],
+    "ssl_certs": [
+      {
+        "name": "ssl_list_domain_certs",
+        "module": "ssl_certs",
+        "summary": "List TLS certificates installed on a user domain.",
+        "destructive": false
+      },
+      {
+        "name": "ssl_get_domain_acme_config",
+        "module": "ssl_certs",
+        "summary": "Read ACME (Let's Encrypt / ZeroSSL) configuration for a domain.",
+        "destructive": false
+      },
+      {
+        "name": "ssl_set_domain_acme_config",
+        "module": "ssl_certs",
+        "summary": "Update ACME settings for a domain before issuing or reissuing a cert.",
+        "destructive": false
+      },
+      {
+        "name": "ssl_reissue_domain",
+        "module": "ssl_certs",
+        "summary": "Reissue / provision the Let's Encrypt (or configured ACME) certificate for a domain.",
+        "destructive": true
+      },
+      {
+        "name": "ssl_reissue_domain_legacy",
+        "module": "ssl_certs",
+        "summary": "Fallback Let's Encrypt request via legacy CMD_API_SSL (older DirectAdmin).",
+        "destructive": true
+      },
+      {
+        "name": "ssl_delete_domain_cert",
+        "module": "ssl_certs",
+        "summary": "Delete one certificate from a domain.",
+        "destructive": true
+      },
+      {
+        "name": "ssl_get_cert_files",
+        "module": "ssl_certs",
+        "summary": "Download certificate + chain + key files for a domain cert id.",
+        "destructive": false
+      },
+      {
+        "name": "ssl_upload_cert_files",
+        "module": "ssl_certs",
+        "summary": "Replace a domain certificate with uploaded PEM files.",
+        "destructive": true
+      },
+      {
+        "name": "ssl_create_csr",
+        "module": "ssl_certs",
+        "summary": "Create a CSR for a domain certificate slot (commercial CA flow).",
+        "destructive": true
+      },
+      {
+        "name": "ssl_install_self_signed",
+        "module": "ssl_certs",
+        "summary": "Install a self-signed certificate on a domain (lab / placeholder only).",
+        "destructive": false
+      },
+      {
+        "name": "ssl_server_status",
+        "module": "ssl_certs",
+        "summary": "Hostname / DirectAdmin service TLS status (not a user domain).",
+        "destructive": false
+      },
+      {
+        "name": "ssl_server_certificate",
+        "module": "ssl_certs",
+        "summary": "Read the current hostname certificate metadata.",
+        "destructive": false
+      },
+      {
+        "name": "ssl_server_acme_config",
+        "module": "ssl_certs",
+        "summary": "Read ACME configuration used for the server hostname certificate.",
+        "destructive": false
+      },
+      {
+        "name": "ssl_set_server_acme_config",
+        "module": "ssl_certs",
+        "summary": "Update ACME settings for the DirectAdmin hostname certificate.",
+        "destructive": false
+      },
+      {
+        "name": "ssl_reissue_server",
+        "module": "ssl_certs",
+        "summary": "Force-obtain / reissue the DirectAdmin hostname TLS certificate.",
+        "destructive": true
+      },
+      {
+        "name": "ssl_server_enable",
+        "module": "ssl_certs",
+        "summary": "Enable TLS on the DirectAdmin service itself.",
+        "destructive": false
+      },
+      {
+        "name": "ssl_server_files",
+        "module": "ssl_certs",
+        "summary": "Download the hostname certificate and key (secret).",
+        "destructive": false
+      },
+      {
+        "name": "ssl_server_upload_files",
+        "module": "ssl_certs",
+        "summary": "Replace the hostname certificate with uploaded PEM files.",
+        "destructive": true
+      },
+      {
+        "name": "ssl_acme_dns_providers",
+        "module": "ssl_certs",
+        "summary": "List ACME DNS-01 providers the panel knows about (Cloudflare, \u2026).",
+        "destructive": false
+      }
+    ],
+    "system": [
+      {
+        "name": "system_info",
+        "module": "system",
+        "summary": "High-level panel info (/api/info).",
+        "destructive": false
+      },
+      {
+        "name": "system_version",
+        "module": "system",
+        "summary": "DirectAdmin version and update channel.",
+        "destructive": false
+      },
+      {
+        "name": "system_set_update_channel",
+        "module": "system",
+        "summary": "Change the DirectAdmin update channel.",
+        "destructive": false
+      },
+      {
+        "name": "system_update_directadmin",
+        "module": "system",
+        "summary": "Update DirectAdmin itself to the latest build on the current channel.",
+        "destructive": false
+      },
+      {
+        "name": "system_restart_directadmin",
+        "module": "system",
+        "summary": "Restart the DirectAdmin service.",
+        "destructive": true
+      },
+      {
+        "name": "system_cpu",
+        "module": "system",
+        "summary": "CPU information.",
+        "destructive": false
+      },
+      {
+        "name": "system_memory",
+        "module": "system",
+        "summary": "Memory information.",
+        "destructive": false
+      },
+      {
+        "name": "system_load",
+        "module": "system",
+        "summary": "1/5/10 minute load averages.",
+        "destructive": false
+      },
+      {
+        "name": "system_disk",
+        "module": "system",
+        "summary": "Filesystem usage.",
+        "destructive": false
+      },
+      {
+        "name": "system_uptime",
+        "module": "system",
+        "summary": "Host uptime.",
+        "destructive": false
+      },
+      {
+        "name": "system_services_overview",
+        "module": "system",
+        "summary": "Services occupancy snapshot (not the systemd list).",
+        "destructive": false
+      },
+      {
+        "name": "system_resource_usage_latest",
+        "module": "system",
+        "summary": "Latest per-user resource usage snapshot.",
+        "destructive": false
+      },
+      {
+        "name": "system_resource_usage_history",
+        "module": "system",
+        "summary": "Historical resource usage.",
+        "destructive": false
+      },
+      {
+        "name": "system_global_usage_latest",
+        "module": "system",
+        "summary": "Latest global resource usage.",
+        "destructive": false
+      },
+      {
+        "name": "system_global_usage_history",
+        "module": "system",
+        "summary": "Global resource usage history for one user.",
+        "destructive": false
+      },
+      {
+        "name": "system_packages_updates",
+        "module": "system",
+        "summary": "Available OS package upgrades.",
+        "destructive": false
+      },
+      {
+        "name": "system_packages_update_test",
+        "module": "system",
+        "summary": "Dry-run OS package upgrade.",
+        "destructive": false
+      },
+      {
+        "name": "system_packages_update_run",
+        "module": "system",
+        "summary": "Apply OS package upgrades.",
+        "destructive": false
+      },
+      {
+        "name": "system_packages_history",
+        "module": "system",
+        "summary": "History of OS package upgrade tasks.",
+        "destructive": false
+      },
+      {
+        "name": "license_get",
+        "module": "system",
+        "summary": "DirectAdmin license details.",
+        "destructive": false
+      },
+      {
+        "name": "license_proof",
+        "module": "system",
+        "summary": "License proof document.",
+        "destructive": false
+      },
+      {
+        "name": "license_update_key",
+        "module": "system",
+        "summary": "Install a new license key.",
+        "destructive": false
+      },
+      {
+        "name": "maintenance_list",
+        "module": "system",
+        "summary": "Maintenance tasks / health checks the panel exposes.",
+        "destructive": false
+      },
+      {
+        "name": "maintenance_check",
+        "module": "system",
+        "summary": "Run a maintenance check.",
+        "destructive": false
+      },
+      {
+        "name": "maintenance_fix",
+        "module": "system",
+        "summary": "Apply a maintenance fix.",
+        "destructive": false
+      }
+    ],
+    "wordpress": [
+      {
+        "name": "wp_locations",
+        "module": "wordpress",
+        "summary": "List WordPress installations.",
+        "destructive": false
+      },
+      {
+        "name": "wp_install",
+        "module": "wordpress",
+        "summary": "Install WordPress.",
+        "destructive": false
+      },
+      {
+        "name": "wp_install_quick",
+        "module": "wordpress",
+        "summary": "Quick WordPress install.",
+        "destructive": false
+      },
+      {
+        "name": "wp_get",
+        "module": "wordpress",
+        "summary": "WordPress instance details.",
+        "destructive": false
+      },
+      {
+        "name": "wp_delete",
+        "module": "wordpress",
+        "summary": "Remove a WordPress location from the manager.",
+        "destructive": true
+      }
+    ]
+  }
+}

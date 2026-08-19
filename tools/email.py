@@ -1,70 +1,111 @@
-"""
-MCP tools for interacting with DirectAdmin's email-related endpoints.
-"""
+"""Email logs, vacation messages, IMAP sync, mobileconfig."""
 
-import logging
-from mcp_instance import mcp
+from __future__ import annotations
+
+from typing import Any, Dict
+
 from da import call_da_api
+from mcp_instance import mcp
+from security import validate_domain
+from tools.common import format_response, guard_confirm, log_tool_call
 
-logger = logging.getLogger(__name__)
-
-@mcp.tool()
-async def api_email_config_mobileconfig(email, format):
-    """
-    Download Apple Mail configuration profile.
-
-    Args:
-        email: The email address for which to generate the profile.
-        format: The format of the profile (e.g., 'mac', 'ios').
-
-    Returns:
-        The mobileconfig profile.
-    """
-    try:
-        response = await call_da_api("/api/email-config/mobileconfig", method="GET", data={"email": email, "format": format})
-        return response
-    except Exception as e:
-        logger.error(f"Error in api_email_config_mobileconfig: {e}")
-        raise
 
 @mcp.tool()
-async def api_email_logs(e_from, e_to, address, domain, state, type):
-    """
-    Retrieve email log entries.
+@log_tool_call
+async def email_logs() -> Dict[str, Any]:
+    """Global email logs (admin)."""
+    return format_response(await call_da_api("/api/email-logs"))
 
-    Args:
-        e_from: Start time filter.
-        e_to: End time filter.
-        address: Specific email address.
-        domain: Domain name.
-        state: Email state (sent, deferred, etc.).
-        type: Type of email (incoming, outgoing, etc.).
-
-    Returns:
-        List of email log entries.
-    """
-    try:
-        response = await call_da_api("/api/email-logs", method="GET", data={"from": e_from, "to": e_to, "address": address, "domain": domain, "state": state, "type": type})
-        return response
-    except Exception as e:
-        logger.error(f"Error in api_email_logs: {e}")
-        raise
 
 @mcp.tool()
-async def api_email_logs_summary(e_from, e_to):
-    """
-    Retrieve summary of email log statistics.
+@log_tool_call
+async def email_logs_summary() -> Dict[str, Any]:
+    """Email log summary."""
+    return format_response(await call_da_api("/api/email-logs-summary"))
+
+
+@mcp.tool()
+@log_tool_call
+async def email_logs_user() -> Dict[str, Any]:
+    """Current/impersonated user email logs."""
+    return format_response(await call_da_api("/api/email-logs/user"))
+
+
+@mcp.tool()
+@log_tool_call
+async def email_vacation_list(domain: str) -> Dict[str, Any]:
+    """Vacation / autoresponder list for a domain.
 
     Args:
-        e_from: Start time filter.
-        e_to: End time filter.
-
-    Returns:
-        Summary statistics of email logs.
+        domain: Domain.
     """
-    try:
-        response = await call_da_api("/api/email-logs-summary", method="GET", data={"from": e_from, "to": e_to})
-        return response
-    except Exception as e:
-        logger.error(f"Error in api_email_logs_summary: {e}")
-        raise
+    domain = validate_domain(domain)
+    return format_response(await call_da_api(f"/api/emailvacation/{domain}"))
+
+
+@mcp.tool()
+@log_tool_call
+async def email_vacation_get(domain: str, user: str) -> Dict[str, Any]:
+    """One vacation message.
+
+    Args:
+        domain: Domain.
+        user: Local part.
+    """
+    domain = validate_domain(domain)
+    return format_response(await call_da_api(f"/api/emailvacation/{domain}/{user}"))
+
+
+@mcp.tool()
+@log_tool_call
+async def email_vacation_set(
+    domain: str, user: str, values: Dict[str, Any], confirm: bool = False
+) -> Dict[str, Any]:
+    """Create/update a vacation message.
+
+    Args:
+        domain: Domain.
+        user: Local part.
+        values: Vacation body.
+        confirm: Required.
+    """
+    rejected = guard_confirm("email_vacation_set", confirm)
+    if rejected:
+        return rejected
+    domain = validate_domain(domain)
+    return format_response(
+        await call_da_api(f"/api/emailvacation/{domain}/{user}", method="PUT", data=values)
+    )
+
+
+@mcp.tool()
+@log_tool_call
+async def email_vacation_delete(domain: str, user: str, confirm: bool = False) -> Dict[str, Any]:
+    """Delete a vacation message.
+
+    Args:
+        domain: Domain.
+        user: Local part.
+        confirm: Required.
+    """
+    rejected = guard_confirm("email_vacation_delete", confirm)
+    if rejected:
+        return rejected
+    domain = validate_domain(domain)
+    return format_response(
+        await call_da_api(f"/api/emailvacation/{domain}/{user}", method="DELETE")
+    )
+
+
+@mcp.tool()
+@log_tool_call
+async def email_mobileconfig() -> Dict[str, Any]:
+    """Apple mobileconfig for the current email account."""
+    return format_response(await call_da_api("/api/email-config/mobileconfig"))
+
+
+@mcp.tool()
+@log_tool_call
+async def imapsync_migrations() -> Dict[str, Any]:
+    """IMAP migration tasks."""
+    return format_response(await call_da_api("/api/imapsync/migrations"))

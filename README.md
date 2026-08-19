@@ -1,342 +1,249 @@
 # DirectAdmin MCP Server
 
-[![version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/omryatia/directadmin-mcp)
+[![ci](https://github.com/OpenIaaS/directadmin-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenIaaS/directadmin-mcp/actions/workflows/ci.yml)
+[![version](https://img.shields.io/badge/version-2.0.0-0b6bcb.svg)](https://github.com/OpenIaaS/directadmin-mcp)
+[![license](https://img.shields.io/badge/license-MIT-0b6bcb.svg)](LICENSE)
 
-A Model Context Protocol (MCP) server for DirectAdmin integration, allowing AI assistants to interact with DirectAdmin through natural language.
+A [Model Context Protocol](https://modelcontextprotocol.io) server that lets an
+AI assistant operate a **DirectAdmin** box as an administrator — in particular
+**reissue Let's Encrypt / hostname SSL** and **unblock IPs in CSF + Brute Force
+Monitor**.
 
-## Features
-
-- **MCP Integration**: Connect AI assistants to DirectAdmin using the Model Context Protocol
-- **RESTful API**: Comprehensive API for DirectAdmin management
-- **Server-Sent Events (SSE)**: Real-time communication with clients
-- **Tool-based Architecture**: Modular design with tool-based commands
-- **Command-line Client**: Included client for testing and scripting
-- **Docker Support**: Easy deployment with Docker and Docker Compose
-
-## Architecture
-
-This project implements a server that acts as a bridge between AI assistants and DirectAdmin:
+This is the completed OpenIaaS fork of the original half-finished project. It
+covers the [DirectAdmin New JSON API](https://docs.directadmin.com/developer/api/)
+(320 operations from the official swagger) **and** the legacy `CMD_API_*`
+admin calls the New API still does not replace (create user, DNS, backups, BFM).
 
 ```
-┌──────────┐     ┌─────────────────┐     ┌────────────┐
-│   AI     │     │  DirectAdmin    │     │ DirectAdmin│
-│ Assistant├────►│  MCP Server     ├────►│   API      │
-└──────────┘     └─────────────────┘     └────────────┘
-      MCP                SSE                 HTTP
+┌──────────────┐     MCP (stdio / SSE)     ┌──────────────────┐     HTTPS      ┌─────────────┐
+│  Claude /    │ ─────────────────────────► │  directadmin-mcp │ ─────────────► │ DirectAdmin │
+│  Cursor /    │                            │  confirm=true    │  Basic+key    │  :2222/api  │
+│  any MCP     │ ◄───────────────────────── │  audit.jsonl     │               │  + CSF plug │
+└──────────────┘                            └──────────────────┘               └─────────────┘
 ```
 
-The server exposes DirectAdmin functionality through a tool-based interface, making it easy for AI assistants to understand and interact with DirectAdmin operations.
+## What you can ask
 
-## Prerequisites
+| You say | Tool |
+| --- | --- |
+| “Reissue the Let's Encrypt cert for shop.example.com” | `ssl_reissue_domain` |
+| “The hostname cert expired, renew it” | `ssl_reissue_server` |
+| “Customer 203.0.113.44 is locked out of CSF” | `csf_unblock_ip` / `firewall_unblock_everywhere` |
+| “Is that IP blocked in BFM too?” | `bfm_list` + `bfm_unblock_ip` |
+| “List users over quota” | `users_list_all` + `users_get_usage` |
+| “Restart php-fpm74” | `services_restart` |
+| Anything else in `/api/*` | `da_list_endpoints` → `da_api` |
 
-- Python 3.12+
-- DirectAdmin server with API access
-- DirectAdmin login key (preferred) or username/password
+Destructive calls (`delete`, `deny`, `restart`, `reissue`, `unblock`, …)
+**require `confirm=true`**. The model must get an explicit go-ahead.
 
-## Installation
+## Requirements
 
-### Option 1: Standard Installation
+- Python 3.10+ (3.12 recommended) or Docker
+- DirectAdmin with API access and a **login key** (not the main password)
+- For CSF tools: the [ConfigServer Security & Firewall](https://docs.directadmin.com/operation-system-level/securing/csf.html) DirectAdmin plugin
+- Network path from the MCP host to `https://your-panel:2222`
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/omryatia/directadmin-mcp.git
-   cd directadmin-mcp
-   ```
+## Quick start (stdio — Claude Desktop / Cursor)
 
-2. Create a virtual environment:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+```bash
+git clone https://github.com/OpenIaaS/directadmin-mcp.git
+cd directadmin-mcp
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.sample .env
+# edit .env — DA_URL, DA_USERNAME, DA_LOGIN_KEY
+```
 
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+Generate a login key in **Admin Level → Account Manager → Login Keys**. Restrict
+it to this machine's IP. Put the key in `.env`:
 
-4. Create configuration:
-   ```bash
-   cp .gitignore.sample .gitignore
-   cp .env.sample .env
-   # Edit .env with your DirectAdmin settings
-   ```
+```ini
+DA_URL=https://panel.example.com:2222
+DA_USERNAME=admin
+DA_LOGIN_KEY=...
+DA_SSL_VERIFY=true
+```
 
-### Option 2: Docker Installation
+Claude Desktop (`claude_desktop_config.json`):
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/omryatia/directadmin-mcp.git
-   cd directadmin-mcp
-   ```
+```json
+{
+  "mcpServers": {
+    "directadmin": {
+      "command": "/absolute/path/to/directadmin-mcp/.venv/bin/python",
+      "args": ["/absolute/path/to/directadmin-mcp/server.py"],
+      "env": {
+        "DA_URL": "https://panel.example.com:2222",
+        "DA_USERNAME": "admin",
+        "DA_LOGIN_KEY": "your-login-key"
+      }
+    }
+  }
+}
+```
 
-2. Create configuration:
-   ```bash
-   cp .env.sample .env
-   # Edit .env with your DirectAdmin settings
-   ```
+Cursor / other MCP clients use the same `command` + `args` + `env` shape.
 
-3. Build and start with Docker Compose:
-   ```bash
-   docker-compose up -d
-   ```
+## HTTP / SSE mode (remote assistant)
+
+```bash
+python -c "import secrets; print(secrets.token_urlsafe(48))"   # MCP_AUTH_TOKEN
+# put the token in .env, keep MCP_HOST=127.0.0.1
+python main.py
+```
+
+Put Caddy or nginx in front with TLS. Clients send
+`Authorization: Bearer <MCP_AUTH_TOKEN>` to `/sse`.
+
+Docker (loopback only):
+
+```bash
+cp .env.sample .env   # fill DA_* and MCP_AUTH_TOKEN
+docker compose up -d --build
+curl -sS http://127.0.0.1:8888/health
+```
+
+The image runs as UID 10001, drops all capabilities, and uses a read-only root
+filesystem. See [SECURITY.md](SECURITY.md).
+
+## SSL reissue
+
+New API (DirectAdmin 1.660+ / current Evolution):
+
+```
+ssl_get_domain_acme_config  domain=shop.example.com  impersonate=alice
+ssl_reissue_domain          domain=shop.example.com  impersonate=alice  confirm=true
+ssl_reissue_domain          domain=shop.example.com  dry_run=true
+ssl_reissue_server          confirm=true
+```
+
+`ssl_reissue_domain` is `POST /api/domain-tls/{domain}/provision-certs`.
+`ssl_reissue_server` is `POST /api/server-tls/obtain`.
+
+On older panels the same intent is `ssl_reissue_domain_legacy` (`CMD_API_SSL`
+Let's Encrypt request). Always impersonate the **owning user** when you are
+logged in as admin — domain TLS is a user-level resource.
+
+Related: `ssl_list_domain_certs`, `ssl_set_domain_acme_config`,
+`ssl_upload_cert_files`, `ssl_create_csr`, `ssl_install_self_signed`,
+`ssl_acme_dns_providers`.
+
+## CSF / firewall unblock
+
+CSF is **not** in the New JSON API. These tools POST to the official plugin
+`/CMD_PLUGINS_ADMIN/csf/`. The plugin must be installed.
+
+An IP is often blocked in **two** places (LFD *and* DirectAdmin BFM). Use the
+combined tool when a customer is locked out:
+
+```
+firewall_unblock_everywhere  ip=203.0.113.44  confirm=true
+csf_search_ip                ip=203.0.113.44
+csf_unblock_ip               ip=203.0.113.44  also_allow=true  confirm=true
+bfm_unblock_ip               ip=203.0.113.44  confirm=true
+```
+
+`csf_unblock_ip` runs the plugin Quick Unblock (`action=kill` → `csf -dr` +
+`csf -tr` + drop states). `also_allow=true` adds a 1-hour temporary allow so
+the next handshake is not immediately re-banned.
+
+Other CSF tools: `csf_allow_ip`, `csf_deny_ip`, `csf_ignore_ip`,
+`csf_flush_temp`, `csf_restart`, `csf_enable`, `csf_disable`, `csf_status`.
+
+`csf_disable` is denied by default (`TOOL_DENYLIST` + `ENABLE_CSF_DISABLE=false`). Unlock customers with `firewall_unblock_everywhere` instead.
+
+## Tool map
+
+Curated tools are grouped by module. Everything else is reachable with
+`da_api` / `da_legacy`. Playbooks: [docs/ssl.md](docs/ssl.md),
+[docs/csf.md](docs/csf.md), [docs/hardening.md](docs/hardening.md).
+Inventory: [docs/tools.json](docs/tools.json) (273 curated tools + 320 swagger ops).
+
+| Module | Tools (prefix) | Notes |
+| --- | --- | --- |
+| SSL | `ssl_*` | Domain + hostname ACME, reissue, upload |
+| CSF | `csf_*`, `firewall_*` | Plugin; needs ENABLE_CSF=true |
+| BFM | `bfm_*` | Native panel blocks |
+| Accounts | `users_*`, `resellers_*`, `admins_*` | New API + CMD_API_ACCOUNT_* |
+| Packages | `packages_*` | User / reseller packages |
+| System | `system_*`, `license_*`, `maintenance_*` | Version, OS updates, usage |
+| Services | `services_*` | start/stop/restart/reload/logs |
+| Settings | `hostname_*`, `da_config_*`, `timezone_*`, `email_server_*` | directadmin.conf |
+| Auth | `login_keys_*`, `login_urls_*`, `mfa_*`, `sessions_*` | Prefer scoped keys |
+| Security | `modsecurity_*`, `clamav_*`, `security_txt_*`, `redis_*` | WAF / AV |
+| Data | `db_*`, `fm_*`, `email_*`, `dns_*`, `ips_*`, `backups_*`, `domains_*`, `ftp_*`, `cron_*` | Admin day-2 |
+| Build | `cb_*`, `plugins_*`, `wp_*`, `git_*`, `cpanel_*` | CustomBuild / apps |
+| Escape hatches | `da_ping`, `da_list_endpoints`, `da_describe_endpoint`, `da_api`, `da_legacy` | Full swagger |
+
+`da_api` only accepts paths that exist in the bundled
+[`tools/api_spec.json`](tools/api_spec.json) (exported from
+`https://demo.directadmin.com:2222/static/swagger.json`). `/api/execute` is
+blocked unless `ENABLE_EXECUTE=true`.
 
 ## Configuration
 
-Edit the `.env` file with your DirectAdmin credentials:
+See [`.env.sample`](.env.sample). Important knobs:
 
-```ini
-# DirectAdmin Settings
-DA_URL=https://your-directadmin-server:2222
-DA_USERNAME=admin
-DA_LOGIN_KEY=your_directadmin_login_key_here/password
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `DA_URL` | required | `https://host:2222` |
+| `DA_USERNAME` / `DA_LOGIN_KEY` | required | Login key, not the password |
+| `DA_IMPERSONATE` | empty | Default login-as; prefer per-tool `impersonate=` |
+| `DA_SSL_VERIFY` | `true` | Verify the panel certificate |
+| `MCP_HOST` / `PORT` | `127.0.0.1` / `8888` | HTTP bind |
+| `MCP_AUTH_TOKEN` | empty | Required for HTTP in production |
+| `MCP_ALLOWED_CIDRS` | empty | Optional client allow-list |
+| `TOOL_ALLOWLIST` / `TOOL_DENYLIST` | empty / `da_execute` | Reduce blast radius |
+| `REQUIRE_CONFIRM` | `true` | Destructive tools need `confirm=true` |
+| `ENABLE_CSF` | `true` | CSF plugin calls |
+| `ENABLE_EXECUTE` | `false` | `/api/execute` passthrough |
+| `RATE_LIMIT_PER_MINUTE` | `60` | Per client identity |
+| `AUDIT_LOG` | `logs/audit.jsonl` | Redacted JSON lines |
 
-# Server Settings
-PORT=8888
-LOG_LEVEL=INFO
-DEBUG=false
+## Security
 
-# SSL Settings
-SSL_VERIFY=true
-```
+Read [SECURITY.md](SECURITY.md). Short version:
 
-### Configuration Options
+- Login key + IP restriction on the DirectAdmin side
+- Bearer token + loopback bind + TLS proxy on the MCP side
+- Confirm gate, allow/deny tool lists, no wildcard CORS
+- Secrets never written to logs
+- Docker: non-root, `cap_drop: ALL`, read-only root
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `DA_URL` | DirectAdmin server URL with port | (Required) |
-| `DA_USERNAME` | DirectAdmin username | (Required) |
-| `DA_LOGIN_KEY` | DirectAdmin login key | (Required) |
-| `PORT` | Port to run the MCP server on | 8888 |
-| `LOG_LEVEL` | Logging level (DEBUG, INFO, WARNING, ERROR) | INFO |
-| `DEBUG` | Enable debug mode for development | false |
-| `SSL_VERIFY` | Verify SSL certificates for DirectAdmin API calls | true |
-
-## Usage
-
-### Starting the Server
-
-You can start the server in two ways:
-
-1. Using FastAPI with SSE support (recommended):
-   ```bash
-   python main.py
-   ```
-
-2. Using the simple MCP server:
-   ```bash
-   python server.py
-   ```
-
-The server will start on port 8888 by default (configurable in .env).
-
-### Using the Command-line Client
-
-The included command-line client allows you to interact with the MCP server:
-
-```bash
-# Get server info
-python client.py --info
-
-# Check server health
-python client.py --health
-
-# Send a specific message
-python client.py "Show me the version of DirectAdmin"
-
-# Interactive mode
-python client.py
-```
-
-#### Client Options
-
-| Option | Description |
-|--------|-------------|
-| `--server`, `-s` | MCP server URL |
-| `--key`, `-k` | API key for authentication |
-| `--no-verify` | Disable SSL verification |
-| `--timeout`, `-t` | Request timeout in seconds |
-| `--info`, `-i` | Get server info |
-| `--health` | Check server health |
-
-### Connecting AI Assistants
-
-Configure your AI assistant to use the MCP endpoint:
-
-```
-http://your-server:8888/sse
-```
-
-This allows the AI assistant to:
-1. Query DirectAdmin information
-2. Execute DirectAdmin commands
-3. Receive real-time updates
-
-## Available Tools
-
-The server exposes the following DirectAdmin operations as tools:
-
-### System Management
-- `api_restart`: Restart DirectAdmin
-- `api_ping`: Check if DirectAdmin is running
-
-### Version Control
-- `api_get_version`: Get DirectAdmin version information
-- `api_version_update`: Update DirectAdmin to the latest version
-- `api_change_update_channel`: Change update channel
-
-### System Updates
-- `api_system_packages_updates`: Get available system package updates
-- `api_system_packages_update_test`: Test system package update
-- `api_system_packages_update_run`: Run system package update
-
-### Security
-- `api_security_txt_status`: Check security.txt status
-- `api_security_txt_get`: Get security.txt content
-- `api_security_txt_update`: Update security.txt content
-
-## API Endpoints
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/` | GET | Root page with HTML welcome message |
-| `/about` | GET | Server information |
-| `/health` | GET | Health check endpoint |
-| `/sse` | GET | MCP SSE connection endpoint |
-| `/messages` | POST | Internal endpoint for posting SSE messages |
+If a token or key leaks, rotate **both** immediately. A login key that was
+pasted into a chat is burned.
 
 ## Development
 
-### Project Structure
-
-```
-directadmin-mcp/
-├── README.md               # Project documentation
-├── .env.sample             # Environment variables template
-├── config.py               # Configuration module
-├── main.py                 # FastAPI application with SSE support
-├── server.py               # Simple MCP server
-├── client.py               # Command-line client
-├── da.py                   # DirectAdmin API client
-├── mcp_instance.py         # MCP instance configuration
-├── tools/                  # Tool modules directory
-│   ├── __init__.py         # Tool loading mechanism
-│   ├── common.py           # Common tool utilities
-│   ├── misc.py             # Misc DirectAdmin operations
-│   ├── security_txt.py     # Security.txt related tools
-│   ├── system_update.py    # System update tools
-│   └── versioning.py       # Versioning and update tools
-│   └── and alot more ......
-└── requirements.txt        # Project dependencies
-```
-
-### Adding New Tools
-
-1. Create or edit a file in the `tools` directory
-2. Add a new function with the `@mcp.tool()` decorator:
-
-```python
-import logging
-from mcp_instance import mcp
-from da import call_da_api
-from tools.common import log_tool_call, format_response
-
-@mcp.tool()
-@log_tool_call
-async def my_new_tool(param1, param2):
-    """
-    Tool documentation.
-    
-    Args:
-        param1: First parameter description
-        param2: Second parameter description
-        
-    Returns:
-        Description of the return value
-    """
-    # Implementation
-    response = await call_da_api("/api/endpoint", method="GET")
-    return format_response(response)
-```
-
-The tool will be automatically discovered and registered when the server starts.
-
-### Logging
-
-The server uses a comprehensive logging system:
-
-- Console logs: Shown in the terminal
-- File logs: Written to the `logs` directory
-- Error logs: Separate file for error tracking
-
-Log levels can be configured in the `.env` file with the `LOG_LEVEL` variable.
-
-## Docker Deployment
-
-The project includes Docker support for easy deployment:
-
 ```bash
-# Build the image
-docker build -t directadmin-mcp .
-
-# Run the container
-docker run -d \
-  -p 8888:8888 \
-  --env-file .env \
-  --name directadmin-mcp \
-  directadmin-mcp
+pip install -r requirements-dev.txt
+pytest -q
+ruff check .
 ```
 
-Or more simply with Docker Compose:
+Adding a curated tool: create a function in `tools/`, decorate with
+`@mcp.tool()` + `@log_tool_call`, validate inputs (`validate_ip`,
+`validate_domain`, `validate_username`), and call `guard_confirm` if the
+call mutates state.
 
-```bash
-docker-compose up -d
-```
+The generic catalog picks up new swagger paths when you replace
+`tools/api_spec.json` with a fresh export from your own panel
+(`/static/swagger.json`).
 
-## Security Considerations
+## Compatibility
 
-- Use HTTPS with a valid SSL certificate in production
-- Set up proper firewall rules to restrict access
-- Use a reverse proxy (like Nginx) with proper security headers
-- Keep your DirectAdmin login key secure and rotate it regularly
-- Consider adding authentication to the MCP server for production use
+| Transport | File | When |
+| --- | --- | --- |
+| stdio | `server.py` | Claude Desktop, Cursor, local agents |
+| SSE | `main.py` → `/sse` | Older remote MCP clients |
+| HTTP health / tool list | `main.py` | `/health`, `/mcp/tools` |
 
-## Troubleshooting
-
-### Connection Issues
-
-If you encounter connection issues:
-
-1. Verify that your DirectAdmin server is accessible
-2. Check that your DirectAdmin API credentials are correct
-3. Ensure the DirectAdmin API is enabled
-4. Check your SSL settings if using HTTPS
-
-### Common Error Messages
-
-- "Authentication failed": Check your DirectAdmin credentials
-- "SSL verification failed": Set `SSL_VERIFY=false` in .env or fix your certificates
-- "Tool not found": Ensure the tool module is correctly loaded
-- "Connection refused": Check that DirectAdmin is running and accessible
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+Tested against the official New API swagger (`info.version = 1.0`, 269 paths /
+320 operations). Legacy calls follow
+[docs.directadmin.com/developer/api/legacy-api.html](https://docs.directadmin.com/developer/api/legacy-api.html).
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-- [Model Context Protocol](https://github.com/modelcontextprotocol)
-- [DirectAdmin](https://www.directadmin.com/)
-- [DirectAdmin Api Swagger](https://demo.directadmin.com:2222/evo/api-docs)
-- [DirectAdmin Api Swagger Json](https://demo.directadmin.com:2222/docs/swagger.json)
-- [FastAPI](https://fastapi.tiangolo.com/)
-- [SSE Client](https://github.com/btubbs/sseclient)
+MIT. See [LICENSE](LICENSE).

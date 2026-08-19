@@ -1,48 +1,71 @@
-"""
-DirectAdmin MCP Tool Registry.
+"""Auto-load every tool module so @mcp.tool registrations run."""
 
-This package contains all the tool modules for DirectAdmin MCP integration.
-Tools are automatically imported and registered with the MCP instance.
-"""
+from __future__ import annotations
 
-import os
 import importlib
 import logging
-import glob
+import pkgutil
 from typing import List
 
 logger = logging.getLogger(__name__)
 
-def load_all_tools() -> List[str]:
-    """
-    Load all tool modules from the tools directory.
-    
-    Returns:
-        List of loaded module names
-    """
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    tool_files = glob.glob(os.path.join(current_dir, "*.py"))
-    
-    # Filter out __init__.py and common.py
-    tool_modules = []
-    for file_path in tool_files:
-        filename = os.path.basename(file_path)
-        module_name = os.path.splitext(filename)[0]
-        
-        if module_name not in ["__init__", "common"]:
-            tool_modules.append(module_name)
-    
-    # Import each module - this will register the tools with MCP
-    loaded_modules = []
-    for module_name in tool_modules:
-        try:
-            importlib.import_module(f"tools.{module_name}")
-            loaded_modules.append(module_name)
-            logger.info(f"Loaded tool module: tools.{module_name}")
-        except Exception as e:
-            logger.error(f"Error loading tool module tools.{module_name}: {str(e)}")
-    
-    return loaded_modules
+# Load order: curated first, generic catalog last
+_PREFERRED = [
+    "common",
+    "ssl_certs",
+    "csf_firewall",
+    "brute_force",
+    "accounts",
+    "packages",
+    "ip_manager",
+    "dns_admin",
+    "domains",
+    "mailboxes",
+    "email",
+    "hosting",
+    "backups",
+    "system",
+    "services",
+    "server_settings",
+    "login_keys",
+    "sessions",
+    "security_center",
+    "databases",
+    "filemanager",
+    "custombuild",
+    "plugins",
+    "wordpress",
+    "git_deploy",
+    "search",
+    "catalog",
+]
 
-# Import common utilities
-from tools.common import log_tool_call, format_response, parse_args
+
+def load_all_tools() -> List[str]:
+    loaded: List[str] = []
+    seen = set()
+
+    for name in _PREFERRED:
+        if _import(f"tools.{name}"):
+            loaded.append(name)
+            seen.add(name)
+
+    import tools as pkg
+
+    for module in pkgutil.iter_modules(pkg.__path__):
+        if module.name in seen or module.name.startswith("_"):
+            continue
+        if _import(f"tools.{module.name}"):
+            loaded.append(module.name)
+            seen.add(module.name)
+    return loaded
+
+
+def _import(dotted: str) -> bool:
+    try:
+        importlib.import_module(dotted)
+        logger.info("Loaded %s", dotted)
+        return True
+    except Exception as exc:  # pragma: no cover - surfaced in logs
+        logger.error("Failed to load %s: %s", dotted, exc, exc_info=True)
+        return False
