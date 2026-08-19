@@ -18,8 +18,7 @@ every DA box): a read-only listener for the chatty agent and a write listener
 for allowed mutations. Fleet facts (CloudLinux, profile) live in
 `inventory.json` on that hops machine.
 
-This is the completed OpenIaaS fork of the original half-finished project. It
-covers the [DirectAdmin New JSON API](https://docs.directadmin.com/developer/api/)
+It covers the [DirectAdmin New JSON API](https://docs.directadmin.com/developer/api/)
 (320 operations from the official swagger) **and** the legacy `CMD_API_*`
 admin calls the New API still does not replace (create user, DNS, backups, BFM).
 
@@ -279,4 +278,11 @@ Tested against the official New API swagger (`info.version = 1.0`, 269 paths /
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+[MIT](LICENSE). Use it, fork it, ship it with your panel tooling.
+
+Early structure was released under the same MIT license in 2025
+([omryatia/directadmin-mcp](https://github.com/omryatia/directadmin-mcp)).
+This tree keeps that notice. New work is Copyright OpenIaaS.
+
+Built with thanks to the DirectAdmin community — docs, forum, and operators
+who have been running these boxes for years.

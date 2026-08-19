@@ -123,7 +123,7 @@ Second hardening pass for agent-driven administration.
 
 ## 2.0.0 — 2026-08-19
 
-Complete rewrite of the half-finished OpenIaaS / omryatia fork.
+Starting point: 2025 MIT tree. Subsequent versions are this control plane.
 
 ### Highlights
 
