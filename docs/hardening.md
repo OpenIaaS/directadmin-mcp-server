@@ -38,6 +38,9 @@ Agents will pass `confirm=true` without asking. Defaults assume that.
 | `TOOL_DENYLIST` | `da_execute,csf_disable` | Defence in depth |
 | `DA_SSL_VERIFY` | `true` | No silent MITM |
 | `RATE_LIMIT_PER_MINUTE` | `60` | Brute-force the token |
+| `MCP_ACTOR` / `X-Agent-Id` | `unknown` | Stamped on every audit line |
+| `MAINTENANCE_WINDOW` | empty | Mutating families only; SSL/CSF stay 24/7 |
+| `AUDIT_LOG` | `logs/audit.jsonl` | Query with `audit_search` |
 
 Always-on helpdesk surface (still needs `confirm` / approval token for writes):
 SSL reissue, CSF/BFM unblock, reads.

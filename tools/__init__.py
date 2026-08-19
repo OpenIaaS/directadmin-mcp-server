@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 _PREFERRED = [
     "common",
     "policy",
+    "audit",
     "ssl_certs",
     "csf_firewall",
     "brute_force",

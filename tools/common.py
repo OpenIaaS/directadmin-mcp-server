@@ -13,6 +13,7 @@ from security import (
     confirm_or_reject,
     redact,
     tool_permitted,
+    window_denied,
     write_audit,
 )
 
@@ -48,6 +49,11 @@ def log_tool_call(func: T) -> T:
         if gated:
             write_audit("tool_capability_denied", tool=name, flag=gated.get("denied_by"))
             return gated
+
+        closed = window_denied(name)
+        if closed:
+            write_audit("tool_window_denied", tool=name)
+            return closed
 
         sig = inspect.signature(func)
         try:

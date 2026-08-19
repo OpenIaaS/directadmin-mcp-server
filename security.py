@@ -11,8 +11,12 @@ import re
 import threading
 import time
 from collections import defaultdict, deque
+from contextvars import ContextVar
+from datetime import datetime
+from datetime import time as dtime
 from typing import Any, Iterable, Optional
 from urllib.parse import urlparse
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from config import settings
 
@@ -61,6 +65,20 @@ DESTRUCTIVE_HINTS = (
 _EMAIL_LOCAL = re.compile(r"^[A-Za-z0-9._%+-]{1,64}$")
 _CRON_FIELD = re.compile(r"^[\d*/,\-]+$")
 _SERVICE = re.compile(r"^[A-Za-z0-9._-]{1,64}$")
+_ACTOR = re.compile(r"^[A-Za-z0-9._@:+-]{1,64}$")
+_DAYS = {
+    "mon": 0,
+    "tue": 1,
+    "wed": 2,
+    "thu": 3,
+    "fri": 4,
+    "sat": 5,
+    "sun": 6,
+}
+
+current_actor: ContextVar[str] = ContextVar("current_actor", default="")
+current_ip: ContextVar[str] = ContextVar("current_ip", default="")
+current_request_id: ContextVar[str] = ContextVar("current_request_id", default="")
 
 
 class SecurityError(Exception):
@@ -426,8 +444,139 @@ class RateLimiter:
 rate_limiter = RateLimiter(settings.RATE_LIMIT_PER_MINUTE)
 
 
+def sanitize_actor(value: Optional[str], fallback: str = "unknown") -> str:
+    candidate = (value or "").strip()
+    if candidate and _ACTOR.fullmatch(candidate):
+        return candidate
+    default = (fallback or settings.MCP_ACTOR or "unknown").strip()
+    if default and _ACTOR.fullmatch(default):
+        return default
+    return "unknown"
+
+
+def bind_request_context(actor: str = "", ip: str = "", request_id: str = "") -> None:
+    current_actor.set(sanitize_actor(actor, settings.MCP_ACTOR))
+    current_ip.set((ip or "")[:64])
+    current_request_id.set((request_id or "")[:32])
+
+
+def _parse_hhmm(value: str) -> dtime:
+    hour, minute = value.split(":", 1)
+    parsed = dtime(int(hour), int(minute))
+    return parsed
+
+
+def _parse_days(spec: str) -> set[int]:
+    if spec in {"*", "all", "daily"}:
+        return set(range(7))
+    days: set[int] = set()
+    for chunk in spec.split(","):
+        chunk = chunk.strip().lower()
+        if not chunk:
+            continue
+        if "-" in chunk and chunk.split("-")[0] in _DAYS:
+            start, end = chunk.split("-", 1)
+            a, b = _DAYS[start], _DAYS[end]
+            if a <= b:
+                days.update(range(a, b + 1))
+            else:
+                days.update(list(range(a, 7)) + list(range(0, b + 1)))
+        elif chunk in _DAYS:
+            days.add(_DAYS[chunk])
+        else:
+            raise SecurityError(f"Invalid day in MAINTENANCE_WINDOW: {chunk}")
+    return days or set(range(7))
+
+
+def parse_maintenance_window(spec: str) -> Optional[dict]:
+    text = (spec or "").strip()
+    if not text:
+        return None
+    parts = text.split()
+    tz_name = "UTC"
+    if len(parts) >= 2 and ":" not in parts[-1]:
+        tz_name = parts[-1]
+        parts = parts[:-1]
+    if not parts:
+        raise SecurityError("MAINTENANCE_WINDOW is missing HH:MM-HH:MM")
+    clock = parts[-1]
+    days_spec = parts[0] if len(parts) > 1 else "*"
+    if "-" not in clock:
+        raise SecurityError("MAINTENANCE_WINDOW clock must be HH:MM-HH:MM")
+    start_s, end_s = clock.split("-", 1)
+    try:
+        tz = ZoneInfo(tz_name)
+    except ZoneInfoNotFoundError as exc:
+        raise SecurityError(f"Unknown timezone in MAINTENANCE_WINDOW: {tz_name}") from exc
+    return {
+        "days": sorted(_parse_days(days_spec)),
+        "start": _parse_hhmm(start_s),
+        "end": _parse_hhmm(end_s),
+        "tz": tz_name,
+        "tzinfo": tz,
+        "spec": text,
+    }
+
+
+def window_status(now: Optional[datetime] = None) -> dict:
+    """Is *now* inside the configured maintenance window?"""
+    spec = settings.MAINTENANCE_WINDOW
+    if not spec.strip():
+        return {
+            "configured": False,
+            "open": True,
+            "enforce": False,
+            "reason": "no maintenance window configured",
+        }
+    parsed = parse_maintenance_window(spec)
+    assert parsed is not None
+    tz = parsed["tzinfo"]
+    moment = now.astimezone(tz) if now else datetime.now(tz)
+    weekday = moment.weekday()
+    clock = moment.time().replace(second=0, microsecond=0)
+    start, end = parsed["start"], parsed["end"]
+    if start <= end:
+        in_hours = start <= clock < end
+    else:
+        in_hours = clock >= start or clock < end
+    open_now = weekday in parsed["days"] and in_hours
+    return {
+        "configured": True,
+        "open": open_now,
+        "enforce": bool(settings.WINDOW_ENFORCE),
+        "spec": parsed["spec"],
+        "tz": parsed["tz"],
+        "local_time": moment.isoformat(timespec="minutes"),
+        "reason": "inside window" if open_now else "outside maintenance window",
+    }
+
+
+def window_denied(tool_name: str, now: Optional[datetime] = None) -> Optional[dict]:
+    if not settings.WINDOW_ENFORCE or not settings.MAINTENANCE_WINDOW.strip():
+        return None
+    # Helpdesk 24/7: SSL reissue + CSF unblock have no capability flag.
+    # Window applies to opt-in mutating families (restart, updates, deletes…).
+    if capability_for(tool_name) is None:
+        return None
+    status = window_status(now)
+    if status["open"]:
+        return None
+    return {
+        "success": False,
+        "error": True,
+        "denied_by": "MAINTENANCE_WINDOW",
+        "window": status,
+        "message": (
+            f"'{tool_name}' is a mutating action and the maintenance window "
+            f"is closed ({status['reason']}; {status.get('spec')}). "
+            "Reads, SSL reissue and CSF unblock still work. "
+            "Wait for the window or change MAINTENANCE_WINDOW."
+        ),
+    }
+
+
 def write_audit(event: str, **fields: Any) -> None:
-    """Append one JSON line. Never write secrets."""
+    """Append one JSON line. Never write secrets. Always stamp actor/ip."""
     path = settings.AUDIT_LOG
     if not path:
         return
@@ -435,6 +584,9 @@ def write_audit(event: str, **fields: Any) -> None:
     record = {
         "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "event": event,
+        "actor": current_actor.get() or sanitize_actor(settings.MCP_ACTOR),
+        "ip": current_ip.get() or "",
+        "request_id": current_request_id.get() or "",
         **redact(fields),
     }
     try:

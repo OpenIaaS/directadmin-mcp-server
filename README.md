@@ -1,7 +1,7 @@
 # DirectAdmin MCP Server
 
 [![ci](https://github.com/OpenIaaS/directadmin-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenIaaS/directadmin-mcp/actions/workflows/ci.yml)
-[![version](https://img.shields.io/badge/version-2.4.3-0b6bcb.svg)](https://github.com/OpenIaaS/directadmin-mcp)
+[![version](https://img.shields.io/badge/version-2.5.0-0b6bcb.svg)](https://github.com/OpenIaaS/directadmin-mcp)
 [![license](https://img.shields.io/badge/license-MIT-0b6bcb.svg)](LICENSE)
 
 A [Model Context Protocol](https://modelcontextprotocol.io) server that lets an
@@ -177,7 +177,8 @@ Curated tools are grouped by module. Everything else is reachable with
 `da_api` / `da_legacy`. Playbooks: [docs/agent.md](docs/agent.md),
 [docs/operations.md](docs/operations.md), [docs/ssl.md](docs/ssl.md),
 [docs/csf.md](docs/csf.md), [docs/propack.md](docs/propack.md),
-[docs/cloudlinux.md](docs/cloudlinux.md), [docs/hardening.md](docs/hardening.md).
+[docs/cloudlinux.md](docs/cloudlinux.md), [docs/hardening.md](docs/hardening.md),
+[docs/audit.md](docs/audit.md).
 Inventory: [docs/tools.json](docs/tools.json) (273 curated tools + 320 swagger ops).
 
 | Module | Tools (prefix) | Notes |
@@ -197,6 +198,7 @@ Inventory: [docs/tools.json](docs/tools.json) (273 curated tools + 320 swagger o
 | Pro Pack | `unit_*`, `nginx_set_template`, `imapsync_*`, `propack_inventory` | Unit + templates; no web terminal |
 | CloudLinux | `cl_*` | Opt-in (`ENABLE_CLOUDLINUX=false` by default) |
 | Policy | `policy_status` | Live `ENABLE_*` flags; approval-token required? |
+| Audit | `audit_search`, `audit_recent`, `window_now` | Who did what, when, in-window? |
 | Escape hatches | `da_ping`, `da_list_endpoints`, `da_describe_endpoint`, `da_api`, `da_legacy` | Full swagger |
 
 `da_api` only accepts paths that exist in the bundled

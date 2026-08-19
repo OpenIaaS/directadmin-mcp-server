@@ -16,9 +16,11 @@ from starlette.routing import Mount
 from config import VERSION, settings, setup_logging
 from mcp_instance import mcp
 from security import (
+    bind_request_context,
     constant_time_token_match,
     ip_in_cidrs,
     rate_limiter,
+    sanitize_actor,
     write_audit,
 )
 
@@ -92,6 +94,11 @@ class GateMiddleware(BaseHTTPMiddleware):
             write_audit("http_rate_limited", ip=ip, path=path)
             return JSONResponse({"error": "rate_limited"}, status_code=429)
 
+        actor = sanitize_actor(
+            request.headers.get("x-agent-id") or request.headers.get("x-mcp-actor"),
+            settings.MCP_ACTOR,
+        )
+        bind_request_context(actor=actor, ip=ip, request_id=secrets.token_hex(8))
         return await call_next(request)
 
 
@@ -111,6 +118,8 @@ async def lifespan(app: FastAPI):
 
     loaded = tools.load_all_tools()
     logger.info("Loaded %d tool modules: %s", len(loaded), ", ".join(loaded))
+    bind_request_context(actor=settings.MCP_ACTOR, ip="stdio", request_id="startup")
+    write_audit("server_start", version=VERSION)
     yield
     from da import client
 

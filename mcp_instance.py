@@ -34,6 +34,8 @@ Operating contract:
 9. Never print login keys, passwords, private keys, bearer tokens, or PEM.
 10. Do not delete users, files, databases, or WordPress. Those families are
     off by default on purpose.
+11. For “who did what”: audit_search / audit_recent. For “защо е блокиран”:
+    ip_block_reason. Honour MAINTENANCE_WINDOW — do not try to bypass it.
 """
 
 mcp = FastMCP(settings.MCP_NAME, instructions=AGENT_INSTRUCTIONS)

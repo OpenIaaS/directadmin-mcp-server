@@ -1,6 +1,15 @@
 # Changelog
 
+## 2.5.0 — 2026-08-19
+
+- Structured audit is queryable: `audit_search` / `audit_recent` answer
+  “which agent restarted httpd” and “who ran a package update”.
+- `MCP_ACTOR` + `X-Agent-Id` stamped on every event (with IP + request id).
+- `MAINTENANCE_WINDOW` (e.g. `Mon-Fri 01:00-05:00 Europe/Sofia`) blocks
+  mutating families outside the window. SSL + CSF unblock stay 24/7.
+
 ## 2.4.3 — 2026-08-19
+
 
 - `ip_block_reason` — CSF/LFD + BFM in one read. `operator_reason` for the
   admin, `customer_message.bg` / `.en` to paste to the client. Does not invent

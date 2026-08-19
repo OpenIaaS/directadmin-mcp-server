@@ -6,7 +6,7 @@ from typing import Any, Dict
 
 from config import settings
 from mcp_instance import mcp
-from security import capability_enabled
+from security import capability_enabled, window_status
 from tools.common import format_response, log_tool_call
 
 _FLAGS = (
@@ -43,11 +43,14 @@ async def policy_status() -> Dict[str, Any]:
         {
             "flags": flags,
             "approval_token_required": token_set,
+            "actor_default": settings.MCP_ACTOR,
+            "window": window_status(),
             "default_profile": "helpdesk — SSL + CSF unblock + reads",
             "hint": (
                 "Deletes, account writes, filemanager writes, CustomBuild, "
                 "OS updates, plugin installs, backup restore, service control, "
-                "config writes and generic da_api writes are off until enabled."
+                "config writes and generic da_api writes are off until enabled. "
+                "Mutating families honour MAINTENANCE_WINDOW when set."
             ),
         }
     )

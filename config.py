@@ -12,7 +12,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 load_dotenv()
 
-VERSION = "2.4.3"
+VERSION = "2.5.0"
 
 
 class Settings(BaseSettings):
@@ -71,6 +71,10 @@ class Settings(BaseSettings):
     ENABLE_DA_WRITE: bool = Field(False)
     RATE_LIMIT_PER_MINUTE: int = Field(60, ge=0)
     AUDIT_LOG: str = Field("logs/audit.jsonl")
+    MCP_ACTOR: str = Field("unknown")
+    # Empty = no time gate. Example: Mon-Fri 01:00-05:00 Europe/Sofia
+    MAINTENANCE_WINDOW: str = Field("")
+    WINDOW_ENFORCE: bool = Field(True)
 
     @field_validator("DA_URL")
     @classmethod
