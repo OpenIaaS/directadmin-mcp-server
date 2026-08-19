@@ -1,5 +1,35 @@
 # Changelog
 
+## 2.1.0 — 2026-08-19
+
+Second hardening pass for agent-driven administration.
+
+### Security
+
+- Bearer token is **header-only**. Query-string `?token=` is rejected (it leaks
+  via access logs, Referer, and browser history).
+- `/health` is process liveness and does **not** call DirectAdmin (safe for
+  Docker HEALTHCHECK). `/ready` probes the panel and never returns exception
+  strings.
+- Reused `httpx.AsyncClient` with connection limits; closed on shutdown.
+- Rate limiter evicts idle identities so it cannot grow without bound.
+- `MCP_AUTH_TOKEN` must be ≥ 24 characters when set.
+- Impersonation targets are validated as usernames.
+- Service names and backup filenames are validated (no `/../` injection).
+- Search queries are length-capped.
+- `Content-Security-Policy` on HTTP responses.
+
+### Agent contract
+
+- FastMCP `instructions` now encode the operating contract (read first,
+  confirm only after a human go-ahead, never disable CSF, never print secrets).
+- New playbooks: [docs/agent.md](docs/agent.md), [docs/operations.md](docs/operations.md).
+
+### CI
+
+- GitHub Actions on 3.10 + 3.12, SHA-pinned actions, `contents: read`,
+  no persisted credentials, concurrency cancel.
+
 ## 2.0.0 — 2026-08-19
 
 Complete rewrite of the half-finished OpenIaaS / omryatia fork.
@@ -31,12 +61,6 @@ Complete rewrite of the half-finished OpenIaaS / omryatia fork.
 - Path-traversal checks on file-manager paths
 - Sanitised CSF comments; rejected `0.0.0.0/0`
 - Docker: non-root, dropped caps, read-only FS, loopback publish
-
-### CI
-
-- GitHub Actions on 3.10 + 3.12 (`ruff` + `pytest`)
-- Least-privilege `contents: read`, concurrency cancel, SHA-pinned actions
-- Dependabot for pip and GitHub Actions
 
 ### Breaking
 

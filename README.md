@@ -1,7 +1,7 @@
 # DirectAdmin MCP Server
 
 [![ci](https://github.com/OpenIaaS/directadmin-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenIaaS/directadmin-mcp/actions/workflows/ci.yml)
-[![version](https://img.shields.io/badge/version-2.0.0-0b6bcb.svg)](https://github.com/OpenIaaS/directadmin-mcp)
+[![version](https://img.shields.io/badge/version-2.1.0-0b6bcb.svg)](https://github.com/OpenIaaS/directadmin-mcp)
 [![license](https://img.shields.io/badge/license-MIT-0b6bcb.svg)](LICENSE)
 
 A [Model Context Protocol](https://modelcontextprotocol.io) server that lets an
@@ -13,6 +13,10 @@ This is the completed OpenIaaS fork of the original half-finished project. It
 covers the [DirectAdmin New JSON API](https://docs.directadmin.com/developer/api/)
 (320 operations from the official swagger) **and** the legacy `CMD_API_*`
 admin calls the New API still does not replace (create user, DNS, backups, BFM).
+
+The intended operator is an **AI agent**. Read [docs/agent.md](docs/agent.md)
+before pointing a model at a production box — confirm gates, impersonation,
+and “never disable CSF” are part of the protocol, not optional courtesy.
 
 ```
 ┌──────────────┐     MCP (stdio / SSE)     ┌──────────────────┐     HTTPS      ┌─────────────┐
@@ -96,6 +100,7 @@ python main.py
 
 Put Caddy or nginx in front with TLS. Clients send
 `Authorization: Bearer <MCP_AUTH_TOKEN>` to `/sse`.
+Do not put the token in the query string.
 
 Docker (loopback only):
 
@@ -157,7 +162,8 @@ Other CSF tools: `csf_allow_ip`, `csf_deny_ip`, `csf_ignore_ip`,
 ## Tool map
 
 Curated tools are grouped by module. Everything else is reachable with
-`da_api` / `da_legacy`. Playbooks: [docs/ssl.md](docs/ssl.md),
+`da_api` / `da_legacy`. Playbooks: [docs/agent.md](docs/agent.md),
+[docs/operations.md](docs/operations.md), [docs/ssl.md](docs/ssl.md),
 [docs/csf.md](docs/csf.md), [docs/hardening.md](docs/hardening.md).
 Inventory: [docs/tools.json](docs/tools.json) (273 curated tools + 320 swagger ops).
 
@@ -238,7 +244,7 @@ The generic catalog picks up new swagger paths when you replace
 | --- | --- | --- |
 | stdio | `server.py` | Claude Desktop, Cursor, local agents |
 | SSE | `main.py` → `/sse` | Older remote MCP clients |
-| HTTP health / tool list | `main.py` | `/health`, `/mcp/tools` |
+| HTTP health / tool list | `main.py` | `/health` (liveness), `/ready` (panel), `/mcp/tools` |
 
 Tested against the official New API swagger (`info.version = 1.0`, 269 paths /
 320 operations). Legacy calls follow

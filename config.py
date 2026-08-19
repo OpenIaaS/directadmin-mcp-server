@@ -12,6 +12,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 load_dotenv()
 
+VERSION = "2.1.0"
+
 
 class Settings(BaseSettings):
     """Environment-driven configuration with safe defaults."""
@@ -67,6 +69,14 @@ class Settings(BaseSettings):
         if value not in {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}:
             raise ValueError("LOG_LEVEL must be a standard logging level")
         return value
+
+    @field_validator("MCP_AUTH_TOKEN")
+    @classmethod
+    def _token_length(cls, value: SecretStr) -> SecretStr:
+        raw = value.get_secret_value() if isinstance(value, SecretStr) else str(value or "")
+        if raw and len(raw) < 24:
+            raise ValueError("MCP_AUTH_TOKEN must be at least 24 characters")
+        return value if isinstance(value, SecretStr) else SecretStr(raw)
 
     @property
     def ssl_verify(self) -> bool:

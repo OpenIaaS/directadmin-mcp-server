@@ -6,6 +6,7 @@ from typing import Any, Dict
 
 from da import call_da_api, client
 from mcp_instance import mcp
+from security import validate_service
 from tools.common import format_response, guard_confirm, log_tool_call
 
 
@@ -24,6 +25,7 @@ async def services_get(service: str) -> Dict[str, Any]:
     Args:
         service: Service name (e.g. httpd, exim, dovecot, named, proftpd).
     """
+    service = validate_service(service)
     return format_response(await call_da_api(f"/api/system-services/service/{service}"))
 
 
@@ -43,11 +45,12 @@ async def services_logs(
         limit: Max lines.
         level: Optional log level filter.
     """
-    params = {"limit": limit}
+    service = validate_service(service)
+    params: Dict[str, Any] = {"limit": max(1, min(int(limit), 1000))}
     if cursor:
-        params["cursor"] = cursor
+        params["cursor"] = cursor[:256]
     if level:
-        params["level"] = level
+        params["level"] = level[:32]
     data = await client.request(
         f"/api/system-services/service/{service}/log", method="GET", params=params
     )
@@ -66,6 +69,7 @@ async def services_start(service: str, confirm: bool = False) -> Dict[str, Any]:
     rejected = guard_confirm("services_start", confirm)
     if rejected:
         return rejected
+    service = validate_service(service)
     return format_response(
         await call_da_api(f"/api/system-services-actions/service/{service}/start", method="POST")
     )
@@ -83,6 +87,7 @@ async def services_stop(service: str, confirm: bool = False) -> Dict[str, Any]:
     rejected = guard_confirm("services_stop", confirm)
     if rejected:
         return rejected
+    service = validate_service(service)
     return format_response(
         await call_da_api(f"/api/system-services-actions/service/{service}/stop", method="POST")
     )
@@ -100,6 +105,7 @@ async def services_restart(service: str, confirm: bool = False) -> Dict[str, Any
     rejected = guard_confirm("services_restart", confirm)
     if rejected:
         return rejected
+    service = validate_service(service)
     return format_response(
         await call_da_api(f"/api/system-services-actions/service/{service}/restart", method="POST")
     )
@@ -117,6 +123,7 @@ async def services_reload(service: str, confirm: bool = False) -> Dict[str, Any]
     rejected = guard_confirm("services_reload", confirm)
     if rejected:
         return rejected
+    service = validate_service(service)
     return format_response(
         await call_da_api(f"/api/system-services-actions/service/{service}/reload", method="POST")
     )
@@ -135,6 +142,7 @@ async def services_watchdog(service: str, enabled: bool, confirm: bool = False) 
     rejected = guard_confirm("services_watchdog", confirm)
     if rejected:
         return rejected
+    service = validate_service(service)
     return format_response(
         await call_da_api(
             f"/api/system-services-actions/service/{service}/watchdog",

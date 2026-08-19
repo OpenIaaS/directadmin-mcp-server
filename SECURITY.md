@@ -16,9 +16,10 @@ See [docs/hardening.md](docs/hardening.md) for the full guide. Short version:
    - the MCP host IP
    - only the commands you need (`CMD_API_*` + plugin `csf` if you use CSF)
    - a short expiry if the deployment is temporary
-2. **Set `MCP_AUTH_TOKEN`** to a 48-byte urlsafe secret. HTTP / SSE mode refuses
-   to start usefully without it (unless `MCP_ALLOW_ANONYMOUS=true`, which is
-   lab-only).
+2. **Set `MCP_AUTH_TOKEN`** to a 48-byte urlsafe secret (≥ 24 characters).
+   HTTP / SSE mode refuses to start usefully without it (unless
+   `MCP_ALLOW_ANONYMOUS=true`, which is lab-only). Send it as
+   `Authorization: Bearer …` — **never** as `?token=`.
 3. Bind HTTP to `127.0.0.1` and put TLS in front (Caddy, nginx, Traefik). The
    Docker Compose file already publishes only on loopback.
 4. Keep `DA_SSL_VERIFY=true`. `DA_ALLOW_INSECURE_HTTP` is for labs.
@@ -44,9 +45,12 @@ See [docs/hardening.md](docs/hardening.md) for the full guide. Short version:
 - Log login keys, passwords, private keys, or bearer tokens
 - Bind `0.0.0.0` without `MCP_AUTH_TOKEN`
 - Disable CSF unless you flip two explicit flags
+- Authenticate a token from a query string
+- Return DirectAdmin exception strings on public `/ready`
 
 ## Supply chain
 
 Pin your own hashes in production if your policy requires it. CI runs
-`ruff` + `pytest` on 3.10 and 3.12. The Docker image runs as UID 10001,
-`cap_drop: ALL`, `no-new-privileges`, read-only root filesystem.
+`ruff` + `pytest` on 3.10 and 3.12 with SHA-pinned Actions.
+The Docker image runs as UID 10001, `cap_drop: ALL`, `no-new-privileges`,
+read-only root filesystem.

@@ -1,3 +1,5 @@
 """DirectAdmin MCP Server."""
 
-__version__ = "2.0.0"
+from config import VERSION
+
+__version__ = VERSION

@@ -6,7 +6,7 @@ from typing import Any, Dict
 
 from da import call_da_api, call_da_legacy
 from mcp_instance import mcp
-from security import validate_username
+from security import validate_query, validate_username
 from tools.common import format_response, guard_confirm, log_tool_call
 
 
@@ -54,6 +54,7 @@ async def users_search(q: str, extended: bool = False) -> Dict[str, Any]:
         q: Query string (username / domain / email fragment).
         extended: Use /api/search/users-extended.
     """
+    q = validate_query(q)
     path = "/api/search/users-extended" if extended else "/api/search/users"
     return format_response(await call_da_api(path, method="GET", data={"q": q}))
 

@@ -6,7 +6,7 @@ from typing import Any, Dict
 
 from da import call_da_legacy
 from mcp_instance import mcp
-from security import validate_username
+from security import validate_backup_file, validate_username
 from tools.common import format_response, guard_confirm, log_tool_call
 
 
@@ -40,7 +40,7 @@ async def backups_create(
         "select0": username,
         "who": username,
         "when": "now",
-        "where": where,
+        "where": where[:32],
     }
     return format_response(await call_da_legacy("CMD_API_USER_BACKUP", method="POST", data=payload))
 
@@ -63,6 +63,7 @@ async def backups_restore(
     if rejected:
         return rejected
     username = validate_username(username)
+    file = validate_backup_file(file)
     payload = {
         "action": "restore",
         "select0": file,
@@ -83,13 +84,13 @@ async def backups_admin_now(
 
     Args:
         who: all | or a username.
-        where: Destination the panel understands (local / ftp).
+        where: Destination the panel understands.
         confirm: Required.
     """
     rejected = guard_confirm("backups_admin_now", confirm)
     if rejected:
         return rejected
-    if who != "all":
+    if who not in {"all", "except", "selected"}:
         who = validate_username(who)
-    payload = {"action": "backup", "who": who, "when": "now", "where": where}
+    payload = {"action": "backup", "who": who, "when": "now", "where": where[:32]}
     return format_response(await call_da_legacy("CMD_API_ADMIN_BACKUP", method="POST", data=payload))

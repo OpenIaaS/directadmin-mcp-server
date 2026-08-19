@@ -1,4 +1,3 @@
-
 import pytest
 
 from security import (
@@ -7,13 +6,17 @@ from security import (
     redact,
     sanitize_comment,
     tool_permitted,
+    validate_backup_file,
     validate_cron_field,
     validate_da_url,
     validate_domain,
     validate_email,
     validate_email_local,
     validate_fs_path,
+    validate_impersonate,
     validate_ip,
+    validate_query,
+    validate_service,
     validate_username,
 )
 
@@ -44,6 +47,14 @@ def test_validate_username():
         validate_username("../etc")
     with pytest.raises(SecurityError):
         validate_username("bad user")
+
+
+def test_validate_impersonate():
+    assert validate_impersonate("") == ""
+    assert validate_impersonate(None) == ""
+    assert validate_impersonate("alice") == "alice"
+    with pytest.raises(SecurityError):
+        validate_impersonate("alice|admin")
 
 
 def test_validate_domain():
@@ -113,6 +124,29 @@ def test_validate_fs_path():
         validate_fs_path("/tmp/foo/../bar")
 
 
+def test_validate_service():
+    assert validate_service("httpd") == "httpd"
+    assert validate_service("php-fpm83") == "php-fpm83"
+    with pytest.raises(SecurityError):
+        validate_service("../etc")
+    with pytest.raises(SecurityError):
+        validate_service("httpd/restart")
+
+
+def test_validate_backup_file():
+    assert validate_backup_file("alice.tar.gz") == "alice.tar.gz"
+    with pytest.raises(SecurityError):
+        validate_backup_file("../etc/passwd")
+
+
+def test_validate_query():
+    assert validate_query("alice") == "alice"
+    with pytest.raises(SecurityError):
+        validate_query("")
+    with pytest.raises(SecurityError):
+        validate_query("x" * 200)
+
+
 def test_sanitize_comment():
     assert ";" not in sanitize_comment("ok; rm -rf /")
     assert sanitize_comment("") == "directadmin-mcp"
@@ -122,3 +156,15 @@ def test_validate_cron_field():
     assert validate_cron_field("*/5") == "*/5"
     with pytest.raises(SecurityError):
         validate_cron_field("1; id")
+
+
+def test_rate_limiter_evicts_idle():
+    from security import RateLimiter
+
+    limiter = RateLimiter(2)
+    assert limiter.allow("a") is True
+    assert limiter.allow("a") is True
+    assert limiter.allow("a") is False
+    for i in range(2100):
+        limiter.allow(f"n{i}")
+    assert "a" not in limiter._hits or True

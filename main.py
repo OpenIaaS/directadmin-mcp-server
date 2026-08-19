@@ -13,7 +13,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.routing import Mount
 
-from config import settings, setup_logging
+from config import VERSION, settings, setup_logging
 from mcp_instance import mcp
 from security import (
     constant_time_token_match,
@@ -47,13 +47,17 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
         response.headers["Cache-Control"] = "no-store"
         response.headers["X-Robots-Tag"] = "noindex"
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'none'; style-src 'unsafe-inline'; "
+            "img-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
+        )
         return response
 
 
 class GateMiddleware(BaseHTTPMiddleware):
-    """Bearer token + CIDR + rate-limit for every HTTP route except /health."""
+    """Bearer token + CIDR + rate-limit for every HTTP route except liveness."""
 
-    PUBLIC = {"/health", "/favicon.ico"}
+    PUBLIC = {"/health", "/ready", "/favicon.ico"}
 
     async def dispatch(self, request: Request, call_next):
         path = request.url.path
@@ -68,7 +72,8 @@ class GateMiddleware(BaseHTTPMiddleware):
         identity = ip
         expected = settings.MCP_AUTH_TOKEN.get_secret_value()
         if expected:
-            provided = request.headers.get("authorization") or request.query_params.get("token")
+            # Header only. Query-string tokens leak via logs, Referer, history.
+            provided = request.headers.get("authorization")
             if not constant_time_token_match(provided, expected):
                 write_audit("http_auth_fail", ip=ip, path=path)
                 return JSONResponse({"error": "unauthorized"}, status_code=401)
@@ -107,13 +112,16 @@ async def lifespan(app: FastAPI):
     loaded = tools.load_all_tools()
     logger.info("Loaded %d tool modules: %s", len(loaded), ", ".join(loaded))
     yield
+    from da import client
+
+    await client.aclose()
     logger.info("DirectAdmin MCP Server shutting down")
 
 
 app = FastAPI(
     title="DirectAdmin MCP Server",
     description="Model Context Protocol bridge for the DirectAdmin New API + CSF + SSL.",
-    version="2.0.0",
+    version=VERSION,
     lifespan=lifespan,
     docs_url="/docs" if settings.DEBUG else None,
     redoc_url=None,
@@ -145,25 +153,26 @@ except Exception as exc:  # pragma: no cover
 
 @app.get("/", response_class=HTMLResponse)
 async def homepage() -> str:
-    return """<!doctype html>
+    return f"""<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>DirectAdmin MCP</title>
 <style>
-  :root { color-scheme: dark; }
-  body { font: 16px/1.5 ui-sans-serif, system-ui; margin: 0; background: #0c1014; color: #e6edf3; }
-  main { max-width: 720px; margin: 0 auto; padding: 3rem 1.25rem; }
-  h1 { font-size: 1.75rem; letter-spacing: -0.03em; }
-  a { color: #3d9cf0; }
-  code { background: #141a21; padding: 0.1em 0.35em; border-radius: 4px; }
-  .card { background: #141a21; border: 1px solid #243040; border-radius: 12px; padding: 1.25rem; }
+  :root {{ color-scheme: dark; }}
+  body {{ font: 16px/1.5 ui-sans-serif, system-ui; margin: 0; background: #0c1014; color: #e6edf3; }}
+  main {{ max-width: 720px; margin: 0 auto; padding: 3rem 1.25rem; }}
+  h1 {{ font-size: 1.75rem; letter-spacing: -0.03em; }}
+  a {{ color: #3d9cf0; }}
+  code {{ background: #141a21; padding: 0.1em 0.35em; border-radius: 4px; }}
+  .card {{ background: #141a21; border: 1px solid #243040; border-radius: 12px; padding: 1.25rem; }}
 </style></head>
 <body><main>
-  <h1>DirectAdmin MCP Server</h1>
+  <h1>DirectAdmin MCP Server {VERSION}</h1>
   <p>Bridge between an AI assistant and a DirectAdmin admin account. Prefer stdio locally; this HTTP port is for SSE / streamable HTTP.</p>
   <div class="card">
-    <p><strong>Health</strong> — <a href="/health">/health</a></p>
-    <p><strong>SSE</strong> — <code>/sse</code></p>
+    <p><strong>Liveness</strong> — <a href="/health">/health</a></p>
+    <p><strong>Readiness</strong> — <a href="/ready">/ready</a></p>
+    <p><strong>SSE</strong> — <code>/sse</code> (Authorization: Bearer)</p>
     <p><strong>Tools</strong> — <a href="/mcp/tools">/mcp/tools</a></p>
   </div>
 </main></body></html>"""
@@ -171,29 +180,33 @@ async def homepage() -> str:
 
 @app.get("/health")
 async def health():
+    """Process liveness. Does not touch DirectAdmin — safe for Docker HEALTHCHECK."""
+    return {"status": "ok", "version": VERSION}
+
+
+@app.get("/ready")
+async def ready():
+    """Readiness: can we reach the panel? No exception strings on the wire."""
     from da import DirectAdminError, client
 
     da_ok = False
-    version = None
-    error = None
     try:
-        version = await client.call_api("/api/version")
+        await client.call_api("/api/version")
         da_ok = True
-    except DirectAdminError as exc:
-        error = str(exc)
-    except Exception as exc:
-        error = str(exc)
-    tools = []
-    try:
-        tools = await mcp.list_tools()
+    except DirectAdminError:
+        da_ok = False
     except Exception:
-        pass
-    status = "healthy" if da_ok else "degraded"
+        da_ok = False
+    tools = 0
+    try:
+        tools = len(await mcp.list_tools())
+    except Exception:
+        tools = 0
     payload = {
-        "status": status,
-        "version": "2.0.0",
-        "directadmin": {"connected": da_ok, "version": version, "error": error},
-        "mcp": {"tools": len(tools)},
+        "status": "ready" if da_ok else "degraded",
+        "version": VERSION,
+        "directadmin": {"connected": da_ok},
+        "mcp": {"tools": tools},
     }
     return JSONResponse(payload, status_code=200 if da_ok else 503)
 
@@ -203,7 +216,7 @@ async def about():
     tools = await mcp.list_tools()
     return {
         "name": "DirectAdmin MCP Server",
-        "version": "2.0.0",
+        "version": VERSION,
         "tools": len(tools),
         "config": settings.public_dict(),
     }

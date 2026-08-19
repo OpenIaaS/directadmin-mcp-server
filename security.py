@@ -60,6 +60,7 @@ DESTRUCTIVE_HINTS = (
 
 _EMAIL_LOCAL = re.compile(r"^[A-Za-z0-9._%+-]{1,64}$")
 _CRON_FIELD = re.compile(r"^[\d*/,\-]+$")
+_SERVICE = re.compile(r"^[A-Za-z0-9._-]{1,64}$")
 
 
 class SecurityError(Exception):
@@ -123,6 +124,13 @@ def validate_username(value: str) -> str:
     return value
 
 
+def validate_impersonate(value: Optional[str]) -> str:
+    """Empty is fine (admin context). Otherwise a DirectAdmin username."""
+    if not value:
+        return ""
+    return validate_username(value)
+
+
 def validate_domain(value: str) -> str:
     if not value or len(value) > 253:
         raise SecurityError("Invalid domain")
@@ -158,6 +166,35 @@ def validate_fs_path(value: str) -> str:
     if any(part == ".." for part in value.replace("\\", "/").split("/")):
         raise SecurityError("Path traversal is not allowed")
     return value
+
+
+def validate_service(value: str) -> str:
+    """systemd / DirectAdmin service name (httpd, php-fpm83, named, …)."""
+    if not value or not _SERVICE.fullmatch(value):
+        raise SecurityError("Invalid service name")
+    return value
+
+
+def validate_backup_file(value: str) -> str:
+    """Backup filename as listed by the panel. No traversal."""
+    if not value or not isinstance(value, str) or len(value) > 255:
+        raise SecurityError("Invalid backup file")
+    if "\x00" in value:
+        raise SecurityError("Invalid backup file")
+    if any(part == ".." for part in value.replace("\\", "/").split("/")):
+        raise SecurityError("Path traversal is not allowed")
+    return value
+
+
+def validate_query(value: str, max_len: int = 128) -> str:
+    if value is None:
+        raise SecurityError("Query is required")
+    cleaned = value.strip()
+    if not cleaned or len(cleaned) > max_len:
+        raise SecurityError("Invalid query")
+    if "\x00" in cleaned:
+        raise SecurityError("Invalid query")
+    return cleaned
 
 
 def sanitize_comment(value: str, max_len: int = 80) -> str:
@@ -224,7 +261,7 @@ def confirm_or_reject(tool_name: str, confirm: bool, extra_flag: bool = False) -
 
 
 class RateLimiter:
-    """Simple sliding-window limiter (per-process)."""
+    """Simple sliding-window limiter (per-process). Evicts idle identities."""
 
     def __init__(self, per_minute: int) -> None:
         self.per_minute = per_minute
@@ -237,6 +274,14 @@ class RateLimiter:
         now = time.time()
         window = 60.0
         with self._lock:
+            if len(self._hits) > 2048:
+                stale = [
+                    key
+                    for key, bucket in self._hits.items()
+                    if not bucket or now - bucket[-1] > window
+                ]
+                for key in stale:
+                    del self._hits[key]
             bucket = self._hits[identity]
             while bucket and now - bucket[0] > window:
                 bucket.popleft()

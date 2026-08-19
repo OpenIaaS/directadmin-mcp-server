@@ -3,14 +3,15 @@
 from __future__ import annotations
 
 import base64
+import json
 import logging
 from typing import Any, Dict, Mapping, Optional, Union
 from urllib.parse import parse_qs
 
 import httpx
 
-from config import settings
-from security import SecurityError, redact, validate_da_url, write_audit
+from config import VERSION, settings
+from security import SecurityError, redact, validate_da_url, validate_impersonate, write_audit
 
 logger = logging.getLogger(__name__)
 
@@ -48,8 +49,6 @@ def _parse_legacy(text: str) -> Any:
         return {}
     stripped = text.strip()
     if stripped.startswith("{") or stripped.startswith("["):
-        import json
-
         try:
             return json.loads(stripped)
         except json.JSONDecodeError:
@@ -86,17 +85,34 @@ class DirectAdminClient:
         self.username = username or settings.DA_USERNAME
         self.login_key = login_key or settings.DA_LOGIN_KEY.get_secret_value()
         self.verify_ssl = settings.ssl_verify if verify_ssl is None else verify_ssl
-        self.impersonate = (
+        self.impersonate = validate_impersonate(
             impersonate if impersonate is not None else settings.DA_IMPERSONATE
         )
         self.timeout = timeout or settings.DA_TIMEOUT
+        self._http: Optional[httpx.AsyncClient] = None
+
+    def _ensure_http(self) -> httpx.AsyncClient:
+        if self._http is None or self._http.is_closed:
+            self._http = httpx.AsyncClient(
+                follow_redirects=False,
+                verify=self.verify_ssl,
+                timeout=httpx.Timeout(self.timeout),
+                limits=httpx.Limits(max_keepalive_connections=8, max_connections=16),
+            )
+        return self._http
+
+    async def aclose(self) -> None:
+        if self._http is not None and not self._http.is_closed:
+            await self._http.aclose()
+        self._http = None
 
     def _headers(self, impersonate: Optional[str], json_body: bool) -> Dict[str, str]:
         target = impersonate if impersonate is not None else self.impersonate
+        target = validate_impersonate(target)
         headers = {
             "Authorization": f"Basic {_basic_token(self.username, self.login_key, target)}",
             "Accept": "application/json",
-            "User-Agent": "directadmin-mcp/2.0",
+            "User-Agent": f"directadmin-mcp/{VERSION}",
         }
         if json_body:
             headers["Content-Type"] = "application/json"
@@ -132,26 +148,23 @@ class DirectAdminClient:
         )
 
         try:
-            async with httpx.AsyncClient(
-                follow_redirects=False,
-                verify=self.verify_ssl,
-                timeout=timeout or self.timeout,
-            ) as http:
-                kwargs: Dict[str, Any] = {
-                    "method": method,
-                    "url": url,
-                    "headers": self._headers(impersonate, json_body=json_mode and not form),
-                    "params": params,
-                }
-                if method != "GET":
-                    if form:
-                        kwargs["data"] = data
-                        kwargs["headers"]["Content-Type"] = "application/x-www-form-urlencoded"
-                    elif json_mode:
-                        kwargs["json"] = data
-                    else:
-                        kwargs["data"] = data
-                response = await http.request(**kwargs)
+            http = self._ensure_http()
+            kwargs: Dict[str, Any] = {
+                "method": method,
+                "url": url,
+                "headers": self._headers(impersonate, json_body=json_mode and not form),
+                "params": params,
+                "timeout": timeout or self.timeout,
+            }
+            if method != "GET":
+                if form:
+                    kwargs["data"] = data
+                    kwargs["headers"]["Content-Type"] = "application/x-www-form-urlencoded"
+                elif json_mode:
+                    kwargs["json"] = data
+                else:
+                    kwargs["data"] = data
+            response = await http.request(**kwargs)
         except httpx.RequestError as exc:
             raise DirectAdminError(f"Cannot reach DirectAdmin: {exc}") from exc
 
