@@ -175,6 +175,12 @@
         "destructive": false
       },
       {
+        "name": "bfm_ip_reason",
+        "module": "brute_force",
+        "summary": "Why BFM listed an IP: service, user, attempts, log line.",
+        "destructive": false
+      },
+      {
         "name": "bfm_unblock_ip",
         "module": "brute_force",
         "summary": "Remove an IP from DirectAdmin Brute Force Monitor blocks.",

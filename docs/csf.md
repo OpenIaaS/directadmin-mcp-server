@@ -18,9 +18,14 @@ states) **and** `bfm_unblock_ip`.
 
 ```
 csf_search_ip   ip=203.0.113.44
+bfm_ip_reason   ip=203.0.113.44
 bfm_list
 csf_status
 ```
+
+`bfm_ip_reason` is the BFM “why”: service (dovecot / exim / ssh / DA login /
+WordPress), username tried, attempt count, and the log line. The New JSON API
+does not expose this — it is `CMD_API_BRUTE_FORCE_MONITOR`.
 
 ## Unblock only CSF
 

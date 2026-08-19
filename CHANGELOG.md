@@ -1,6 +1,12 @@
 # Changelog
 
+## 2.4.2 — 2026-08-19
+
+- `bfm_ip_reason` — why Brute Force Monitor listed an IP (service, user,
+  attempts, log line). Same data as Admin → BFM; not in the New JSON API.
+
 ## 2.4.1 — 2026-08-19
+
 
 - CI: pytest 8+ no longer puts the repo root on `sys.path`. Set
   `pythonpath = ["."]`, `PYTHONPATH=.`, and `pip install -e .` so the
