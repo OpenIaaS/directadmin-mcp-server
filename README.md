@@ -13,10 +13,11 @@ as structured JSON, rate-limited, and refused outside a maintenance window.
 SSL reissue and CSF/BFM unlock are first-class helpdesk actions — they are
 not the whole product.
 
-The intended layout is a **hops host** next to the agent (not an install on
-every DA box): a read-only listener for the chatty agent and a write listener
-for allowed mutations. Fleet facts (CloudLinux, profile) live in
-`inventory.json` on that hops machine.
+The intended layout is an ops host, not an install on every DirectAdmin
+server. Bind a read-only listener for inspection and a separate write
+listener for approved changes (SSL reissue, CSF/BFM unlock). Per-server
+facts such as CloudLinux and the policy profile live in `inventory.json`
+on that host.
 
 It covers the [DirectAdmin New JSON API](https://docs.directadmin.com/developer/api/)
 (320 operations from the official swagger) **and** the legacy `CMD_API_*`
