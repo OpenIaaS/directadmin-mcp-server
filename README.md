@@ -30,11 +30,11 @@ before pointing a model at production.
 <div align="center">
 
 ```
-┌───────────┐ stdio/SSE ┌─────────────────┐ HTTPS ┌─────────────┐
-│ Claude /  │ ────────► │ directadmin-mcp │ ────► │ DirectAdmin │
-│ Cursor /  │           │ confirm · audit │  key  │ :2222 + CSF │
-│ any MCP   │ ◄──────── │                 │       │             │
-└───────────┘           └─────────────────┘       └─────────────┘
+┌────────────┐  stdio / SSE  ┌─────────────────────────┐  HTTPS  ┌──────────────┐
+│ Claude /   │ ────────────► │ directadmin-mcp-server  │ ──────► │ DirectAdmin  │
+│ Cursor /   │               │ confirm · audit.jsonl   │   key   │ :2222 + CSF  │
+│ any MCP    │ ◄──────────── │                         │         │              │
+└────────────┘               └─────────────────────────┘         └──────────────┘
 ```
 
 </div>
