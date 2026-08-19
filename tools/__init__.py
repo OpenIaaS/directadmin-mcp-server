@@ -36,6 +36,8 @@ _PREFERRED = [
     "plugins",
     "wordpress",
     "git_deploy",
+    "propack",
+    "cloudlinux",
     "search",
     "catalog",
 ]

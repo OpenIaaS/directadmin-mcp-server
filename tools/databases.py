@@ -219,6 +219,10 @@ async def db_kill_process(process_id: str, confirm: bool = False) -> Dict[str, A
     rejected = guard_confirm("db_kill_process", confirm)
     if rejected:
         return rejected
+    if not process_id or "/" in process_id or ".." in process_id:
+        from tools.common import format_error
+
+        return format_error("Invalid process id")
     return format_response(
         await call_da_api(f"/api/db-monitor/processes/{process_id}/kill", method="POST")
     )

@@ -39,6 +39,8 @@ model sees it at session start.
 | “Restart php-fpm83” | `services_get php-fpm83` | `services_restart confirm=true` |
 | “User alice is over quota” | `users_get_usage alice` | tell the operator; do not silently raise limits |
 | “Back up bob before we touch him” | `backups_admin_list` | `backups_create username=bob confirm=true` |
+| “Throttle alice (CloudLinux)” | `cl_status` then `cl_lve_get` | `cl_lve_set confirm=true` |
+| “WordPress / Unit / Redis” | `propack_inventory` | matching curated tool |
 | Anything else in `/api/*` | `da_list_endpoints` | `da_describe_endpoint` → `da_api` |
 
 ## Least privilege for a help-desk agent

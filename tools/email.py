@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import re
 from typing import Any, Dict
 
 from da import call_da_api
 from mcp_instance import mcp
 from security import validate_domain
-from tools.common import format_response, guard_confirm, log_tool_call
+from tools.common import format_error, format_response, guard_confirm, log_tool_call
 
 
 @mcp.tool()
@@ -109,3 +110,52 @@ async def email_mobileconfig() -> Dict[str, Any]:
 async def imapsync_migrations() -> Dict[str, Any]:
     """IMAP migration tasks."""
     return format_response(await call_da_api("/api/imapsync/migrations"))
+
+
+@mcp.tool()
+@log_tool_call
+async def imapsync_import(payload: Dict[str, Any], confirm: bool = False) -> Dict[str, Any]:
+    """Import mail from a remote IMAP server into this box.
+
+    Args:
+        payload: Panel imapsync import body (host, user, password, dest).
+        confirm: Required. Passwords in the payload are redacted in logs.
+    """
+    rejected = guard_confirm("imapsync_import", confirm)
+    if rejected:
+        return rejected
+    return format_response(await call_da_api("/api/imapsync/import", method="POST", data=payload))
+
+
+@mcp.tool()
+@log_tool_call
+async def imapsync_export(payload: Dict[str, Any], confirm: bool = False) -> Dict[str, Any]:
+    """Export mail from this box to a remote IMAP server.
+
+    Args:
+        payload: Panel imapsync export body.
+        confirm: Required.
+    """
+    rejected = guard_confirm("imapsync_export", confirm)
+    if rejected:
+        return rejected
+    return format_response(await call_da_api("/api/imapsync/export", method="POST", data=payload))
+
+
+@mcp.tool()
+@log_tool_call
+async def imapsync_cancel(migration_id: str, confirm: bool = False) -> Dict[str, Any]:
+    """Cancel a running IMAP migration.
+
+    Args:
+        migration_id: Id from imapsync_migrations.
+        confirm: Required.
+    """
+    rejected = guard_confirm("imapsync_cancel", confirm)
+    if rejected:
+        return rejected
+    if not re.fullmatch(r"[A-Za-z0-9._-]{1,80}", migration_id):
+        return format_error("Invalid migration id")
+    return format_response(
+        await call_da_api(f"/api/imapsync/migrations/{migration_id}", method="DELETE")
+    )

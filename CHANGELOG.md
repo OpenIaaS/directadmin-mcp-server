@@ -1,6 +1,25 @@
 # Changelog
 
+## 2.3.0 — 2026-08-19
+
+### Pro Pack
+
+- `propack_inventory` maps every Pro Pack feature to a curated tool.
+- Nginx Unit: `unit_list` / `unit_create` / `unit_delete` (`CMD_UNIT`).
+- Nginx CMS templates: `nginx_set_template` (closed allow-list).
+- IMAP sync import / export / cancel.
+- Git deploy webhook rotation.
+- Web Terminal (`/api/terminal`) stays blocked.
+
+### CloudLinux
+
+- New module `cl_*` talks to LVE Manager / CloudLinux Manager plugin.
+- Detect, list/set LVE limits, CageFS enable/disable, PHP Selector.
+- Gated by `ENABLE_CLOUDLINUX`. No shell, no `/api/execute`.
+- Limit values must be a number, a percent, or `unlimited`.
+
 ## 2.2.0 — 2026-08-19
+
 
 ### Admin SSL
 

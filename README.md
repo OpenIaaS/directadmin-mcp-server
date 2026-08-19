@@ -1,7 +1,7 @@
 # DirectAdmin MCP Server
 
 [![ci](https://github.com/OpenIaaS/directadmin-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenIaaS/directadmin-mcp/actions/workflows/ci.yml)
-[![version](https://img.shields.io/badge/version-2.2.0-0b6bcb.svg)](https://github.com/OpenIaaS/directadmin-mcp)
+[![version](https://img.shields.io/badge/version-2.3.0-0b6bcb.svg)](https://github.com/OpenIaaS/directadmin-mcp)
 [![license](https://img.shields.io/badge/license-MIT-0b6bcb.svg)](LICENSE)
 
 A [Model Context Protocol](https://modelcontextprotocol.io) server that lets an
@@ -174,7 +174,8 @@ Other CSF tools: `csf_allow_ip`, `csf_deny_ip`, `csf_ignore_ip`,
 Curated tools are grouped by module. Everything else is reachable with
 `da_api` / `da_legacy`. Playbooks: [docs/agent.md](docs/agent.md),
 [docs/operations.md](docs/operations.md), [docs/ssl.md](docs/ssl.md),
-[docs/csf.md](docs/csf.md), [docs/hardening.md](docs/hardening.md).
+[docs/csf.md](docs/csf.md), [docs/propack.md](docs/propack.md),
+[docs/cloudlinux.md](docs/cloudlinux.md), [docs/hardening.md](docs/hardening.md).
 Inventory: [docs/tools.json](docs/tools.json) (273 curated tools + 320 swagger ops).
 
 | Module | Tools (prefix) | Notes |
@@ -191,6 +192,8 @@ Inventory: [docs/tools.json](docs/tools.json) (273 curated tools + 320 swagger o
 | Security | `modsecurity_*`, `clamav_*`, `security_txt_*`, `redis_*` | WAF / AV |
 | Data | `db_*`, `fm_*`, `email_*`, `dns_*`, `ips_*`, `backups_*`, `domains_*`, `ftp_*`, `cron_*` | Admin day-2 |
 | Build | `cb_*`, `plugins_*`, `wp_*`, `git_*`, `cpanel_*` | CustomBuild / apps |
+| Pro Pack | `unit_*`, `nginx_set_template`, `imapsync_*`, `propack_inventory` | Unit + templates; no web terminal |
+| CloudLinux | `cl_*` | LVE Manager plugin; `ENABLE_CLOUDLINUX` |
 | Escape hatches | `da_ping`, `da_list_endpoints`, `da_describe_endpoint`, `da_api`, `da_legacy` | Full swagger |
 
 `da_api` only accepts paths that exist in the bundled

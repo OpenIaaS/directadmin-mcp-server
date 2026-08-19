@@ -6,7 +6,7 @@ from typing import Any, Dict
 
 from da import call_da_api
 from mcp_instance import mcp
-from security import validate_domain
+from security import validate_domain, validate_username
 from tools.common import format_response, guard_confirm, log_tool_call
 
 
@@ -57,3 +57,23 @@ async def git_fetch(uuid: str) -> Dict[str, Any]:
         uuid: Application uuid.
     """
     return format_response(await call_da_api(f"/api/git/uuid/{uuid}/fetch", method="POST"))
+
+
+@mcp.tool()
+@log_tool_call
+async def git_webhook(username: str, uuid: str, confirm: bool = False) -> Dict[str, Any]:
+    """Create or rotate the deploy webhook for a git application.
+
+    Args:
+        username: Owning user.
+        uuid: Application uuid.
+        confirm: Required — webhook URLs are secrets.
+    """
+    rejected = guard_confirm("git_webhook", confirm)
+    if rejected:
+        return rejected
+    username = validate_username(username)
+    return format_response(
+        await call_da_api(f"/api/git/user/{username}/uuid/{uuid}/webhook", method="POST")
+    )
+

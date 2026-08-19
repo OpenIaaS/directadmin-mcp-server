@@ -89,7 +89,19 @@ Always impersonate the owner:
 # impersonate=alice on every call
 ```
 
-## 9. When there is no curated tool
+## 9. Pro Pack / CloudLinux
+
+```
+propack_inventory
+cl_status
+cl_lve_get     username=alice
+cl_lve_set     username=alice  speed=50%  confirm=true
+unit_list      domain=shop.example.com  impersonate=alice
+```
+
+Web Terminal is blocked. CloudLinux writes go through the LVE Manager plugin.
+
+## 10. When there is no curated tool
 
 ```
 da_list_endpoints       prefix=/api/…
@@ -100,14 +112,14 @@ da_api                  method=POST path=/api/…  confirm=true
 
 `/api/execute`, `/api/login`, `/api/logout`, `/api/terminal` are blocked.
 
-## 10. Incident: key leaked
+## 11. Incident: key leaked
 
 1. Revoke the DirectAdmin login key in the panel.
 2. Rotate `MCP_AUTH_TOKEN`.
 3. Read `logs/audit.jsonl` for the window after the leak.
 4. Issue a new IP-restricted login key.
 
-## 11. Health
+## 12. Health
 
 | URL | Auth | Meaning |
 | --- | --- | --- |
