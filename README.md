@@ -1,7 +1,7 @@
 # DirectAdmin MCP Server
 
-[![ci](https://github.com/OpenIaaS/directadmin-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenIaaS/directadmin-mcp/actions/workflows/ci.yml)
-[![version](https://img.shields.io/badge/version-2.6.0-0b6bcb.svg)](https://github.com/OpenIaaS/directadmin-mcp)
+[![ci](https://github.com/OpenIaaS/directadmin-mcp-server/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenIaaS/directadmin-mcp-server/actions/workflows/ci.yml)
+[![version](https://img.shields.io/badge/version-2.6.0-0b6bcb.svg)](https://github.com/OpenIaaS/directadmin-mcp-server)
 [![license](https://img.shields.io/badge/license-MIT-0b6bcb.svg)](LICENSE)
 
 A production [Model Context Protocol](https://modelcontextprotocol.io) control
@@ -59,8 +59,8 @@ Destructive calls (`delete`, `deny`, `restart`, `reissue`, `unblock`, …)
 ## Quick start (stdio — Claude Desktop / Cursor)
 
 ```bash
-git clone https://github.com/OpenIaaS/directadmin-mcp.git
-cd directadmin-mcp
+git clone https://github.com/OpenIaaS/directadmin-mcp-server.git
+cd directadmin-mcp-server
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
