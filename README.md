@@ -1,7 +1,7 @@
 # DirectAdmin MCP Server
 
 [![ci](https://github.com/OpenIaaS/directadmin-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenIaaS/directadmin-mcp/actions/workflows/ci.yml)
-[![version](https://img.shields.io/badge/version-2.3.0-0b6bcb.svg)](https://github.com/OpenIaaS/directadmin-mcp)
+[![version](https://img.shields.io/badge/version-2.3.1-0b6bcb.svg)](https://github.com/OpenIaaS/directadmin-mcp)
 [![license](https://img.shields.io/badge/license-MIT-0b6bcb.svg)](LICENSE)
 
 A [Model Context Protocol](https://modelcontextprotocol.io) server that lets an
@@ -193,7 +193,7 @@ Inventory: [docs/tools.json](docs/tools.json) (273 curated tools + 320 swagger o
 | Data | `db_*`, `fm_*`, `email_*`, `dns_*`, `ips_*`, `backups_*`, `domains_*`, `ftp_*`, `cron_*` | Admin day-2 |
 | Build | `cb_*`, `plugins_*`, `wp_*`, `git_*`, `cpanel_*` | CustomBuild / apps |
 | Pro Pack | `unit_*`, `nginx_set_template`, `imapsync_*`, `propack_inventory` | Unit + templates; no web terminal |
-| CloudLinux | `cl_*` | LVE Manager plugin; `ENABLE_CLOUDLINUX` |
+| CloudLinux | `cl_*` | Opt-in (`ENABLE_CLOUDLINUX=false` by default) |
 | Escape hatches | `da_ping`, `da_list_endpoints`, `da_describe_endpoint`, `da_api`, `da_legacy` | Full swagger |
 
 `da_api` only accepts paths that exist in the bundled

@@ -30,13 +30,16 @@ PLUGIN_PATHS = (
 _LIMIT = re.compile(r"^(unlimited|\d+%?)$", re.IGNORECASE)
 
 
-def _require() -> Optional[Dict[str, Any]]:
-    if not settings.ENABLE_CLOUDLINUX:
-        return format_error(
-            "CloudLinux tools are disabled (ENABLE_CLOUDLINUX=false). "
-            "Turn them on only on CloudLinux hosts with LVE Manager installed."
-        )
-    return None
+def _require(write: bool = True) -> Optional[Dict[str, Any]]:
+    if settings.ENABLE_CLOUDLINUX:
+        return None
+    if not write:
+        return None
+    return format_error(
+        "CloudLinux tools are opt-in (ENABLE_CLOUDLINUX=false). "
+        "Most hosts do not run CloudLinux — set ENABLE_CLOUDLINUX=true only "
+        "on the boxes that have LVE Manager installed."
+    )
 
 
 def _as_text(payload: Any) -> str:
@@ -89,9 +92,17 @@ async def cl_status() -> Dict[str, Any]:
 
     Reads the plugin list and pings LVE Manager. Does not change anything.
     """
-    blocked = _require()
+    blocked = _require(write=False)
     if blocked:
         return blocked
+    if not settings.ENABLE_CLOUDLINUX:
+        return format_response(
+            {
+                "enabled": False,
+                "plugin_reachable": False,
+                "hint": "Opt-in is off. Set ENABLE_CLOUDLINUX=true only on CloudLinux hosts.",
+            }
+        )
     plugins = None
     try:
         from da import call_da_api
@@ -107,6 +118,7 @@ async def cl_status() -> Dict[str, Any]:
         available = False
     return format_response(
         {
+            "enabled": True,
             "cloudlinux_tools": True,
             "plugin_reachable": available,
             "plugins": plugins,

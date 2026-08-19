@@ -1,6 +1,13 @@
 # Changelog
 
+## 2.3.1 — 2026-08-19
+
+- CloudLinux is opt-in. `ENABLE_CLOUDLINUX` defaults to **false** so the
+  majority of (non-CL) servers never hit LVE Manager. `cl_status` still
+  answers. Set `true` only on the CloudLinux boxes.
+
 ## 2.3.0 — 2026-08-19
+
 
 ### Pro Pack
 

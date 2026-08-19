@@ -10,11 +10,12 @@ They **never** spawn `lvectl` / `cagefsctl` and they **never** use
 ## Enable
 
 ```
-ENABLE_CLOUDLINUX=true
+ENABLE_CLOUDLINUX=false   # default — most servers do not run CloudLinux
+ENABLE_CLOUDLINUX=true    # only on the 7–8 boxes with LVE Manager
 ```
 
-Off on non-CL boxes (`ENABLE_CLOUDLINUX=false`) so the agent does not poke a
-missing plugin.
+Default is **off**. `cl_status` still answers (reports opt-in is off) so the
+agent does not guess. Every other `cl_*` tool refuses until the flag is on.
 
 The login key must be allowed to run `CMD_PLUGINS_ADMIN`.
 

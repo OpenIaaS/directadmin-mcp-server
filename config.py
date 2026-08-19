@@ -12,7 +12,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 load_dotenv()
 
-VERSION = "2.3.0"
+VERSION = "2.3.1"
 
 
 class Settings(BaseSettings):
@@ -54,7 +54,7 @@ class Settings(BaseSettings):
     ENABLE_EXECUTE: bool = Field(False)
     ENABLE_CSF: bool = Field(True)
     ENABLE_CSF_DISABLE: bool = Field(False)
-    ENABLE_CLOUDLINUX: bool = Field(True)
+    ENABLE_CLOUDLINUX: bool = Field(False)
     RATE_LIMIT_PER_MINUTE: int = Field(60, ge=0)
     AUDIT_LOG: str = Field("logs/audit.jsonl")
 

@@ -44,3 +44,9 @@ def test_unit_and_terminal_blocked_in_catalog():
     src = (Path(__file__).resolve().parents[1] / "tools" / "catalog.py").read_text()
     assert "/api/terminal" in src
     assert "/api/execute" in src
+
+
+def test_cloudlinux_is_opt_in():
+    from config import Settings
+
+    assert Settings.model_fields["ENABLE_CLOUDLINUX"].default is False
