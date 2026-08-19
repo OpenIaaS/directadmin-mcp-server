@@ -114,6 +114,8 @@ async def ssl_reissue_domain(
     impersonate: str = "",
     dry_run: bool = False,
     confirm: bool = False,
+    reason: str = "",
+    idempotency_key: str = "",
 ) -> Dict[str, Any]:
     """Reissue / provision the Let's Encrypt (or configured ACME) certificate for a domain.
 
@@ -416,7 +418,9 @@ async def ssl_set_server_acme_config(
 
 @mcp.tool()
 @log_tool_call
-async def ssl_reissue_server(confirm: bool = False) -> Dict[str, Any]:
+async def ssl_reissue_server(
+    confirm: bool = False, reason: str = "", idempotency_key: str = ""
+) -> Dict[str, Any]:
     """Force-obtain / reissue the DirectAdmin hostname TLS certificate.
 
     Calls POST /api/server-tls/obtain. Use this when the panel hostname cert
@@ -542,6 +546,8 @@ async def ssl_admin_reissue(
     domains: List[str],
     wildcard: bool = False,
     confirm: bool = False,
+    reason: str = "",
+    idempotency_key: str = "",
 ) -> Dict[str, Any]:
     """Request Let's Encrypt certificates for selected customer domains.
 

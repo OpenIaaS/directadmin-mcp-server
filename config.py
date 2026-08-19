@@ -12,7 +12,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 load_dotenv()
 
-VERSION = "2.5.0"
+VERSION = "2.6.0"
 
 
 class Settings(BaseSettings):
@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     DA_URL: str = Field(..., description="DirectAdmin base URL including port")
     DA_USERNAME: str = Field(..., description="DirectAdmin username")
     DA_LOGIN_KEY: SecretStr = Field(..., description="DirectAdmin login key")
+    DA_LOGIN_KEY_FILE: str = Field("")
     DA_IMPERSONATE: str = Field("", description="Optional default impersonation target")
     DA_SSL_VERIFY: bool = Field(True)
     DA_ALLOW_INSECURE_HTTP: bool = Field(False)
@@ -43,6 +44,9 @@ class Settings(BaseSettings):
     MCP_TRANSPORT: str = Field("sse")
 
     MCP_AUTH_TOKEN: SecretStr = Field(default=SecretStr(""))
+    MCP_AUTH_TOKEN_FILE: str = Field("")
+    MCP_TOKENS_FILE: str = Field("")
+    MCP_PROFILE: str = Field("helpdesk")
     MCP_ALLOW_ANONYMOUS: bool = Field(False)
     MCP_CORS_ORIGINS: str = Field("")
     MCP_ALLOWED_CIDRS: str = Field("")
@@ -75,6 +79,18 @@ class Settings(BaseSettings):
     # Empty = no time gate. Example: Mon-Fri 01:00-05:00 Europe/Sofia
     MAINTENANCE_WINDOW: str = Field("")
     WINDOW_ENFORCE: bool = Field(True)
+    REQUIRE_REASON: bool = Field(True)
+    REQUIRE_BACKUP_BEFORE: bool = Field(False)
+    IDEMPOTENCY_TTL_SECONDS: int = Field(900, ge=60, le=86400)
+    MAX_RESPONSE_CHARS: int = Field(12000, ge=2000, le=200_000)
+    AUDIT_RETENTION_DAYS: int = Field(90, ge=1, le=3650)
+    AUDIT_MAX_BYTES: int = Field(20 * 1024 * 1024, ge=65_536)
+    ALERT_WEBHOOK_URL: str = Field("")
+    ALERT_EVENTS: str = Field(
+        "tool_window_denied,users_delete,csf_disable,approval_fail,tool_capability_denied"
+    )
+    INVENTORY_FILE: str = Field("inventory.json")
+    MCP_SERVER_ID: str = Field("")
 
     @field_validator("DA_URL")
     @classmethod
@@ -105,11 +121,23 @@ class Settings(BaseSettings):
             raise ValueError("APPROVAL_TOKEN must be at least 16 characters")
         return value if isinstance(value, SecretStr) else SecretStr(raw)
 
+    @field_validator("MCP_PROFILE")
+    @classmethod
+    def _profile(cls, value: str) -> str:
+        value = (value or "helpdesk").strip().lower()
+        if value not in {"readonly", "helpdesk", "operator", "break-glass"}:
+            raise ValueError("MCP_PROFILE must be readonly, helpdesk, operator or break-glass")
+        return value
+
     @property
     def ssl_verify(self) -> bool:
         if self.SSL_VERIFY is not None:
             return bool(self.SSL_VERIFY)
         return self.DA_SSL_VERIFY
+
+    @property
+    def alert_events(self) -> List[str]:
+        return [item.strip() for item in self.ALERT_EVENTS.split(",") if item.strip()]
 
     @property
     def cors_origins(self) -> List[str]:
@@ -136,7 +164,25 @@ class Settings(BaseSettings):
         return dumped
 
 
+def _apply_secret_files() -> None:
+    """Populate env from *_FILE paths (Docker secrets / systemd LoadCredential)."""
+    mapping = {
+        "DA_LOGIN_KEY_FILE": "DA_LOGIN_KEY",
+        "MCP_AUTH_TOKEN_FILE": "MCP_AUTH_TOKEN",
+        "APPROVAL_TOKEN_FILE": "APPROVAL_TOKEN",
+    }
+    for file_var, dest in mapping.items():
+        path = os.getenv(file_var, "").strip()
+        if not path or os.getenv(dest):
+            continue
+        try:
+            os.environ[dest] = open(path, encoding="utf-8").read().strip()
+        except OSError:
+            pass
+
+
 def _load_settings() -> Settings:
+    _apply_secret_files()
     # Allow importing modules (and unit tests) without a live DirectAdmin box.
     if not os.getenv("DA_URL"):
         os.environ.setdefault("DA_URL", "https://127.0.0.1:2222")

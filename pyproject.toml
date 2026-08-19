@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "directadmin-mcp"
-version = "2.5.0"
+version = "2.6.0"
 description = "Model Context Protocol server for DirectAdmin admin operations (SSL reissue, CSF unblock, full New API)."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -30,7 +30,7 @@ dev = ["pytest>=8.0.0", "pytest-asyncio>=0.23.0", "ruff>=0.4.0"]
 directadmin-mcp = "server:main"
 
 [tool.setuptools]
-py-modules = ["config", "da", "security", "mcp_instance", "main", "server"]
+py-modules = ["config", "da", "security", "mcp_instance", "main", "server", "tokens", "alerts", "idempotency", "truncate"]
 
 [tool.setuptools.packages.find]
 include = ["tools*"]

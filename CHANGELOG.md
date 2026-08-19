@@ -1,6 +1,17 @@
 # Changelog
 
+## 2.6.0 — 2026-08-19
+
+- Named hashed tokens (`MCP_TOKENS_FILE`). Audit `actor` is the token name.
+  Profiles: readonly, helpdesk, operator, break-glass.
+- Hops compose: readonly `:8888` + write `:8889`, login key via Docker secret.
+- `reason=` required on mutations; `Idempotency-Key` (15 min) stops double
+  SSL / unblock; responses truncated for the model.
+- Audit retention (90 days / size rotate). Webhook alerts on dangerous events.
+- `inventory.json` on the hops host. `REQUIRE_BACKUP_BEFORE` for account writes.
+
 ## 2.5.0 — 2026-08-19
+
 
 - Structured audit is queryable: `audit_search` / `audit_recent` answer
   “which agent restarted httpd” and “who ran a package update”.

@@ -1,0 +1,20 @@
+{
+  "hops": "local-ops",
+  "this": "da-sof-01",
+  "servers": [
+    {
+      "id": "da-sof-01",
+      "da_url": "https://panel1.example.com:2222",
+      "cloudlinux": false,
+      "profile": "helpdesk",
+      "notes": "most boxes look like this"
+    },
+    {
+      "id": "da-sof-07",
+      "da_url": "https://panel7.example.com:2222",
+      "cloudlinux": true,
+      "profile": "helpdesk",
+      "notes": "one of the 7–8 CloudLinux hosts — set ENABLE_CLOUDLINUX on that container"
+    }
+  ]
+}

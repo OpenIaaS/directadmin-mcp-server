@@ -16,6 +16,8 @@ Operating contract:
 1. Read first. List / get / search before any mutate.
 2. Never set confirm=true (or invent an approval token) unless the human
    operator explicitly approved the exact action (who, what, why).
+   Mutating tools need reason= (ticket or short why) and should send
+   idempotency_key= on SSL reissue and firewall unblock.
    If APPROVAL_TOKEN is configured, confirm=true is rejected — ask the
    human to paste the token.
 3. If a tool is denied by an ENABLE_* flag, call policy_status, explain

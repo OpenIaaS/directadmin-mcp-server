@@ -138,6 +138,8 @@ async def csf_unblock_ip(
     allow_ttl_seconds: int = 3600,
     comment: str = "unblocked-via-directadmin-mcp",
     confirm: bool = False,
+    reason: str = "",
+    idempotency_key: str = "",
 ) -> Dict[str, Any]:
     """Unblock an IP in CSF/LFD (permanent deny + temporary ban).
 

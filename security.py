@@ -79,6 +79,9 @@ _DAYS = {
 current_actor: ContextVar[str] = ContextVar("current_actor", default="")
 current_ip: ContextVar[str] = ContextVar("current_ip", default="")
 current_request_id: ContextVar[str] = ContextVar("current_request_id", default="")
+current_profile: ContextVar[str] = ContextVar("current_profile", default="")
+current_reason: ContextVar[str] = ContextVar("current_reason", default="")
+current_idem: ContextVar[str] = ContextVar("current_idem", default="")
 
 
 class SecurityError(Exception):
@@ -339,18 +342,20 @@ def capability_enabled(flag: str) -> bool:
 
 def capability_denied(tool_name: str) -> Optional[dict]:
     flag = capability_for(tool_name)
-    if not flag or capability_enabled(flag):
-        return None
-    return {
-        "success": False,
-        "error": True,
-        "denied_by": flag,
-        "message": (
-            f"'{tool_name}' is disabled ({flag}=false). "
-            "This is the default so a rogue agent cannot delete or rewrite "
-            "the box. Set the flag in .env if you really want this class of action."
-        ),
-    }
+    if flag and not capability_enabled(flag):
+        return {
+            "success": False,
+            "error": True,
+            "denied_by": flag,
+            "message": (
+                f"'{tool_name}' is disabled ({flag}=false). "
+                "This is the default so a rogue agent cannot delete or rewrite "
+                "the box. Set the flag in .env if you really want this class of action."
+            ),
+        }
+    from tokens import profile_denied
+
+    return profile_denied(tool_name, current_profile.get() or settings.MCP_PROFILE)
 
 
 def _approval_token() -> str:
@@ -369,6 +374,7 @@ def confirm_accepted(confirm: Any) -> tuple[bool, str]:
             )
         if constant_time_token_match(str(confirm).strip(), token):
             return True, ""
+        write_audit("approval_fail", tool="confirm")
         return False, "Approval token does not match. Do not retry with a guess."
     if confirm is True:
         return True, ""
@@ -454,10 +460,20 @@ def sanitize_actor(value: Optional[str], fallback: str = "unknown") -> str:
     return "unknown"
 
 
-def bind_request_context(actor: str = "", ip: str = "", request_id: str = "") -> None:
+def bind_request_context(
+    actor: str = "",
+    ip: str = "",
+    request_id: str = "",
+    profile: str = "",
+    reason: str = "",
+    idempotency_key: str = "",
+) -> None:
     current_actor.set(sanitize_actor(actor, settings.MCP_ACTOR))
     current_ip.set((ip or "")[:64])
     current_request_id.set((request_id or "")[:32])
+    current_profile.set((profile or settings.MCP_PROFILE or "helpdesk")[:32])
+    current_reason.set(sanitize_reason(reason) if reason else "")
+    current_idem.set((idempotency_key or "")[:128])
 
 
 def _parse_hhmm(value: str) -> dtime:
@@ -575,16 +591,111 @@ def window_denied(tool_name: str, now: Optional[datetime] = None) -> Optional[di
     }
 
 
+def sanitize_reason(value: Any) -> str:
+    text = " ".join(str(value or "").split())[:200]
+    if any(ord(ch) < 32 for ch in text):
+        return ""
+    return text
+
+
+def reason_denied(tool_name: str, reason: Any) -> Optional[dict]:
+    from tokens import helpdesk_write
+
+    if not settings.REQUIRE_REASON:
+        return None
+    mutating = bool(
+        capability_for(tool_name) or needs_confirm(tool_name) or helpdesk_write(tool_name)
+    )
+    if not mutating:
+        return None
+    text = sanitize_reason(reason)
+    if len(text) >= 4:
+        return None
+    return {
+        "success": False,
+        "error": True,
+        "needs_reason": True,
+        "message": (
+            f"'{tool_name}' needs reason= (ticket id or short why, 4–200 chars). "
+            "Example: reason='DA-1234 customer locked out'."
+        ),
+    }
+
+
+def backup_denied(tool_name: str, backup_confirmed: Any) -> Optional[dict]:
+    if not settings.REQUIRE_BACKUP_BEFORE:
+        return None
+    if capability_for(tool_name) != "ENABLE_ACCOUNT_WRITE":
+        return None
+    if tool_name.startswith("users_get") or tool_name.endswith("_list"):
+        return None
+    if backup_confirmed is True or str(backup_confirmed).lower() in {"true", "1", "yes"}:
+        return None
+    return {
+        "success": False,
+        "error": True,
+        "needs_backup": True,
+        "message": (
+            f"'{tool_name}' requires a backup first (REQUIRE_BACKUP_BEFORE). "
+            "Run backups_create, then retry with backup_confirmed=true."
+        ),
+    }
+
+
+def rotate_audit() -> None:
+    path = settings.AUDIT_LOG
+    if not path:
+        return
+    try:
+        size = os.path.getsize(path)
+    except OSError:
+        return
+    if size < settings.AUDIT_MAX_BYTES:
+        _expire_old_audits()
+        return
+    stamped = f"{path}.{time.strftime('%Y%m%d-%H%M%S', time.gmtime())}"
+    try:
+        os.replace(path, stamped)
+    except OSError as exc:
+        logger.warning("audit rotate failed: %s", exc)
+        return
+    _expire_old_audits()
+
+
+def _expire_old_audits() -> None:
+    path = settings.AUDIT_LOG
+    directory = os.path.dirname(path) or "logs"
+    base = os.path.basename(path)
+    cutoff = time.time() - settings.AUDIT_RETENTION_DAYS * 86400
+    try:
+        names = os.listdir(directory)
+    except OSError:
+        return
+    for name in names:
+        if name != base and not name.startswith(base + "."):
+            continue
+        full = os.path.join(directory, name)
+        if name == base:
+            continue
+        try:
+            if os.path.getmtime(full) < cutoff:
+                os.remove(full)
+        except OSError:
+            continue
+
+
 def write_audit(event: str, **fields: Any) -> None:
     """Append one JSON line. Never write secrets. Always stamp actor/ip."""
     path = settings.AUDIT_LOG
     if not path:
         return
+    rotate_audit()
     os.makedirs(os.path.dirname(path) or "logs", exist_ok=True)
     record = {
         "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "event": event,
         "actor": current_actor.get() or sanitize_actor(settings.MCP_ACTOR),
+        "profile": current_profile.get() or settings.MCP_PROFILE,
         "ip": current_ip.get() or "",
         "request_id": current_request_id.get() or "",
         **redact(fields),
@@ -594,6 +705,12 @@ def write_audit(event: str, **fields: Any) -> None:
             handle.write(json.dumps(record, default=str) + "\n")
     except OSError as exc:
         logger.warning("audit log write failed: %s", exc)
+    try:
+        from alerts import fire_alert
+
+        fire_alert(event, **{k: record.get(k) for k in ("actor", "ip", "tool", "profile", "message")})
+    except Exception:
+        logger.debug("alert dispatch skipped", exc_info=True)
 
 
 def constant_time_token_match(provided: Optional[str], expected: str) -> bool:

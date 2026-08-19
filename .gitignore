@@ -45,3 +45,12 @@ htmlcov/
 # Local scratch
 tmp/
 scratch/
+
+# Hops secrets / live token files
+secrets/*
+!secrets/README.md
+tokens-readonly.json
+tokens-write.json
+inventory.json
+!inventory.example.json
+!tokens.example.json

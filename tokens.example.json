@@ -1,0 +1,14 @@
+{
+  "tokens": [
+    {
+      "name": "helpdesk",
+      "profile": "helpdesk",
+      "hash": "sha256:REPLACE_WITH_python_tokens.py"
+    },
+    {
+      "name": "emergency",
+      "profile": "break-glass",
+      "hash": "sha256:REPLACE_WITH_python_tokens.py"
+    }
+  ]
+}

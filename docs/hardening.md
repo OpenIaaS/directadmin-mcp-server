@@ -17,7 +17,13 @@ Agents will pass `confirm=true` without asking. Defaults assume that.
 | Control | Default | Why |
 | --- | --- | --- |
 | `MCP_HOST` | `127.0.0.1` | No public bind |
-| `MCP_AUTH_TOKEN` | required for HTTP, ≥ 24 chars | Bearer on every non-health route |
+| `MCP_TOKENS_FILE` | empty | Named hashed tokens; actor = token name |
+| `MCP_PROFILE` | `helpdesk` | readonly / helpdesk / operator / break-glass |
+| `REQUIRE_REASON` | `true` | Ticket / why on every mutate |
+| `IDEMPOTENCY_TTL_SECONDS` | `900` | Replay SSL/unblock instead of doubling |
+| `MAX_RESPONSE_CHARS` | `12000` | Truncate BFM/CSF dumps to the model |
+| `AUDIT_RETENTION_DAYS` | `90` | GDPR-sized log, not forever |
+| `ALERT_WEBHOOK_URL` | empty | Wake someone on delete / window / bad approval |
 | `MCP_ALLOW_ANONYMOUS` | `false` | Lab-only escape hatch |
 | `REQUIRE_CONFIRM` | `true` | Mutating tools no-op without approval |
 | `APPROVAL_TOKEN` | empty | When set, `confirm=true` is **not** enough — paste the token |

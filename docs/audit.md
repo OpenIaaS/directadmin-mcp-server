@@ -59,5 +59,9 @@ Applies to **opt-in mutating families** (restart, OS updates, deletes,
 CustomBuild, …). **SSL reissue and CSF unblock stay 24/7** — a locked-out
 customer or an expired cert is not a scheduled change.
 
-Reads always work. A closed window returns `denied_by=MAINTENANCE_WINDOW`
-and is logged as `tool_window_denied`.
+Retention: `AUDIT_RETENTION_DAYS=90` (rotated files older than that are
+deleted). Size rotate at `AUDIT_MAX_BYTES` (default 20 MiB).
+
+Dangerous events can POST to `ALERT_WEBHOOK_URL` (no secrets in the body):
+`tool_window_denied`, `users_delete`, `csf_disable`, `approval_fail`,
+`tool_capability_denied`.

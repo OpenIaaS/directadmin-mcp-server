@@ -14,6 +14,7 @@ _PREFERRED = [
     "common",
     "policy",
     "audit",
+    "inventory",
     "ssl_certs",
     "csf_firewall",
     "brute_force",

@@ -1,17 +1,29 @@
+# Hops host: both agents talk to loopback only.
+# Readonly (8888) = mail-reading / chatty agent.
+# Write (8889) = helpdesk SSL + CSF unblock (owner or emergency sysadmin).
+# One compose stack per DirectAdmin box (copy + env file per panel).
+
 services:
-  directadmin-mcp:
+  mcp-readonly:
     build: .
-    image: directadmin-mcp:2.4.0
+    image: directadmin-mcp:2.6.0
     restart: unless-stopped
     env_file:
       - .env
     environment:
       MCP_HOST: "0.0.0.0"
+      MCP_PROFILE: readonly
+      PORT: "8888"
+      MCP_TOKENS_FILE: /app/tokens.json
+      DA_LOGIN_KEY_FILE: /run/secrets/da_login_key
+    secrets:
+      - da_login_key
     ports:
-      # Publish only on loopback by default — put Caddy/nginx in front for TLS.
       - "127.0.0.1:8888:8888"
     volumes:
       - mcp-logs:/app/logs
+      - ./inventory.json:/app/inventory.json:ro
+      - ./tokens-readonly.json:/app/tokens.json:ro
     read_only: true
     tmpfs:
       - /tmp
@@ -21,6 +33,40 @@ services:
       - ALL
     mem_limit: 256m
     pids_limit: 128
+
+  mcp-write:
+    build: .
+    image: directadmin-mcp:2.6.0
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      MCP_HOST: "0.0.0.0"
+      MCP_PROFILE: helpdesk
+      PORT: "8888"
+      MCP_TOKENS_FILE: /app/tokens.json
+      DA_LOGIN_KEY_FILE: /run/secrets/da_login_key
+    secrets:
+      - da_login_key
+    ports:
+      - "127.0.0.1:8889:8888"
+    volumes:
+      - mcp-logs:/app/logs
+      - ./inventory.json:/app/inventory.json:ro
+      - ./tokens-write.json:/app/tokens.json:ro
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    mem_limit: 256m
+    pids_limit: 128
+
+secrets:
+  da_login_key:
+    file: ./secrets/da_login_key
 
 volumes:
   mcp-logs:

@@ -8,14 +8,21 @@ import logging
 from typing import Any, Callable, Dict, Optional, TypeVar, cast
 
 from da import DirectAdminError
+from idempotency import check_idempotency, store_idempotency
 from security import (
+    backup_denied,
     capability_denied,
     confirm_or_reject,
+    current_idem,
+    current_reason,
+    reason_denied,
     redact,
+    sanitize_reason,
     tool_permitted,
     window_denied,
     write_audit,
 )
+from truncate import cap_payload
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +32,12 @@ T = TypeVar("T", bound=Callable)
 def format_response(data: Any) -> Dict[str, Any]:
     if isinstance(data, dict) and data.get("error") is True:
         return data
-    return {"success": True, "data": data}
+    capped, truncated = cap_payload(data)
+    payload: Dict[str, Any] = {"success": True, "data": capped}
+    if truncated:
+        payload["truncated"] = True
+        payload["message"] = "Response truncated for the model. Full event is in the audit log."
+    return payload
 
 
 def format_error(message: str, **extra: Any) -> Dict[str, Any]:
@@ -41,6 +53,10 @@ def log_tool_call(func: T) -> T:
     @functools.wraps(func)
     async def wrapper(*args: Any, **kwargs: Any):
         name = func.__name__
+        reason = kwargs.pop("reason", "") or current_reason.get()
+        idem_key = kwargs.pop("idempotency_key", "") or current_idem.get()
+        backup_confirmed = kwargs.pop("backup_confirmed", False)
+
         if not tool_permitted(name):
             write_audit("tool_denied", tool=name)
             return format_error(f"Tool '{name}' is blocked by TOOL_ALLOWLIST/TOOL_DENYLIST")
@@ -55,6 +71,16 @@ def log_tool_call(func: T) -> T:
             write_audit("tool_window_denied", tool=name)
             return closed
 
+        needed = reason_denied(name, reason)
+        if needed:
+            write_audit("tool_reason_denied", tool=name)
+            return needed
+
+        backed = backup_denied(name, backup_confirmed)
+        if backed:
+            write_audit("tool_backup_denied", tool=name)
+            return backed
+
         sig = inspect.signature(func)
         try:
             bound = sig.bind_partial(*args, **kwargs)
@@ -64,12 +90,33 @@ def log_tool_call(func: T) -> T:
                 safe["confirm"] = "********"
         except Exception:
             safe = {"_": "unbound"}
+        if reason:
+            safe["reason"] = sanitize_reason(reason)
 
-        write_audit("tool_call", tool=name, args=safe)
+        cached, idem_err = check_idempotency(str(idem_key or ""), name, safe)
+        if idem_err:
+            return idem_err
+        if cached is not None:
+            write_audit("tool_idempotent", tool=name, reason=safe.get("reason", ""))
+            return cached
+
+        write_audit("tool_call", tool=name, args=safe, reason=safe.get("reason", ""))
         logger.info("tool %s args=%s", name, safe)
         try:
             result = await func(*args, **kwargs)
+            if isinstance(result, dict) and result.get("success") is True:
+                capped, truncated = cap_payload(result.get("data"))
+                result = dict(result)
+                result["data"] = capped
+                if truncated:
+                    result["truncated"] = True
+                    result.setdefault(
+                        "message",
+                        "Response truncated for the model. Full event is in the audit log.",
+                    )
+                    write_audit("tool_truncated", tool=name)
             write_audit("tool_ok", tool=name)
+            store_idempotency(str(idem_key or ""), name, safe, result)
             return result
         except DirectAdminError as exc:
             logger.error("DirectAdmin error in %s: %s", name, exc)

@@ -282,7 +282,9 @@ async def ip_block_reason(ip: str) -> Dict[str, Any]:
 
 @mcp.tool()
 @log_tool_call
-async def bfm_unblock_ip(ip: str, confirm: bool = False) -> Dict[str, Any]:
+async def bfm_unblock_ip(
+    ip: str, confirm: bool = False, reason: str = "", idempotency_key: str = ""
+) -> Dict[str, Any]:
     """Remove an IP from DirectAdmin Brute Force Monitor blocks.
 
     Use together with csf_unblock_ip — an IP is often listed in BOTH places.
@@ -340,6 +342,8 @@ async def firewall_unblock_everywhere(
     ip: str,
     also_allow: bool = False,
     confirm: bool = False,
+    reason: str = "",
+    idempotency_key: str = "",
 ) -> Dict[str, Any]:
     """Unblock an IP in CSF *and* DirectAdmin Brute Force Monitor.
 

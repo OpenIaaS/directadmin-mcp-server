@@ -15,6 +15,11 @@ model sees it at session start.
    (who, what, why). If `APPROVAL_TOKEN` is set, `confirm=true` is rejected —
    ask the human to paste the token. Never invent one. “Unlock this IP” is
    not a blank cheque to disable CSF or delete a user.
+   Mutating tools also need `reason=` (ticket id or short why).
+3. **Use `idempotency_key=`** on SSL reissue and firewall unblock so a retry
+   does not issue twice.
+4. **If you are on the readonly listener**, you may only inspect
+   (`ip_block_reason`, lists, audit). Hand writes to the write listener.
 3. **Prefer curated tools.** `da_api` / `da_legacy` are escape hatches.
 4. **Impersonate the owning user** for domain TLS, mailboxes, FTP, cron, files.
 5. **Never echo secrets.** Login keys, passwords, PEM, bearer tokens stay out

@@ -6,7 +6,8 @@ from typing import Any, Dict
 
 from config import settings
 from mcp_instance import mcp
-from security import capability_enabled, window_status
+from security import capability_enabled, current_actor, current_profile, window_status
+from tokens import load_tokens
 from tools.common import format_response, log_tool_call
 
 _FLAGS = (
@@ -43,7 +44,11 @@ async def policy_status() -> Dict[str, Any]:
         {
             "flags": flags,
             "approval_token_required": token_set,
-            "actor_default": settings.MCP_ACTOR,
+            "actor": current_actor.get() or settings.MCP_ACTOR,
+            "profile": current_profile.get() or settings.MCP_PROFILE,
+            "tokens_loaded": [row.public() for row in load_tokens()],
+            "require_reason": settings.REQUIRE_REASON,
+            "require_backup_before": settings.REQUIRE_BACKUP_BEFORE,
             "window": window_status(),
             "default_profile": "helpdesk — SSL + CSF unblock + reads",
             "hint": (

@@ -17,12 +17,12 @@ from config import VERSION, settings, setup_logging
 from mcp_instance import mcp
 from security import (
     bind_request_context,
-    constant_time_token_match,
     ip_in_cidrs,
     rate_limiter,
     sanitize_actor,
     write_audit,
 )
+from tokens import authenticate_bearer, has_auth_configured
 
 logger = logging.getLogger(__name__)
 
@@ -72,33 +72,42 @@ class GateMiddleware(BaseHTTPMiddleware):
             return JSONResponse({"error": "forbidden"}, status_code=403)
 
         identity = ip
-        expected = settings.MCP_AUTH_TOKEN.get_secret_value()
-        if expected:
-            # Header only. Query-string tokens leak via logs, Referer, history.
+        if has_auth_configured() and not settings.MCP_ALLOW_ANONYMOUS:
             provided = request.headers.get("authorization")
-            if not constant_time_token_match(provided, expected):
+            record = authenticate_bearer(provided)
+            if record is None:
                 write_audit("http_auth_fail", ip=ip, path=path)
                 return JSONResponse({"error": "unauthorized"}, status_code=401)
-            identity = "token"
+            identity = record.name
+            token_name = record.name
+            token_profile = record.profile
         elif not settings.MCP_ALLOW_ANONYMOUS:
             write_audit("http_auth_missing_config", ip=ip, path=path)
             return JSONResponse(
                 {
                     "error": "server_misconfigured",
-                    "message": "Set MCP_AUTH_TOKEN or (dev only) MCP_ALLOW_ANONYMOUS=true",
+                    "message": "Set MCP_TOKENS_FILE or MCP_AUTH_TOKEN (or MCP_ALLOW_ANONYMOUS=true in lab)",
                 },
                 status_code=503,
             )
+        else:
+            token_name = settings.MCP_ACTOR
+            token_profile = settings.MCP_PROFILE
 
         if not rate_limiter.allow(identity):
             write_audit("http_rate_limited", ip=ip, path=path)
             return JSONResponse({"error": "rate_limited"}, status_code=429)
 
-        actor = sanitize_actor(
-            request.headers.get("x-agent-id") or request.headers.get("x-mcp-actor"),
-            settings.MCP_ACTOR,
+        bind_request_context(
+            actor=token_name,
+            ip=ip,
+            request_id=secrets.token_hex(8),
+            profile=token_profile,
+            reason=request.headers.get("x-change-reason") or "",
+            idempotency_key=request.headers.get("idempotency-key") or "",
         )
-        bind_request_context(actor=actor, ip=ip, request_id=secrets.token_hex(8))
+        # Header agent id is a label only — the actor is the token name.
+        _ = sanitize_actor(request.headers.get("x-agent-id") or "", token_name)
         return await call_next(request)
 
 
@@ -109,10 +118,10 @@ async def lifespan(app: FastAPI):
     logger.info("=" * 60)
     logger.info("DirectAdmin MCP Server starting")
     logger.info("config=%s", settings.public_dict())
-    if not settings.MCP_AUTH_TOKEN.get_secret_value() and not settings.MCP_ALLOW_ANONYMOUS:
+    if not has_auth_configured() and not settings.MCP_ALLOW_ANONYMOUS:
         logger.warning(
-            "MCP_AUTH_TOKEN is empty. HTTP mode will refuse connections. "
-            "Generate one with: python -c \"import secrets; print(secrets.token_urlsafe(48))\""
+            "No MCP tokens configured. HTTP mode will refuse connections. "
+            "python tokens.py   # prints a token and its sha256"
         )
     import tools
 
@@ -143,7 +152,7 @@ if settings.cors_origins:
         allow_origins=settings.cors_origins,
         allow_credentials=False,
         allow_methods=["GET", "POST"],
-        allow_headers=["Authorization", "Content-Type", "Accept"],
+        allow_headers=["Authorization", "Content-Type", "Accept", "Idempotency-Key", "X-Change-Reason"],
     )
 
 app.add_middleware(SecurityHeadersMiddleware)
@@ -268,9 +277,9 @@ if __name__ == "__main__":
     setup_logging()
     host = settings.MCP_HOST
     # Binding 0.0.0.0 without a token is refused
-    if host in {"0.0.0.0", "::"} and not settings.MCP_AUTH_TOKEN.get_secret_value():
+    if host in {"0.0.0.0", "::"} and not has_auth_configured():
         raise SystemExit(
-            "Refusing to bind 0.0.0.0 without MCP_AUTH_TOKEN. "
+            "Refusing to bind 0.0.0.0 without MCP_TOKENS_FILE or MCP_AUTH_TOKEN. "
             "Set MCP_HOST=127.0.0.1 or provide a token."
         )
     if settings.DA_LOGIN_KEY.get_secret_value() in {"", "unset", "replace-with-login-key"}:

@@ -1,22 +1,31 @@
 # DirectAdmin MCP Server
 
 [![ci](https://github.com/OpenIaaS/directadmin-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenIaaS/directadmin-mcp/actions/workflows/ci.yml)
-[![version](https://img.shields.io/badge/version-2.5.0-0b6bcb.svg)](https://github.com/OpenIaaS/directadmin-mcp)
+[![version](https://img.shields.io/badge/version-2.6.0-0b6bcb.svg)](https://github.com/OpenIaaS/directadmin-mcp)
 [![license](https://img.shields.io/badge/license-MIT-0b6bcb.svg)](LICENSE)
 
-A [Model Context Protocol](https://modelcontextprotocol.io) server that lets an
-AI assistant operate a **DirectAdmin** box as an administrator — in particular
-**reissue Let's Encrypt / hostname SSL** and **unblock IPs in CSF + Brute Force
-Monitor**.
+A production [Model Context Protocol](https://modelcontextprotocol.io) control
+plane for **DirectAdmin**. An AI agent (helpdesk, owner, or emergency sysadmin)
+talks to this process; the process talks to the panel. Every call is
+authenticated as a **named hashed token**, authorised by a **profile**
+(readonly / helpdesk / operator / break-glass), optionally confirmed, logged
+as structured JSON, rate-limited, and refused outside a maintenance window.
+SSL reissue and CSF/BFM unlock are first-class helpdesk actions — they are
+not the whole product.
+
+The intended layout is a **hops host** next to the agent (not an install on
+every DA box): a read-only listener for the chatty agent and a write listener
+for allowed mutations. Fleet facts (CloudLinux, profile) live in
+`inventory.json` on that hops machine.
 
 This is the completed OpenIaaS fork of the original half-finished project. It
 covers the [DirectAdmin New JSON API](https://docs.directadmin.com/developer/api/)
 (320 operations from the official swagger) **and** the legacy `CMD_API_*`
 admin calls the New API still does not replace (create user, DNS, backups, BFM).
 
-The intended operator is an **AI agent**. Read [docs/agent.md](docs/agent.md)
-before pointing a model at a production box — confirm gates, impersonation,
-and “never disable CSF” are part of the protocol, not optional courtesy.
+Read [docs/agent.md](docs/agent.md) and [docs/tokens.md](docs/tokens.md)
+before pointing a model at production.
+
 
 ```
 ┌──────────────┐     MCP (stdio / SSE)     ┌──────────────────┐     HTTPS      ┌─────────────┐
@@ -178,7 +187,7 @@ Curated tools are grouped by module. Everything else is reachable with
 [docs/operations.md](docs/operations.md), [docs/ssl.md](docs/ssl.md),
 [docs/csf.md](docs/csf.md), [docs/propack.md](docs/propack.md),
 [docs/cloudlinux.md](docs/cloudlinux.md), [docs/hardening.md](docs/hardening.md),
-[docs/audit.md](docs/audit.md).
+[docs/audit.md](docs/audit.md), [docs/tokens.md](docs/tokens.md).
 Inventory: [docs/tools.json](docs/tools.json) (273 curated tools + 320 swagger ops).
 
 | Module | Tools (prefix) | Notes |
