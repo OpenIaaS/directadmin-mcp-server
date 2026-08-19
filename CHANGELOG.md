@@ -1,6 +1,14 @@
 # Changelog
 
+## 2.4.3 — 2026-08-19
+
+- `ip_block_reason` — CSF/LFD + BFM in one read. `operator_reason` for the
+  admin, `customer_message.bg` / `.en` to paste to the client. Does not invent
+  a reason when none is recorded.
+- `csf_ip_reason` parses the LFD comment from `csf -g` (service, attempts).
+
 ## 2.4.2 — 2026-08-19
+
 
 - `bfm_ip_reason` — why Brute Force Monitor listed an IP (service, user,
   attempts, log line). Same data as Admin → BFM; not in the New JSON API.

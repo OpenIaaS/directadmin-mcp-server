@@ -1,7 +1,7 @@
 # DirectAdmin MCP Server
 
 [![ci](https://github.com/OpenIaaS/directadmin-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenIaaS/directadmin-mcp/actions/workflows/ci.yml)
-[![version](https://img.shields.io/badge/version-2.4.2-0b6bcb.svg)](https://github.com/OpenIaaS/directadmin-mcp)
+[![version](https://img.shields.io/badge/version-2.4.3-0b6bcb.svg)](https://github.com/OpenIaaS/directadmin-mcp)
 [![license](https://img.shields.io/badge/license-MIT-0b6bcb.svg)](LICENSE)
 
 A [Model Context Protocol](https://modelcontextprotocol.io) server that lets an
@@ -33,7 +33,7 @@ and “never disable CSF” are part of the protocol, not optional courtesy.
 | “Reissue the Let's Encrypt cert for shop.example.com” | `ssl_reissue_domain` |
 | “The hostname cert expired, renew it” | `ssl_reissue_server` |
 | “Customer 203.0.113.44 is locked out of CSF” | `csf_unblock_ip` / `firewall_unblock_everywhere` |
-| “Is that IP blocked in BFM too? Why?” | `bfm_ip_reason` / `bfm_list` |
+| “Is that IP blocked? Why? Tell the customer.” | `ip_block_reason` |
 | “List users over quota” | `users_list_all` + `users_get_usage` |
 | “Restart php-fpm74” | `services_restart` (needs `ENABLE_SERVICE_CONTROL=true`) |
 | Anything else in `/api/*` | `da_list_endpoints` → `da_api` |
@@ -156,6 +156,7 @@ combined tool when a customer is locked out:
 ```
 csf_search_ip                ip=203.0.113.44
 bfm_ip_reason                ip=203.0.113.44
+ip_block_reason              ip=203.0.113.44
 firewall_unblock_everywhere  ip=203.0.113.44  confirm=true
 csf_unblock_ip               ip=203.0.113.44  also_allow=true  confirm=true
 bfm_unblock_ip               ip=203.0.113.44  confirm=true

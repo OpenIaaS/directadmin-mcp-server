@@ -39,6 +39,7 @@ ssl_reissue_server  confirm=true
 See [csf.md](csf.md).
 
 ```
+ip_block_reason                  ip=203.0.113.44
 csf_search_ip                    ip=203.0.113.44
 bfm_ip_reason                    ip=203.0.113.44
 firewall_unblock_everywhere      ip=203.0.113.44  confirm=true

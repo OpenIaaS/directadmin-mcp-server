@@ -38,7 +38,7 @@ model sees it at session start.
 | “SSL for shop.example.com is expired” | `ssl_get_domain_acme_config` (impersonate owner) | dry-run → `ssl_reissue_domain confirm=true` |
 | “Reissue SSL for these clients” (Admin SSL icon) | `ssl_admin_list` | `ssl_admin_reissue domains=[…] confirm=true` |
 | “The panel hostname cert is bad” | `ssl_server_status` | `ssl_reissue_server confirm=true` |
-| “Customer IP is locked out” | `csf_search_ip` + `bfm_ip_reason` | `firewall_unblock_everywhere confirm=true` |
+| “Customer IP is locked out” / “защо е блокиран” | `ip_block_reason` | paste `customer_message.bg` → `firewall_unblock_everywhere confirm=true` |
 | “Restart php-fpm83” | `policy_status` — needs `ENABLE_SERVICE_CONTROL` | then `services_get` → `services_restart` |
 | “User alice is over quota” | `users_get_usage alice` | tell the operator; do not silently raise limits |
 | “Back up bob before we touch him” | `backups_admin_list` | `backups_create username=bob confirm=true` |

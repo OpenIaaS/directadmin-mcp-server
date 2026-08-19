@@ -17,15 +17,21 @@ states) **and** `bfm_unblock_ip`.
 ## Diagnose first
 
 ```
+ip_block_reason ip=203.0.113.44
 csf_search_ip   ip=203.0.113.44
 bfm_ip_reason   ip=203.0.113.44
 bfm_list
 csf_status
 ```
 
-`bfm_ip_reason` is the BFM “why”: service (dovecot / exim / ssh / DA login /
-WordPress), username tried, attempt count, and the log line. The New JSON API
-does not expose this — it is `CMD_API_BRUTE_FORCE_MONITOR`.
+`ip_block_reason` is the one to call when someone asks **why**. It returns:
+
+- `operator_reason` — CSF list + LFD comment and BFM service/user/log line
+- `customer_message.bg` / `.en` — paste to the client (no host paths)
+- empty/honest text if there is **no** recorded reason (does not invent one)
+
+`bfm_ip_reason` is BFM only. `csf_ip_reason` is CSF/LFD only (`csf -g` comment
+like `lfd: (sshd) Failed SSH login … 8 in the last 3600 secs`).
 
 ## Unblock only CSF
 

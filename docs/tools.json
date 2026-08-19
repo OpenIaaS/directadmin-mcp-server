@@ -177,7 +177,13 @@
       {
         "name": "bfm_ip_reason",
         "module": "brute_force",
-        "summary": "Why BFM listed an IP: service, user, attempts, log line.",
+        "summary": "Why BFM listed an IP: service, user, attempts, log line + customer text.",
+        "destructive": false
+      },
+      {
+        "name": "ip_block_reason",
+        "module": "brute_force",
+        "summary": "Why blocked: CSF/LFD + BFM, operator reason and customer_message (bg/en).",
         "destructive": false
       },
       {
@@ -235,7 +241,13 @@
       {
         "name": "csf_search_ip",
         "module": "csf_firewall",
-        "summary": "Search CSF/iptables/LFD for an IP (csf -g). Shows why it is blocked.",
+        "summary": "Search CSF/iptables/LFD for an IP (csf -g). Includes parsed LFD reason.",
+        "destructive": false
+      },
+      {
+        "name": "csf_ip_reason",
+        "module": "csf_firewall",
+        "summary": "Why CSF/LFD listed an IP (list + LFD comment) and customer text.",
         "destructive": false
       },
       {

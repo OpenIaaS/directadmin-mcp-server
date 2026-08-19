@@ -160,37 +160,19 @@ async def bfm_list(blocked_only: bool = True) -> Dict[str, Any]:
     return format_response({"blocked_only": blocked_only, "result": data})
 
 
-@mcp.tool()
-@log_tool_call
-async def bfm_ip_reason(ip: str) -> Dict[str, Any]:
-    """Why Brute Force Monitor listed this IP (service, user, attempts, log line).
-
-    Not in the New JSON API — uses CMD_API_BRUTE_FORCE_MONITOR (same data as
-    Admin → Brute Force Monitor). Typical reasons: failed DA logins, Dovecot /
-    Exim / SSH / FTP / WordPress wp-login, or 'Your IP is blacklisted'.
-
-    Also run csf_search_ip — LFD often blocked the same address for a
-    different reason.
-
-    Args:
-        ip: IPv4 or IPv6 to explain.
-    """
-    address = validate_ip(ip)
+async def _bfm_reason_payload(address: str) -> Dict[str, Any]:
     rows: List[Dict[str, Any]] = []
     errors: List[str] = []
-
     try:
         rows.extend(records_for_ip(await _bfm_get(), address, "all"))
     except Exception as exc:
         errors.append(f"list: {exc}")
-
     for table in ("LOGINFAILURES", "BLOCKEDIPS"):
         try:
             payload = await _bfm_get({"show": table, "value": address})
             rows.extend(records_for_ip(payload, address, table))
         except Exception as exc:
             errors.append(f"{table}: {exc}")
-
     rows = _dedupe(rows)
     summaries = [row["summary"] for row in rows if row.get("summary")]
     blocked = any(
@@ -199,21 +181,101 @@ async def bfm_ip_reason(ip: str) -> Dict[str, Any]:
         or (row.get("raw") or {}).get("dateblocked")
         for row in rows
     )
+    from tools.csf_reason import customer_messages
+
+    payload = {
+        "ip": address,
+        "listed": bool(rows),
+        "blocked": blocked,
+        "reason": summaries[0]
+        if summaries
+        else "No BFM evidence for this IP. Check csf_ip_reason — CSF/LFD may hold the block.",
+        "events": rows,
+        "tables": _BFM_TABLES,
+        "errors": errors,
+    }
+    payload["customer_message"] = customer_messages(address, bfm=payload)
+    return payload
+
+
+@mcp.tool()
+@log_tool_call
+async def bfm_ip_reason(ip: str) -> Dict[str, Any]:
+    """Why Brute Force Monitor listed this IP (service, user, attempts, log line).
+
+    Returns operator `reason` and `customer_message` (en + bg) you can paste
+    to the client. Prefer ip_block_reason when you also need the CSF/LFD side.
+
+    Args:
+        ip: IPv4 or IPv6 to explain.
+    """
+    address = validate_ip(ip)
+    payload = await _bfm_reason_payload(address)
+    payload["hint"] = (
+        "Unblock with firewall_unblock_everywhere (CSF + BFM). "
+        "Use ip_block_reason for CSF + BFM + a ready customer text."
+    )
+    return format_response(payload)
+
+
+@mcp.tool()
+@log_tool_call
+async def ip_block_reason(ip: str) -> Dict[str, Any]:
+    """Why this IP is blocked — CSF/LFD and Brute Force Monitor together.
+
+    This is the tool to call when the operator (or the customer) asks
+    "защо е блокиран". Read-only. Returns:
+      - operator_reason: technical (lists, LFD comment, BFM log line)
+      - customer_message.en / .bg: paste-ready, no host paths
+
+    If there is no recorded reason, says so instead of inventing one.
+
+    Args:
+        ip: IPv4 or IPv6.
+    """
+    address = validate_ip(ip)
+    from config import settings
+    from tools.csf_reason import customer_messages, parse_csf_grep
+
+    bfm = await _bfm_reason_payload(address)
+    csf: Dict[str, Any] = {"listed": False, "hits": [], "reason": None, "error": None}
+    if settings.ENABLE_CSF:
+        try:
+            from tools.csf_firewall import _csf_plugin
+
+            raw = await _csf_plugin("grep", {"ip": address})
+            csf = parse_csf_grep(raw.get("result", raw), address)
+        except Exception as exc:
+            csf["error"] = str(exc)
+    else:
+        csf["error"] = "ENABLE_CSF=false"
+
+    messages = customer_messages(address, csf=csf, bfm=bfm)
+    operator_bits = []
+    if csf.get("reason"):
+        operator_bits.append(f"CSF: {csf['reason']}")
+    elif csf.get("listed"):
+        operator_bits.append("CSF: listed, no LFD comment")
+    if bfm.get("listed") and bfm.get("reason") and "No BFM evidence" not in str(bfm.get("reason")):
+        operator_bits.append(f"BFM: {bfm['reason']}")
+    if not operator_bits:
+        operator_bits.append("No recorded reason in CSF or BFM.")
+
     return format_response(
         {
             "ip": address,
-            "listed": bool(rows),
-            "blocked": blocked,
-            "reason": summaries[0] if summaries else (
-                "No BFM evidence for this IP. Check csf_search_ip — CSF/LFD may hold the block."
-            ),
-            "events": rows,
-            "tables": _BFM_TABLES,
-            "errors": errors,
-            "hint": (
-                "Unblock with firewall_unblock_everywhere (CSF + BFM). "
-                "Skip-list with bfm_skip_ip if it is a known-good customer."
-            ),
+            "listed_csf": bool(csf.get("listed")),
+            "listed_bfm": bool(bfm.get("listed") or bfm.get("blocked")),
+            "operator_reason": " | ".join(operator_bits),
+            "customer_message": messages,
+            "csf": {"reason": csf.get("reason"), "hits": csf.get("hits"), "error": csf.get("error")},
+            "bfm": {
+                "reason": bfm.get("reason"),
+                "blocked": bfm.get("blocked"),
+                "events": bfm.get("events"),
+                "errors": bfm.get("errors"),
+            },
+            "hint": "Tell the customer customer_message.bg (or .en). Unblock with firewall_unblock_everywhere.",
         }
     )
 

@@ -17,6 +17,7 @@ from da import DirectAdminError, client
 from mcp_instance import mcp
 from security import sanitize_comment, validate_ip
 from tools.common import format_error, format_response, guard_confirm, log_tool_call
+from tools.csf_reason import parse_csf_grep
 
 CSF_PATHS = (
     "/CMD_PLUGINS_ADMIN/csf/index.raw",
@@ -93,7 +94,40 @@ async def csf_search_ip(ip: str) -> Dict[str, Any]:
         return blocked
     address = validate_ip(ip)
     data = await _csf_plugin("grep", {"ip": address})
-    return format_response(data)
+    parsed = parse_csf_grep(data.get("result", data), address)
+    return format_response({"ip": address, "reason": parsed["reason"], "parsed": parsed, "plugin": data})
+
+
+@mcp.tool()
+@log_tool_call
+async def csf_ip_reason(ip: str) -> Dict[str, Any]:
+    """Why CSF/LFD listed this IP (list + LFD comment). Safe to show an operator.
+
+    Parses `csf -g` via the plugin. Typical comment:
+    `lfd: (sshd) Failed SSH login … 8 in the last 3600 secs`.
+    Pair with bfm_ip_reason or use ip_block_reason for both + a customer text.
+
+    Args:
+        ip: IPv4 or IPv6.
+    """
+    blocked = _require_csf()
+    if blocked:
+        return blocked
+    address = validate_ip(ip)
+    data = await _csf_plugin("grep", {"ip": address})
+    parsed = parse_csf_grep(data.get("result", data), address)
+    from tools.csf_reason import customer_messages
+
+    return format_response(
+        {
+            "ip": address,
+            "listed": parsed["listed"],
+            "reason": parsed["reason"]
+            or ("Not listed in CSF/LFD grep." if not parsed["listed"] else "Listed, no LFD comment."),
+            "hits": parsed["hits"],
+            "customer_message": customer_messages(address, csf=parsed),
+        }
+    )
 
 
 @mcp.tool()
