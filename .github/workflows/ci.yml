@@ -31,6 +31,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
+          pip install -e .
       - name: Ruff
         run: ruff check .
       - name: Pytest
@@ -38,4 +39,5 @@ jobs:
           DA_URL: https://127.0.0.1:2222
           DA_USERNAME: admin
           DA_LOGIN_KEY: test-only
+          PYTHONPATH: .
         run: pytest -q

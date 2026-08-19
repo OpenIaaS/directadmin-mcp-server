@@ -1,6 +1,13 @@
 # Changelog
 
+## 2.4.1 — 2026-08-19
+
+- CI: pytest 8+ no longer puts the repo root on `sys.path`. Set
+  `pythonpath = ["."]`, `PYTHONPATH=.`, and `pip install -e .` so the
+  workflow stops failing collection with `No module named 'security'`.
+
 ## 2.4.0 — 2026-08-19
+
 
 ### Rogue-agent blast radius
 

@@ -1,7 +1,7 @@
 # DirectAdmin MCP Server
 
 [![ci](https://github.com/OpenIaaS/directadmin-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenIaaS/directadmin-mcp/actions/workflows/ci.yml)
-[![version](https://img.shields.io/badge/version-2.4.0-0b6bcb.svg)](https://github.com/OpenIaaS/directadmin-mcp)
+[![version](https://img.shields.io/badge/version-2.4.1-0b6bcb.svg)](https://github.com/OpenIaaS/directadmin-mcp)
 [![license](https://img.shields.io/badge/license-MIT-0b6bcb.svg)](LICENSE)
 
 A [Model Context Protocol](https://modelcontextprotocol.io) server that lets an
