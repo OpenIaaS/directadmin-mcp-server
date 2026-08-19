@@ -27,10 +27,12 @@ Read [docs/agent.md](docs/agent.md) and [docs/tokens.md](docs/tokens.md)
 before pointing a model at production.
 
 
-```mermaid
-flowchart LR
-  A["Claude / Cursor / any MCP"] -->|"stdio or SSE"| B["directadmin-mcp<br/>confirm · audit.jsonl"]
-  B -->|"HTTPS · login key"| C["DirectAdmin :2222<br/>API + CSF"]
+```
+┌───────────┐ stdio/SSE ┌─────────────────┐ HTTPS ┌─────────────┐
+│ Claude /  │ ────────► │ directadmin-mcp │ ────► │ DirectAdmin │
+│ Cursor /  │           │ confirm · audit │  key  │ :2222 + CSF │
+│ any MCP   │ ◄──────── │                 │       │             │
+└───────────┘           └─────────────────┘       └─────────────┘
 ```
 
 ## What you can ask
