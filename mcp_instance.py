@@ -22,7 +22,8 @@ Operating contract:
 4. Domain TLS is a user-level resource. Always impersonate the owning user.
 5. A locked-out customer is usually blocked in CSF/LFD AND Brute Force Monitor.
    Use firewall_unblock_everywhere. Never disable CSF.
-6. SSL: inspect ACME, dry_run=true, then reissue with confirm=true.
+6. SSL: Admin SSL icon → ssl_admin_list then ssl_admin_reissue. One domain →
+   inspect ACME, dry_run, then ssl_reissue_domain (impersonate the owner).
 7. After a write, verify with a read tool (list certs, csf_search_ip, users_get).
 8. Never print login keys, passwords, private keys, bearer tokens, or PEM.
 9. If a tool is denied by policy, explain the flag. Do not try to bypass it.

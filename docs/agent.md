@@ -33,6 +33,7 @@ model sees it at session start.
 | Human says | First tool | Then |
 | --- | --- | --- |
 | “SSL for shop.example.com is expired” | `ssl_get_domain_acme_config` (impersonate owner) | dry-run → `ssl_reissue_domain confirm=true` |
+| “Reissue SSL for these clients” (Admin SSL icon) | `ssl_admin_list` | `ssl_admin_reissue domains=[…] confirm=true` |
 | “The panel hostname cert is bad” | `ssl_server_status` | `ssl_reissue_server confirm=true` |
 | “Customer IP is locked out” | `csf_search_ip` + `bfm_list` | `firewall_unblock_everywhere confirm=true` |
 | “Restart php-fpm83” | `services_get php-fpm83` | `services_restart confirm=true` |

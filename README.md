@@ -1,7 +1,7 @@
 # DirectAdmin MCP Server
 
 [![ci](https://github.com/OpenIaaS/directadmin-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenIaaS/directadmin-mcp/actions/workflows/ci.yml)
-[![version](https://img.shields.io/badge/version-2.1.0-0b6bcb.svg)](https://github.com/OpenIaaS/directadmin-mcp)
+[![version](https://img.shields.io/badge/version-2.2.0-0b6bcb.svg)](https://github.com/OpenIaaS/directadmin-mcp)
 [![license](https://img.shields.io/badge/license-MIT-0b6bcb.svg)](LICENSE)
 
 A [Model Context Protocol](https://modelcontextprotocol.io) server that lets an
@@ -115,7 +115,17 @@ filesystem. See [SECURITY.md](SECURITY.md).
 
 ## SSL reissue
 
-New API (DirectAdmin 1.660+ / current Evolution):
+**Admin SSL icon** (all customer domains, Pro Pack, not in the New API):
+
+```
+ssl_admin_list
+ssl_admin_reissue  domains=["shop.example.com","blog.example.com"]  confirm=true
+```
+
+This is `CMD_ADMIN_SSL` `action=multiple` — the same action as Admin Level →
+Admin SSL. The login key must be allowed to run that command.
+
+**One domain** (New API, DirectAdmin 1.660+ / current Evolution):
 
 ```
 ssl_get_domain_acme_config  domain=shop.example.com  impersonate=alice

@@ -3,7 +3,17 @@
 Day-2 work an agent can do safely. Every mutating step needs `confirm=true`
 and a human go-ahead.
 
-## 1. Reissue a domain certificate
+## 1. Reissue customer certs (Admin SSL icon)
+
+```
+ssl_admin_list
+ssl_admin_reissue  domains=["shop.example.com"]  confirm=true
+```
+
+This is `CMD_ADMIN_SSL action=multiple` — the Admin Level icon. Pro Pack
+required. For one modern-panel domain, prefer the New API path below.
+
+## 2. Reissue a domain certificate (New API)
 
 See [ssl.md](ssl.md). Short path:
 
@@ -17,14 +27,14 @@ ssl_list_domain_certs            domain=shop.example.com  impersonate=<owner>
 
 If HTTP-01 fails, check CSF did not ban the CA validators, then retry.
 
-## 2. Reissue the panel hostname certificate
+## 3. Reissue the panel hostname certificate
 
 ```
 ssl_server_status
 ssl_reissue_server  confirm=true
 ```
 
-## 3. Unlock a customer IP
+## 4. Unlock a customer IP
 
 See [csf.md](csf.md).
 
@@ -37,7 +47,7 @@ csf_search_ip                    ip=203.0.113.44
 
 Do **not** run `csf_disable`.
 
-## 4. Restart a service
+## 5. Restart a service
 
 ```
 services_list
@@ -49,7 +59,7 @@ services_get        service=httpd
 Valid names look like `httpd`, `exim`, `dovecot`, `named`, `php-fpm83`.
 Anything with `/` or `..` is rejected.
 
-## 5. Inspect / create a user
+## 6. Inspect / create a user
 
 ```
 users_search          q=alice
@@ -60,7 +70,7 @@ users_get_usage       username=alice
 Creating accounts is a dedicated write (`users_create` / reseller tools) and
 always needs `confirm=true`. Prefer a package over ad-hoc limits.
 
-## 6. Backup then change
+## 7. Backup then change
 
 ```
 backups_admin_list
@@ -70,7 +80,7 @@ backups_create        username=alice  where=local  confirm=true
 Restore is extra-gated (`confirm=true` plus the extra destructive flag).
 Backup filenames cannot contain `..`.
 
-## 7. Mailbox / FTP / cron (user context)
+## 8. Mailbox / FTP / cron (user context)
 
 Always impersonate the owner:
 
@@ -79,7 +89,7 @@ Always impersonate the owner:
 # impersonate=alice on every call
 ```
 
-## 8. When there is no curated tool
+## 9. When there is no curated tool
 
 ```
 da_list_endpoints       prefix=/api/…
@@ -90,14 +100,14 @@ da_api                  method=POST path=/api/…  confirm=true
 
 `/api/execute`, `/api/login`, `/api/logout`, `/api/terminal` are blocked.
 
-## 9. Incident: key leaked
+## 10. Incident: key leaked
 
 1. Revoke the DirectAdmin login key in the panel.
 2. Rotate `MCP_AUTH_TOKEN`.
 3. Read `logs/audit.jsonl` for the window after the leak.
 4. Issue a new IP-restricted login key.
 
-## 10. Health
+## 11. Health
 
 | URL | Auth | Meaning |
 | --- | --- | --- |

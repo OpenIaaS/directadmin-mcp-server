@@ -9,6 +9,10 @@ def test_ssl_module_has_reissue_tools():
     assert "/api/server-tls/obtain" in src
     assert "ssl_reissue_domain_legacy" in src
     assert "CMD_API_SSL" in src
+    assert "ssl_admin_list" in src
+    assert "ssl_admin_reissue" in src
+    assert "CMD_ADMIN_SSL" in src
+    assert "ssl_admin_flags" in src
 
 
 def test_firewall_combo_tool_exists():

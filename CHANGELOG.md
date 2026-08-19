@@ -1,6 +1,16 @@
 # Changelog
 
+## 2.2.0 — 2026-08-19
+
+### Admin SSL
+
+- `ssl_admin_list` / `ssl_admin_reissue` / `ssl_admin_flags` wrap the Admin
+  Level **Admin SSL** icon (`CMD_ADMIN_SSL` / `CMD_API_ADMIN_SSL`, Pro Pack).
+  This is how an admin queues Let's Encrypt for selected customer domains
+  without impersonating each user. Not present in the New JSON API swagger.
+
 ## 2.1.0 — 2026-08-19
+
 
 Second hardening pass for agent-driven administration.
 

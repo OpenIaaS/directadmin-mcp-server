@@ -485,3 +485,135 @@ async def ssl_server_upload_files(
 async def ssl_acme_dns_providers() -> Dict[str, Any]:
     """List ACME DNS-01 providers the panel knows about (Cloudflare, …)."""
     return format_response(await call_da_api("/api/session/acme-dns-providers"))
+
+
+# ---------------------------------------------------------------------------
+# Admin SSL (Pro Pack) — the Admin Level icon that reissues customer certs
+# ---------------------------------------------------------------------------
+
+_ADMIN_SSL_CMDS = ("CMD_API_ADMIN_SSL", "CMD_ADMIN_SSL")
+_ADMIN_SSL_MAX_DOMAINS = 50
+
+
+async def _admin_ssl(method: str, data: Optional[Dict[str, Any]] = None) -> Any:
+    """Admin SSL is not in the New JSON API. Talk to CMD_(API_)ADMIN_SSL."""
+    from da import DirectAdminError
+
+    last: Optional[DirectAdminError] = None
+    for command in _ADMIN_SSL_CMDS:
+        try:
+            return await call_da_legacy(command, method=method, data=data or {})
+        except DirectAdminError as exc:
+            last = exc
+            if exc.status_code in {404, 405}:
+                continue
+            if exc.status_code in {301, 302}:
+                raise DirectAdminError(
+                    "Admin SSL redirected — Pro Pack missing or login-key cannot "
+                    "call CMD_ADMIN_SSL. Grant the key that command.",
+                    status_code=exc.status_code,
+                ) from exc
+            raise
+    raise last or DirectAdminError(
+        "Admin SSL is not available (CMD_ADMIN_SSL / CMD_API_ADMIN_SSL). "
+        "This is a Pro Pack feature: Admin Level → Admin SSL."
+    )
+
+
+@mcp.tool()
+@log_tool_call
+async def ssl_admin_list() -> Dict[str, Any]:
+    """List every user/domain certificate the Admin SSL page shows.
+
+    This is the Admin Level → Admin SSL overview (CMD_ADMIN_SSL?json=yes).
+    It is not in the New JSON API. Requires Pro Pack and a login key that
+    is allowed to run CMD_ADMIN_SSL.
+
+    Use this to see which customer domains are missing, expired, or valid
+    before calling ssl_admin_reissue.
+    """
+    data = await _admin_ssl("GET")
+    return format_response(data)
+
+
+@mcp.tool()
+@log_tool_call
+async def ssl_admin_reissue(
+    domains: List[str],
+    wildcard: bool = False,
+    confirm: bool = False,
+) -> Dict[str, Any]:
+    """Request Let's Encrypt certificates for selected customer domains.
+
+    This is the Admin SSL icon action: POST CMD_ADMIN_SSL action=multiple.
+    The panel queues ACME in the background (dataskq) — no impersonation.
+    Prefer this when an operator says “reissue SSL for these clients”
+    from the Admin SSL page.
+
+    For a single domain on a modern panel, ssl_reissue_domain (New API,
+    impersonate the owner) is more precise.
+
+    Args:
+        domains: Customer domain names as listed by ssl_admin_list (max 50).
+        wildcard: Request *.domain (dns-01). Default is http-01 / per-host.
+        confirm: Required.
+    """
+    rejected = guard_confirm("ssl_admin_reissue", confirm)
+    if rejected:
+        return rejected
+    if not domains:
+        return format_error("Provide at least one domain")
+    if len(domains) > _ADMIN_SSL_MAX_DOMAINS:
+        return format_error(
+            f"Refusing more than {_ADMIN_SSL_MAX_DOMAINS} domains in one call "
+            "(Let's Encrypt rate limits). Split the batch."
+        )
+    clean = [validate_domain(item) for item in domains]
+    payload: Dict[str, Any] = {
+        "action": "multiple",
+        "request": "yourdomain",
+        "wildcard": "yes" if wildcard else "no",
+    }
+    for index, name in enumerate(clean):
+        payload[f"select{index}"] = name
+    data = await _admin_ssl("POST", payload)
+    return format_response(
+        {
+            "domains": clean,
+            "wildcard": wildcard,
+            "queued": True,
+            "result": data,
+            "hint": "Admin SSL writes a task; poll ssl_admin_list until the certs show as valid.",
+        }
+    )
+
+
+@mcp.tool()
+@log_tool_call
+async def ssl_admin_flags() -> Dict[str, Any]:
+    """Read admin_ssl_* and letsencrypt_* flags from directadmin.conf.
+
+    These control the automatic Admin SSL poller (install-to-missing,
+    replace-expired, cert-on-create). Change them with da_config_local_patch.
+    """
+    cfg = await call_da_api("/api/server-settings/directadmin-conf/active")
+    if not isinstance(cfg, dict):
+        return format_response(cfg)
+    keys = (
+        "admin_ssl_install_to_missing",
+        "admin_ssl_replace_all_expired_invalid",
+        "admin_ssl_check_retries",
+        "admin_ssl_cert_on_create",
+        "admin_ssl_cert_per_vh",
+        "admin_ssl_default_wildcard",
+        "admin_ssl_poll_frequency",
+        "letsencrypt",
+        "letsencrypt_max_requests_per_week",
+    )
+    picked = {key: cfg.get(key) for key in keys if key in cfg}
+    if not picked:
+        nested = cfg.get("data") or cfg.get("values") or {}
+        if isinstance(nested, dict):
+            picked = {key: nested.get(key) for key in keys if key in nested}
+    return format_response({"flags": picked, "source": "directadmin.conf active"})
+

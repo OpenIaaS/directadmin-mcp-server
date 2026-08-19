@@ -1,16 +1,36 @@
 # SSL reissue playbook
 
-Two certificates matter on a DirectAdmin box:
+Three surfaces matter on a DirectAdmin box:
 
-| Certificate | Tool | New API |
+| Certificate | Tool | API |
 | --- | --- | --- |
-| User domain (Let's Encrypt / ZeroSSL) | `ssl_reissue_domain` | `POST /api/domain-tls/{domain}/provision-certs` |
+| **Admin SSL** (all customer domains) | `ssl_admin_list` / `ssl_admin_reissue` | `CMD_ADMIN_SSL` (Pro Pack, not in New API) |
+| One user domain (Let's Encrypt / ZeroSSL) | `ssl_reissue_domain` | `POST /api/domain-tls/{domain}/provision-certs` |
 | Panel hostname (`:2222`) | `ssl_reissue_server` | `POST /api/server-tls/obtain` |
 
-Always **impersonate the owning user** for domain TLS. Admin context cannot
-provision a user domain.
+Admin SSL is the admin-level icon: overview of every user/domain cert and a
+bulk “request” that queues ACME in dataskq. It does **not** need
+impersonation. Per-domain New API calls **do** — always impersonate the owner.
 
-## Domain cert expired or missing
+## Admin SSL — reissue for selected clients
+
+```
+ssl_admin_list
+ssl_admin_flags
+ssl_admin_reissue  domains=["shop.example.com","blog.example.com"]  confirm=true
+ssl_admin_list
+```
+
+`ssl_admin_reissue` POSTs `CMD_ADMIN_SSL` with `action=multiple` and
+`select0…N`. Max 50 domains per call (Let's Encrypt rate limits).
+The login key must be allowed to run `CMD_ADMIN_SSL`.
+
+Automatic poller (install-to-missing / replace-expired) is
+`admin_ssl_*` in `directadmin.conf` — read with `ssl_admin_flags`, change
+with `da_config_local_patch` (and a panel restart if DA requires it).
+Do not leave `admin_ssl_replace_all_expired_invalid=1` on permanently.
+
+## Domain cert expired or missing (one site)
 
 ```
 ssl_get_domain_acme_config   domain=shop.example.com  impersonate=alice
