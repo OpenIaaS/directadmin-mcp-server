@@ -23,19 +23,24 @@ See [docs/hardening.md](docs/hardening.md) for the full guide. Short version:
 3. Bind HTTP to `127.0.0.1` and put TLS in front (Caddy, nginx, Traefik). The
    Docker Compose file already publishes only on loopback.
 4. Keep `DA_SSL_VERIFY=true`. `DA_ALLOW_INSECURE_HTTP` is for labs.
-5. Leave `REQUIRE_CONFIRM=true`. Destructive tools (delete, deny, restart,
-   reissue, unblock, …) no-op until the model passes `confirm=true`.
-6. Leave `ENABLE_EXECUTE=false`. `/api/execute` is a shell-shaped foot-gun.
-7. Leave `ENABLE_CSF_DISABLE=false`. Unlock a customer with
+5. Leave `REQUIRE_CONFIRM=true`. Prefer `APPROVAL_TOKEN` so `confirm=true`
+   is not enough — a rogue model will set that boolean on its own.
+6. Leave the blast-radius flags **off** (`ENABLE_DELETE`,
+   `ENABLE_ACCOUNT_WRITE`, `ENABLE_FILEMANAGER_WRITE`, `ENABLE_CUSTOMBUILD`,
+   `ENABLE_OS_UPDATES`, `ENABLE_PLUGIN_WRITE`, `ENABLE_BACKUP_RESTORE`,
+   `ENABLE_SERVICE_CONTROL`, `ENABLE_CONFIG_WRITE`, `ENABLE_DA_WRITE`).
+   SSL reissue and CSF unblock stay available.
+7. Leave `ENABLE_EXECUTE=false`. `/api/execute` is a shell-shaped foot-gun.
+8. Leave `ENABLE_CSF_DISABLE=false`. Unlock a customer with
    `firewall_unblock_everywhere`, do not turn CSF off.
-8. Use `TOOL_ALLOWLIST` in production if the assistant only needs SSL + CSF:
+9. Use `TOOL_ALLOWLIST` in production if the assistant only needs SSL + CSF:
    ```
    TOOL_ALLOWLIST=ssl_,csf_,bfm_,firewall_,da_ping,da_list,da_describe,session_get
    ```
-9. Set `MCP_ALLOWED_CIDRS` to the assistant / jump-host network.
-10. Rotate the login key and `MCP_AUTH_TOKEN` after any suspected leak.
-11. Read `logs/audit.jsonl`. Secrets are redacted; the file still tells you
-    *which* tool ran, from where.
+10. Set `MCP_ALLOWED_CIDRS` to the assistant / jump-host network.
+11. Rotate the login key and `MCP_AUTH_TOKEN` after any suspected leak.
+12. Read `logs/audit.jsonl`. Secrets are redacted; the file still tells you
+    *which* tool ran, from where. Call `policy_status` to see live flags.
 
 ## What this server will not do
 

@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 # Load order: curated first, generic catalog last
 _PREFERRED = [
     "common",
+    "policy",
     "ssl_certs",
     "csf_firewall",
     "brute_force",

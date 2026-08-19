@@ -12,8 +12,9 @@ model sees it at session start.
 1. **Read first.** `users_list` / `ssl_list_domain_certs` / `csf_search_ip`
    before any write.
 2. **Do not set `confirm=true` unless the human approved the exact action**
-   (who, what, why). If they said “unlock 203.0.113.44”, that is not a blank
-   cheque to disable CSF.
+   (who, what, why). If `APPROVAL_TOKEN` is set, `confirm=true` is rejected —
+   ask the human to paste the token. Never invent one. “Unlock this IP” is
+   not a blank cheque to disable CSF or delete a user.
 3. **Prefer curated tools.** `da_api` / `da_legacy` are escape hatches.
 4. **Impersonate the owning user** for domain TLS, mailboxes, FTP, cron, files.
 5. **Never echo secrets.** Login keys, passwords, PEM, bearer tokens stay out
@@ -24,7 +25,9 @@ model sees it at session start.
 
 - `csf_disable` / `ENABLE_CSF_DISABLE`
 - `/api/execute` / `ENABLE_EXECUTE`
-- `confirm=true` “just in case”
+- `confirm=true` “just in case” or guessing `APPROVAL_TOKEN`
+- Deleting users, files, databases, or WordPress (those flags default off)
+- Bypassing a `denied_by` flag — call `policy_status` and stop
 - Putting `MCP_AUTH_TOKEN` in a query string
 - Using the main admin password instead of a login key
 
@@ -50,9 +53,12 @@ If the assistant only renews certs and unblocks customers:
 ```
 TOOL_ALLOWLIST=ssl_,csf_,bfm_,firewall_,da_ping,da_list,da_describe,session_get,users_get,users_search
 REQUIRE_CONFIRM=true
+APPROVAL_TOKEN=<paste-from-host>
 ENABLE_CSF=true
 ENABLE_CSF_DISABLE=false
 ENABLE_EXECUTE=false
+ENABLE_DELETE=false
+ENABLE_ACCOUNT_WRITE=false
 ```
 
 Create the DirectAdmin login key with the same blast radius (IP-restricted,

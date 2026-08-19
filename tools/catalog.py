@@ -127,6 +127,11 @@ async def da_api(
     method = method.upper()
     if method not in {"GET", "POST", "PUT", "PATCH", "DELETE"}:
         return format_error("Unsupported method")
+    if method != "GET" and not settings.ENABLE_DA_WRITE:
+        return format_error(
+            "Generic New API writes are disabled (ENABLE_DA_WRITE=false). "
+            "Use a curated tool, or set the flag if you accept the extra risk."
+        )
     if not path.startswith("/api/"):
         return format_error("Only /api/* New API paths are allowed")
     op = _lookup(method, path)
@@ -198,6 +203,11 @@ async def da_legacy(
     if any(bad in name.upper() for bad in ("CMD_API_LOGIN", "CMD_LOGIN", "CMD_LOGOUT")):
         return format_error("Login/logout commands are not allowed through the MCP")
     if method.upper() != "GET":
+        if not settings.ENABLE_DA_WRITE:
+            return format_error(
+                "Generic legacy writes are disabled (ENABLE_DA_WRITE=false). "
+                "Use a curated tool, or set the flag if you accept the extra risk."
+            )
         rejected = guard_confirm("da_legacy", confirm, extra=True)
         if rejected:
             return rejected

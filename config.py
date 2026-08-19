@@ -12,7 +12,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 load_dotenv()
 
-VERSION = "2.3.1"
+VERSION = "2.4.0"
 
 
 class Settings(BaseSettings):
@@ -51,10 +51,24 @@ class Settings(BaseSettings):
     TOOL_ALLOWLIST: str = Field("")
     TOOL_DENYLIST: str = Field("da_execute,csf_disable")
     REQUIRE_CONFIRM: bool = Field(True)
+    # When set, confirm=true is not enough — the operator must paste this token.
+    APPROVAL_TOKEN: SecretStr = Field(default=SecretStr(""))
     ENABLE_EXECUTE: bool = Field(False)
     ENABLE_CSF: bool = Field(True)
     ENABLE_CSF_DISABLE: bool = Field(False)
     ENABLE_CLOUDLINUX: bool = Field(False)
+    # Rogue-agent blast-radius. Default off = the agent can read, reissue SSL,
+    # and unblock CSF. It cannot delete, rewrite accounts, or compile software.
+    ENABLE_DELETE: bool = Field(False)
+    ENABLE_ACCOUNT_WRITE: bool = Field(False)
+    ENABLE_FILEMANAGER_WRITE: bool = Field(False)
+    ENABLE_CUSTOMBUILD: bool = Field(False)
+    ENABLE_OS_UPDATES: bool = Field(False)
+    ENABLE_PLUGIN_WRITE: bool = Field(False)
+    ENABLE_BACKUP_RESTORE: bool = Field(False)
+    ENABLE_SERVICE_CONTROL: bool = Field(False)
+    ENABLE_CONFIG_WRITE: bool = Field(False)
+    ENABLE_DA_WRITE: bool = Field(False)
     RATE_LIMIT_PER_MINUTE: int = Field(60, ge=0)
     AUDIT_LOG: str = Field("logs/audit.jsonl")
 
@@ -77,6 +91,14 @@ class Settings(BaseSettings):
         raw = value.get_secret_value() if isinstance(value, SecretStr) else str(value or "")
         if raw and len(raw) < 24:
             raise ValueError("MCP_AUTH_TOKEN must be at least 24 characters")
+        return value if isinstance(value, SecretStr) else SecretStr(raw)
+
+    @field_validator("APPROVAL_TOKEN")
+    @classmethod
+    def _approval_length(cls, value: SecretStr) -> SecretStr:
+        raw = value.get_secret_value() if isinstance(value, SecretStr) else str(value or "")
+        if raw and len(raw) < 16:
+            raise ValueError("APPROVAL_TOKEN must be at least 16 characters")
         return value if isinstance(value, SecretStr) else SecretStr(raw)
 
     @property

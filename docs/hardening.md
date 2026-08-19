@@ -2,6 +2,7 @@
 
 This process holds a DirectAdmin **admin login key**. Treat it like root.
 The intended operator is an **AI agent** — see [agent.md](agent.md).
+Agents will pass `confirm=true` without asking. Defaults assume that.
 
 ## DirectAdmin side
 
@@ -18,13 +19,40 @@ The intended operator is an **AI agent** — see [agent.md](agent.md).
 | `MCP_HOST` | `127.0.0.1` | No public bind |
 | `MCP_AUTH_TOKEN` | required for HTTP, ≥ 24 chars | Bearer on every non-health route |
 | `MCP_ALLOW_ANONYMOUS` | `false` | Lab-only escape hatch |
-| `REQUIRE_CONFIRM` | `true` | Destructive tools no-op without `confirm=true` |
-| `ENABLE_EXECUTE` | `false` | `/api/execute` is a shell-shaped foot-gun |
-| `ENABLE_CSF_DISABLE` | `false` | `csf -x` is almost never the right fix |
+| `REQUIRE_CONFIRM` | `true` | Mutating tools no-op without approval |
+| `APPROVAL_TOKEN` | empty | When set, `confirm=true` is **not** enough — paste the token |
+| `ENABLE_DELETE` | `false` | Mailbox/FTP/WP/unit/cert deletes |
+| `ENABLE_ACCOUNT_WRITE` | `false` | Create/delete/suspend users, passwords, login keys |
+| `ENABLE_FILEMANAGER_WRITE` | `false` | rm/mv/chmod through the panel |
+| `ENABLE_CUSTOMBUILD` | `false` | Compile the stack |
+| `ENABLE_OS_UPDATES` | `false` | `yum`/`apt` via the panel |
+| `ENABLE_PLUGIN_WRITE` | `false` | Install/remove plugins |
+| `ENABLE_BACKUP_RESTORE` | `false` | Restore overwrites live data |
+| `ENABLE_SERVICE_CONTROL` | `false` | restart/stop/start httpd etc. |
+| `ENABLE_CONFIG_WRITE` | `false` | `directadmin.conf`, hostname |
+| `ENABLE_DA_WRITE` | `false` | Generic `da_api` / `da_legacy` writes |
+| `ENABLE_CLOUDLINUX` | `false` | LVE Manager — only on CL boxes |
+| `ENABLE_EXECUTE` | `false` | `/api/execute` is a shell |
+| `ENABLE_CSF_DISABLE` | `false` | `csf -x` |
+| `ENABLE_CSF` | `true` | Unblock is why the agent exists |
 | `TOOL_DENYLIST` | `da_execute,csf_disable` | Defence in depth |
 | `DA_SSL_VERIFY` | `true` | No silent MITM |
 | `RATE_LIMIT_PER_MINUTE` | `60` | Brute-force the token |
-| Docker | non-root, `cap_drop: ALL`, read-only FS | Blast radius |
+
+Always-on helpdesk surface (still needs `confirm` / approval token for writes):
+SSL reissue, CSF/BFM unblock, reads.
+
+`policy_status` prints the live flags. If a tool is denied, flip the matching
+`ENABLE_*` — do not ask the agent to work around it.
+
+### Approval token (recommended)
+
+```
+python -c "import secrets; print(secrets.token_urlsafe(24))"
+```
+
+Put the value in `APPROVAL_TOKEN`. The agent must pass that string as
+`confirm=`, not `confirm=true`. A model that “just deletes” cannot invent it.
 
 Bind `0.0.0.0` only behind TLS (Caddy / nginx) **and** with a token. The
 process refuses a public bind without `MCP_AUTH_TOKEN`.
@@ -47,13 +75,15 @@ no exception strings). Docker HEALTHCHECK uses `/health`.
 If the assistant only renews SSL and unblocks CSF:
 
 ```
-TOOL_ALLOWLIST=ssl_,csf_,bfm_,firewall_,da_ping,da_list,da_describe,session_get
+TOOL_ALLOWLIST=ssl_,csf_,bfm_,firewall_,da_ping,da_list,da_describe,session_get,policy_
 ```
+
+To allow one extra family on a single box, flip **one** flag, not all of them.
 
 ## Audit
 
 `logs/audit.jsonl` records every tool call with redacted arguments. Login keys,
-passwords, bearer tokens and PEM material never land in logs.
+passwords, bearer tokens, approval tokens and PEM material never land in logs.
 
 ## Supply chain
 

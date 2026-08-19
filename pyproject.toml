@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "directadmin-mcp"
-version = "2.3.1"
+version = "2.4.0"
 description = "Model Context Protocol server for DirectAdmin admin operations (SSL reissue, CSF unblock, full New API)."
 readme = "README.md"
 requires-python = ">=3.10"

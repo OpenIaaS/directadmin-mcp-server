@@ -9,6 +9,7 @@ from typing import Any, Callable, Dict, Optional, TypeVar, cast
 
 from da import DirectAdminError
 from security import (
+    capability_denied,
     confirm_or_reject,
     redact,
     tool_permitted,
@@ -33,6 +34,9 @@ def format_error(message: str, **extra: Any) -> Dict[str, Any]:
 
 
 def log_tool_call(func: T) -> T:
+    if "confirm" in getattr(func, "__annotations__", {}):
+        func.__annotations__["confirm"] = Any
+
     @functools.wraps(func)
     async def wrapper(*args: Any, **kwargs: Any):
         name = func.__name__
@@ -40,11 +44,18 @@ def log_tool_call(func: T) -> T:
             write_audit("tool_denied", tool=name)
             return format_error(f"Tool '{name}' is blocked by TOOL_ALLOWLIST/TOOL_DENYLIST")
 
+        gated = capability_denied(name)
+        if gated:
+            write_audit("tool_capability_denied", tool=name, flag=gated.get("denied_by"))
+            return gated
+
         sig = inspect.signature(func)
         try:
             bound = sig.bind_partial(*args, **kwargs)
             bound.apply_defaults()
             safe = redact(dict(bound.arguments))
+            if isinstance(safe.get("confirm"), str) and len(str(safe["confirm"])) > 8:
+                safe["confirm"] = "********"
         except Exception:
             safe = {"_": "unbound"}
 
@@ -66,5 +77,5 @@ def log_tool_call(func: T) -> T:
     return cast(T, wrapper)
 
 
-def guard_confirm(tool_name: str, confirm: bool, extra: bool = False) -> Optional[Dict[str, Any]]:
+def guard_confirm(tool_name: str, confirm: Any, extra: bool = False) -> Optional[Dict[str, Any]]:
     return confirm_or_reject(tool_name, confirm, extra_flag=extra)

@@ -237,6 +237,126 @@ def tool_permitted(name: str) -> bool:
     return any(name == rule or name.startswith(rule) for rule in allowlist)
 
 
+# First matching rule wins. Reads, SSL reissue, and CSF unblock stay ungated.
+_CAPABILITY_EXACT: dict[str, str] = {
+    "users_create": "ENABLE_ACCOUNT_WRITE",
+    "users_delete": "ENABLE_ACCOUNT_WRITE",
+    "users_suspend": "ENABLE_ACCOUNT_WRITE",
+    "users_unsuspend": "ENABLE_ACCOUNT_WRITE",
+    "users_modify": "ENABLE_ACCOUNT_WRITE",
+    "users_change_password": "ENABLE_ACCOUNT_WRITE",
+    "users_change_creator": "ENABLE_ACCOUNT_WRITE",
+    "users_convert_to_reseller": "ENABLE_ACCOUNT_WRITE",
+    "resellers_create": "ENABLE_ACCOUNT_WRITE",
+    "resellers_convert_to_user": "ENABLE_ACCOUNT_WRITE",
+    "admins_create": "ENABLE_ACCOUNT_WRITE",
+    "login_keys_create": "ENABLE_ACCOUNT_WRITE",
+    "login_keys_update": "ENABLE_ACCOUNT_WRITE",
+    "login_keys_delete": "ENABLE_ACCOUNT_WRITE",
+    "login_urls_create": "ENABLE_ACCOUNT_WRITE",
+    "login_urls_delete": "ENABLE_ACCOUNT_WRITE",
+    "cb_run": "ENABLE_CUSTOMBUILD",
+    "cb_options_update": "ENABLE_CUSTOMBUILD",
+    "cb_kill": "ENABLE_CUSTOMBUILD",
+    "system_packages_update_run": "ENABLE_OS_UPDATES",
+    "system_update_directadmin": "ENABLE_OS_UPDATES",
+    "system_set_update_channel": "ENABLE_OS_UPDATES",
+    "system_restart_directadmin": "ENABLE_SERVICE_CONTROL",
+    "plugins_install_url": "ENABLE_PLUGIN_WRITE",
+    "plugins_activate": "ENABLE_PLUGIN_WRITE",
+    "plugins_deactivate": "ENABLE_PLUGIN_WRITE",
+    "plugins_update": "ENABLE_PLUGIN_WRITE",
+    "plugins_delete": "ENABLE_PLUGIN_WRITE",
+    "backups_restore": "ENABLE_BACKUP_RESTORE",
+    "da_config_local_update": "ENABLE_CONFIG_WRITE",
+    "da_config_local_patch": "ENABLE_CONFIG_WRITE",
+    "hostname_change": "ENABLE_CONFIG_WRITE",
+    "timezone_set": "ENABLE_CONFIG_WRITE",
+    "email_server_config_update": "ENABLE_CONFIG_WRITE",
+    "email_outbound_filter_update": "ENABLE_CONFIG_WRITE",
+    "db_server_config_update": "ENABLE_CONFIG_WRITE",
+    "license_update_key": "ENABLE_CONFIG_WRITE",
+    "csf_disable": "ENABLE_CSF_DISABLE",
+    "da_execute": "ENABLE_EXECUTE",
+}
+
+_DELETE_MARKERS = ("_delete", "_remove", "_destroy", "_drop", "_trash", "uninstall")
+_SERVICE_MARKERS = ("_restart", "_stop", "_start", "_reload", "_kill")
+_FM_WRITE_PREFIXES = ("fm_", "filemanager_")
+
+
+def capability_for(tool_name: str) -> Optional[str]:
+    """Which ENABLE_* flag must be on, or None if the tool is always allowed."""
+    if tool_name in _CAPABILITY_EXACT:
+        return _CAPABILITY_EXACT[tool_name]
+    if tool_name.startswith("cl_"):
+        return "ENABLE_CLOUDLINUX"
+    if tool_name.startswith(("csf_", "bfm_", "firewall_")):
+        if tool_name == "csf_disable":
+            return "ENABLE_CSF_DISABLE"
+        return None if settings.ENABLE_CSF else "ENABLE_CSF"
+    if any(tool_name.startswith(prefix) for prefix in _FM_WRITE_PREFIXES):
+        if tool_name in {
+            "fm_list",
+            "fm_tree",
+            "fm_disk_usage",
+            "fm_search_files",
+            "fm_search_text",
+            "fm_trash",
+        }:
+            return None
+        return "ENABLE_FILEMANAGER_WRITE"
+    if tool_name.startswith("services_") and any(marker in tool_name for marker in _SERVICE_MARKERS):
+        return "ENABLE_SERVICE_CONTROL"
+    if any(marker in tool_name for marker in _DELETE_MARKERS):
+        return "ENABLE_DELETE"
+    if tool_name.endswith("_kill") or "_kill_" in tool_name:
+        return "ENABLE_DELETE"
+    return None
+
+
+def capability_enabled(flag: str) -> bool:
+    return bool(getattr(settings, flag, False))
+
+
+def capability_denied(tool_name: str) -> Optional[dict]:
+    flag = capability_for(tool_name)
+    if not flag or capability_enabled(flag):
+        return None
+    return {
+        "success": False,
+        "error": True,
+        "denied_by": flag,
+        "message": (
+            f"'{tool_name}' is disabled ({flag}=false). "
+            "This is the default so a rogue agent cannot delete or rewrite "
+            "the box. Set the flag in .env if you really want this class of action."
+        ),
+    }
+
+
+def _approval_token() -> str:
+    token = settings.APPROVAL_TOKEN
+    return token.get_secret_value() if hasattr(token, "get_secret_value") else str(token or "")
+
+
+def confirm_accepted(confirm: Any) -> tuple[bool, str]:
+    """confirm=true is enough only when APPROVAL_TOKEN is unset."""
+    token = _approval_token()
+    if token:
+        if confirm is True or confirm is False or confirm is None:
+            return False, (
+                "APPROVAL_TOKEN is set. confirm=true is not enough — ask the "
+                "human to paste the token into confirm=."
+            )
+        if constant_time_token_match(str(confirm).strip(), token):
+            return True, ""
+        return False, "Approval token does not match. Do not retry with a guess."
+    if confirm is True:
+        return True, ""
+    return False, ""
+
+
 def needs_confirm(tool_name: str, extra_flag: bool = False) -> bool:
     if not settings.REQUIRE_CONFIRM:
         return False
@@ -246,18 +366,30 @@ def needs_confirm(tool_name: str, extra_flag: bool = False) -> bool:
     return any(hint in lowered for hint in DESTRUCTIVE_HINTS)
 
 
-def confirm_or_reject(tool_name: str, confirm: bool, extra_flag: bool = False) -> Optional[dict]:
-    if needs_confirm(tool_name, extra_flag=extra_flag) and not confirm:
+def confirm_or_reject(tool_name: str, confirm: Any, extra_flag: bool = False) -> Optional[dict]:
+    if not needs_confirm(tool_name, extra_flag=extra_flag):
+        return None
+    ok, detail = confirm_accepted(confirm)
+    if ok:
+        return None
+    if detail:
         return {
             "success": False,
             "error": True,
             "needs_confirm": True,
-            "message": (
-                f"'{tool_name}' is a destructive action. "
-                "Re-run with confirm=true after the operator has approved it."
-            ),
+            "needs_approval_token": bool(_approval_token()),
+            "message": f"'{tool_name}' is a destructive action. {detail}",
         }
-    return None
+    return {
+        "success": False,
+        "error": True,
+        "needs_confirm": True,
+        "message": (
+            f"'{tool_name}' is a destructive action. "
+            "Re-run with confirm=true after the operator has approved it. "
+            "Do not set confirm=true yourself."
+        ),
+    }
 
 
 class RateLimiter:

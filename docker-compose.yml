@@ -1,7 +1,7 @@
 services:
   directadmin-mcp:
     build: .
-    image: directadmin-mcp:2.3.1
+    image: directadmin-mcp:2.4.0
     restart: unless-stopped
     env_file:
       - .env

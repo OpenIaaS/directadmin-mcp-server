@@ -1,6 +1,20 @@
 # Changelog
 
+## 2.4.0 — 2026-08-19
+
+### Rogue-agent blast radius
+
+- Destructive families are **opt-in** and default off: delete, account write,
+  filemanager write, CustomBuild, OS updates, plugin write, backup restore,
+  service control, config write, generic `da_api`/`da_legacy` writes.
+- SSL reissue and CSF/BFM unblock stay on (still need confirm).
+- `APPROVAL_TOKEN`: when set, `confirm=true` is rejected. The operator pastes
+  the token. A model that “just deletes” cannot invent it.
+- `policy_status` prints the live flags so the agent can explain a denial
+  instead of shopping for another delete tool.
+
 ## 2.3.1 — 2026-08-19
+
 
 - CloudLinux is opt-in. `ENABLE_CLOUDLINUX` defaults to **false** so the
   majority of (non-CL) servers never hit LVE Manager. `cl_status` still
