@@ -278,11 +278,17 @@ Tested against the official New API swagger (`info.version = 1.0`, 269 paths /
 
 ## License
 
-[MIT](LICENSE). Use it, fork it, ship it with your panel tooling.
+[MIT](LICENSE). Use it, modify it, and ship it with your panel tooling.
 
-Early structure was released under the same MIT license in 2025
-([omryatia/directadmin-mcp](https://github.com/omryatia/directadmin-mcp)).
-This tree keeps that notice. New work is Copyright OpenIaaS.
+This repository is an independent implementation, first published by OpenIaaS
+in **August 2026**. A 2025 MIT release
+([omryatia/directadmin-mcp](https://github.com/omryatia/directadmin-mcp))
+supplied the original layout — entrypoints and module names. That starting
+point is preserved as a derivative-work notice in [LICENSE](LICENSE). As of
+20 August 2026 it is a small fraction of the tree: about one in twenty of
+the original unique code lines still appear verbatim; the Python sources are
+roughly three and a half times larger, and the domain tools (SSL, CSF, policy,
+audit) are new.
 
-Built with thanks to the DirectAdmin community — docs, forum, and operators
-who have been running these boxes for years.
+With thanks to the DirectAdmin community — the documentation, the forum, and
+the operators who have been running these boxes for **23+ years**.
