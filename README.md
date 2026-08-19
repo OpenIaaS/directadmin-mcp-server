@@ -35,7 +35,7 @@ and “never disable CSF” are part of the protocol, not optional courtesy.
 | “Customer 203.0.113.44 is locked out of CSF” | `csf_unblock_ip` / `firewall_unblock_everywhere` |
 | “Is that IP blocked in BFM too?” | `bfm_list` + `bfm_unblock_ip` |
 | “List users over quota” | `users_list_all` + `users_get_usage` |
-| “Restart php-fpm74” | `services_restart` |
+| “Restart php-fpm74” | `services_restart` (needs `ENABLE_SERVICE_CONTROL=true`) |
 | Anything else in `/api/*` | `da_list_endpoints` → `da_api` |
 
 Destructive calls (`delete`, `deny`, `restart`, `reissue`, `unblock`, …)

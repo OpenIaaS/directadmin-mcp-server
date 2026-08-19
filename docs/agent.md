@@ -39,7 +39,7 @@ model sees it at session start.
 | “Reissue SSL for these clients” (Admin SSL icon) | `ssl_admin_list` | `ssl_admin_reissue domains=[…] confirm=true` |
 | “The panel hostname cert is bad” | `ssl_server_status` | `ssl_reissue_server confirm=true` |
 | “Customer IP is locked out” | `csf_search_ip` + `bfm_list` | `firewall_unblock_everywhere confirm=true` |
-| “Restart php-fpm83” | `services_get php-fpm83` | `services_restart confirm=true` |
+| “Restart php-fpm83” | `policy_status` — needs `ENABLE_SERVICE_CONTROL` | then `services_get` → `services_restart` |
 | “User alice is over quota” | `users_get_usage alice` | tell the operator; do not silently raise limits |
 | “Back up bob before we touch him” | `backups_admin_list` | `backups_create username=bob confirm=true` |
 | “Throttle alice (CloudLinux)” | `cl_status` then `cl_lve_get` | `cl_lve_set confirm=true` |

@@ -49,6 +49,9 @@ Do **not** run `csf_disable`.
 
 ## 5. Restart a service
 
+Off by default (`ENABLE_SERVICE_CONTROL=false`). Flip the flag on that box
+first, then:
+
 ```
 services_list
 services_get        service=httpd
