@@ -301,7 +301,11 @@ async def ssl_upload_cert_files(
 @mcp.tool()
 @log_tool_call
 async def ssl_create_csr(
-    domain: str, cert_id: str, common_name: str = "", impersonate: str = ""
+    domain: str,
+    cert_id: str,
+    common_name: str = "",
+    impersonate: str = "",
+    confirm: bool = False,
 ) -> Dict[str, Any]:
     """Create a CSR for a domain certificate slot (commercial CA flow).
 
@@ -310,6 +314,7 @@ async def ssl_create_csr(
         cert_id: Certificate id.
         common_name: CN, defaults to the domain.
         impersonate: Owning user.
+        confirm: Required.
     """
     domain = validate_domain(domain)
     cert_id = validate_path_segment(cert_id, "certificate id")

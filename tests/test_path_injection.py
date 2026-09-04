@@ -130,7 +130,11 @@ async def test_phpmyadmin_sso_rejects_traversal(tmp_path, monkeypatch):
 
     monkeypatch.setattr(settings, "AUDIT_LOG", str(tmp_path / "audit.jsonl"))
     bind_request_context(profile="operator")
-    result = await phpmyadmin_sso("../../api/session/login-as/switch", reason="audit-regression-test")
+    # confirm=true: since the central gate (round 2) the confirm check fires
+    # before the body, so the traversal path needs a confirmed call to reach it.
+    result = await phpmyadmin_sso(
+        "../../api/session/login-as/switch", confirm=True, reason="audit-regression-test"
+    )
     assert result["success"] is False
     assert "database name" in result["message"]
 

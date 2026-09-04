@@ -52,11 +52,12 @@ async def git_deploy(uuid: str, confirm: bool = False) -> Dict[str, Any]:
 
 @mcp.tool()
 @log_tool_call
-async def git_fetch(uuid: str) -> Dict[str, Any]:
+async def git_fetch(uuid: str, confirm: bool = False) -> Dict[str, Any]:
     """Fetch remotes for a git application.
 
     Args:
         uuid: Application uuid.
+        confirm: Required — the panel contacts the remote git host.
     """
     uuid = validate_path_segment(uuid, "git application uuid", max_len=64)
     return format_response(await call_da_api(f"/api/git/uuid/{uuid}/fetch", method="POST"))

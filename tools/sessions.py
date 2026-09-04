@@ -47,11 +47,12 @@ async def session_reseller_config() -> Dict[str, Any]:
 
 @mcp.tool()
 @log_tool_call
-async def session_switch_domain(domain: str) -> Dict[str, Any]:
+async def session_switch_domain(domain: str, confirm: bool = False) -> Dict[str, Any]:
     """Switch the active domain in the session.
 
     Args:
         domain: Domain to select.
+        confirm: Required — rewrites the shared-session context.
     """
     domain = validate_domain(domain)
     return format_response(
@@ -162,11 +163,12 @@ async def profile_settings() -> Dict[str, Any]:
 
 @mcp.tool()
 @log_tool_call
-async def profile_settings_update(values: Dict[str, Any]) -> Dict[str, Any]:
+async def profile_settings_update(values: Dict[str, Any], confirm: bool = False) -> Dict[str, Any]:
     """Patch profile settings.
 
     Args:
         values: Partial settings object.
+        confirm: Required.
     """
     return format_response(await call_da_api("/api/profile/settings", method="PATCH", data=values))
 

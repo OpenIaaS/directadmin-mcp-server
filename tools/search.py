@@ -38,11 +38,12 @@ async def cpanel_import_tasks() -> Dict[str, Any]:
 
 @mcp.tool()
 @log_tool_call
-async def cpanel_import_check_remote(payload: Dict[str, Any]) -> Dict[str, Any]:
+async def cpanel_import_check_remote(payload: Dict[str, Any], confirm: bool = False) -> Dict[str, Any]:
     """Check a remote cPanel server before import.
 
     Args:
         payload: Host / credentials body.
+        confirm: Required — the panel dials an arbitrary host.
     """
     return format_response(
         await call_da_api("/api/cpanel-import/check-remote", method="POST", data=payload)
@@ -51,11 +52,12 @@ async def cpanel_import_check_remote(payload: Dict[str, Any]) -> Dict[str, Any]:
 
 @mcp.tool()
 @log_tool_call
-async def phpmyadmin_sso(database: str = "") -> Dict[str, Any]:
+async def phpmyadmin_sso(database: str = "", confirm: bool = False) -> Dict[str, Any]:
     """Create a phpMyAdmin SSO session.
 
     Args:
         database: Optional database name for database-scoped SSO.
+        confirm: Required — mints a database SSO session.
     """
     if database:
         database = validate_path_segment(database, "database name", max_len=64)

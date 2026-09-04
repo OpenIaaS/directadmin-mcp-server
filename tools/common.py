@@ -15,6 +15,7 @@ from security import (
     confirm_or_reject,
     current_idem,
     current_reason,
+    needs_confirm,
     reason_denied,
     redact,
     sanitize_reason,
@@ -85,10 +86,12 @@ def log_tool_call(func: T) -> T:
         try:
             bound = sig.bind_partial(*args, **kwargs)
             bound.apply_defaults()
-            safe = redact(dict(bound.arguments))
+            raw = dict(bound.arguments)
+            safe = redact(dict(raw))
             if isinstance(safe.get("confirm"), str) and len(str(safe["confirm"])) > 8:
                 safe["confirm"] = "********"
         except Exception:
+            raw = {"_": "unbound"}
             safe = {"_": "unbound"}
         if reason:
             safe["reason"] = sanitize_reason(reason)
@@ -99,6 +102,17 @@ def log_tool_call(func: T) -> T:
         if cached is not None:
             write_audit("tool_idempotent", tool=name, reason=safe.get("reason", ""))
             return cached
+
+        # Central confirm gate: policy is needs_confirm(name), not whether the
+        # body remembered guard_confirm(). A cached idempotent replay above is
+        # the only path that skips this — replays do not mutate again. Read the
+        # RAW confirm value: the redacted copy masks a long approval token.
+        if needs_confirm(name):
+            confirm_value = raw.get("confirm", kwargs.get("confirm", False))
+            rejected = confirm_or_reject(name, confirm_value)
+            if rejected:
+                write_audit("tool_confirm_denied", tool=name)
+                return rejected
 
         write_audit("tool_call", tool=name, args=safe, reason=safe.get("reason", ""))
         logger.info("tool %s args=%s", name, safe)

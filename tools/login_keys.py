@@ -140,10 +140,13 @@ async def login_urls_delete(url_id: str, confirm: bool = False) -> Dict[str, Any
 
 @mcp.tool()
 @log_tool_call
-async def login_url_one_shot(payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+async def login_url_one_shot(
+    payload: Optional[Dict[str, Any]] = None, confirm: bool = False
+) -> Dict[str, Any]:
     """Create a one-shot panel login URL (POST /api/login/url).
 
     Args:
         payload: Optional body the panel expects.
+        confirm: Required — mints a credential-equivalent login URL.
     """
     return format_response(await call_da_api("/api/login/url", method="POST", data=payload or {}))
