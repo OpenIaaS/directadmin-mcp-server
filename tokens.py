@@ -105,15 +105,29 @@ def _load_file(path: str) -> List[TokenRecord]:
 
 
 _cached: Optional[List[TokenRecord]] = None
+_cached_source: Optional[tuple] = None
 
 
 def load_tokens() -> List[TokenRecord]:
-    global _cached
-    if _cached is not None:
+    global _cached, _cached_source
+    path = (settings.MCP_TOKENS_FILE or "").strip()
+    fingerprint: Optional[tuple] = None
+    if path and os.path.isfile(path):
+        try:
+            stat = os.stat(path)
+            fingerprint = (path, stat.st_mtime_ns, stat.st_size)
+        except OSError:
+            fingerprint = None
+            path = ""
+    else:
+        path = ""
+    # Hot reload: editing the tokens file (revoking a token) takes effect on
+    # the next request without a process restart. Legacy MCP_AUTH_TOKEN has no
+    # file to watch, so that secret still needs a restart to rotate.
+    if _cached is not None and _cached_source == fingerprint:
         return _cached
     records: List[TokenRecord] = []
-    path = (settings.MCP_TOKENS_FILE or "").strip()
-    if path and os.path.isfile(path):
+    if path:
         try:
             records.extend(_load_file(path))
         except (OSError, json.JSONDecodeError, TypeError) as exc:
@@ -128,12 +142,14 @@ def load_tokens() -> List[TokenRecord]:
             )
         )
     _cached = records
+    _cached_source = fingerprint
     return records
 
 
 def reset_token_cache() -> None:
-    global _cached
+    global _cached, _cached_source
     _cached = None
+    _cached_source = None
 
 
 def authenticate_bearer(provided: Optional[str]) -> Optional[TokenRecord]:

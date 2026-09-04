@@ -41,3 +41,38 @@ def test_helpdesk_profile_allows_ssl_and_blocks_delete():
     assert profile_denied("users_delete", "helpdesk") is not None
     assert profile_denied("csf_disable", "operator") is not None
     assert profile_denied("ssl_reissue_domain", "break-glass") is None
+
+
+def test_tokens_file_hot_reload_revokes_without_restart(tmp_path, monkeypatch):
+    """Editing the tokens file must revoke a token on the next request."""
+    import json
+    import os
+    import time
+
+    from config import settings
+
+    raw = "rotated-away-token-value-32b"
+    replacement = "replacement-token-value-48b"
+    path = tmp_path / "tokens.json"
+    path.write_text(
+        json.dumps({"tokens": [{"name": "helpdesk", "profile": "helpdesk", "hash": hash_secret(raw)}]})
+    )
+    monkeypatch.setattr(settings, "MCP_TOKENS_FILE", str(path))
+    monkeypatch.setattr(settings, "MCP_AUTH_TOKEN", type(settings.MCP_AUTH_TOKEN)(""))
+    reset_token_cache()
+    assert authenticate_bearer(raw) is not None
+
+    # Rewrite the file with a different token; keep reset_token_cache() untouched.
+    path.write_text(
+        json.dumps(
+            {
+                "tokens": [
+                    {"name": "helpdesk", "profile": "helpdesk", "hash": hash_secret(replacement)}
+                ]
+            }
+        )
+    )
+    os.utime(path, (time.time() + 2, time.time() + 2))
+    assert authenticate_bearer(raw) is None  # revoked
+    assert authenticate_bearer(replacement) is not None  # new secret live
+    reset_token_cache()
