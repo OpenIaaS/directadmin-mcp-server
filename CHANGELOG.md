@@ -1,5 +1,30 @@
 # Changelog
 
+## 2.7.1 — 2026-09-04
+
+Security (second-opinion audit fixes — [AUDIT_KIMI.md](AUDIT_KIMI.md), K-01–K-08):
+- Confirm is enforced centrally in `log_tool_call` (`needs_confirm(name)`)
+  instead of relying on each tool body remembering `guard_confirm` — the 7
+  confirm-classified tools that never called it (`phpmyadmin_sso`,
+  `cpanel_import_check_remote`, `login_url_one_shot`,
+  `profile_settings_update`, `session_switch_domain`, `ssl_create_csr`,
+  `git_fetch`) now actually require approval.
+- `cpanel_import_check_remote` validates the host it tells the panel to dial
+  — no more panel-side request forgery via an arbitrary payload host.
+- Idempotency fingerprints the raw bound arguments, not the redacted copy —
+  two `users_change_password` calls with different passwords no longer hash
+  identically and silently replay the cached success.
+- The maintenance window now covers confirm-only write tools
+  (`capability_for(name) or needs_confirm(name)`), not just capability-flagged
+  ones.
+- `da_legacy` GETs are read-only by an explicit `CMD_*` allowlist instead of
+  by honour system.
+- `imapsync_cancel` validates the migration id with `validate_path_segment` —
+  a literal `..` no longer normalizes into a collection DELETE.
+- Log redaction matches sensitive words (`pass`, `secret`, `token`, `key`, …)
+  anywhere in a parameter name, not just as a suffix — a future
+  `password_hash` / `token_id` cannot reach the audit log in cleartext.
+
 ## 2.7.0 — 2026-09-04
 
 Security:

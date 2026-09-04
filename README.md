@@ -1,7 +1,7 @@
 # DirectAdmin MCP Server
 
 [![ci](https://github.com/OpenIaaS/directadmin-mcp-server/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenIaaS/directadmin-mcp-server/actions/workflows/ci.yml)
-[![version](https://img.shields.io/badge/version-2.7.0-0b6bcb.svg)](https://github.com/OpenIaaS/directadmin-mcp-server)
+[![version](https://img.shields.io/badge/version-2.7.1-0b6bcb.svg)](https://github.com/OpenIaaS/directadmin-mcp-server)
 [![license](https://img.shields.io/badge/license-MIT-0b6bcb.svg)](LICENSE)
 
 A production [Model Context Protocol](https://modelcontextprotocol.io) control
@@ -262,9 +262,10 @@ ruff check .
 ```
 
 Adding a curated tool: create a function in `tools/`, decorate with
-`@mcp.tool()` + `@log_tool_call`, validate inputs (`validate_ip`,
-`validate_domain`, `validate_username`), and call `guard_confirm` if the
-call mutates state.
+`@mcp.tool()` + `@log_tool_call`, and validate inputs (`validate_ip`,
+`validate_domain`, `validate_username`). `@log_tool_call` itself gates the
+call on `confirm=true` when `needs_confirm()` says so — no per-tool
+`guard_confirm` to remember.
 
 The generic catalog picks up new swagger paths when you replace
 `tools/api_spec.json` with a fresh export from your own panel

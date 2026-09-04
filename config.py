@@ -12,7 +12,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 load_dotenv()
 
-VERSION = "2.7.0"
+VERSION = "2.7.1"
 
 
 class Settings(BaseSettings):
