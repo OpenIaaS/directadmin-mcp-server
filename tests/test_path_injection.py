@@ -150,6 +150,32 @@ async def test_ssl_cert_files_rejects_traversal(tmp_path, monkeypatch):
 
 
 @pytest.mark.asyncio
+async def test_imapsync_cancel_rejects_dot_dot(tmp_path, monkeypatch):
+    """K-07: the old inline regex [A-Za-z0-9._-]{1,80} admitted a literal "..",
+    which httpx would normalize into a DELETE on /api/imapsync/migrations."""
+    from config import settings
+    from security import bind_request_context
+    from tools.email import imapsync_cancel
+
+    monkeypatch.setattr(settings, "AUDIT_LOG", str(tmp_path / "audit.jsonl"))
+    monkeypatch.setattr(settings, "REQUIRE_REASON", False)
+    bind_request_context(profile="operator")
+    for bad in ("..", ".", "a/../b", "../migrations"):
+        result = await imapsync_cancel(bad, confirm=True)
+        assert result["success"] is False, bad
+        assert "migration id" in result["message"], bad
+    # A normal id still passes validation (and is then rejected/accepted by
+    # the panel — here it just must not be a validation error).
+    monkeypatch.setattr("da.client.request", _ok_request)
+    result = await imapsync_cancel("mig-2026.09.05_01", confirm=True)
+    assert result["success"] is True, result
+
+
+async def _ok_request(*args, **kwargs):
+    return {"ok": True}
+
+
+@pytest.mark.asyncio
 async def test_da_legacy_rejects_dot_segments(tmp_path, monkeypatch):
     from config import settings
     from tools.catalog import da_legacy

@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-import re
 from typing import Any, Dict
 
 from da import call_da_api
 from mcp_instance import mcp
-from security import validate_domain, validate_email_local
+from security import SecurityError, validate_domain, validate_email_local, validate_path_segment
 from tools.common import format_error, format_response, guard_confirm, log_tool_call
 
 
@@ -157,8 +156,13 @@ async def imapsync_cancel(migration_id: str, confirm: bool = False) -> Dict[str,
     rejected = guard_confirm("imapsync_cancel", confirm)
     if rejected:
         return rejected
-    if not re.fullmatch(r"[A-Za-z0-9._-]{1,80}", migration_id):
-        return format_error("Invalid migration id")
+    try:
+        # The old inline regex [A-Za-z0-9._-]{1,80} admitted a literal ".."
+        # (K-07); validate_path_segment blocks traversal, separators and
+        # query/fragment injection.
+        migration_id = validate_path_segment(migration_id, "migration id", max_len=80)
+    except SecurityError as exc:
+        return format_error(str(exc))
     return format_response(
         await call_da_api(f"/api/imapsync/migrations/{migration_id}", method="DELETE")
     )
