@@ -28,6 +28,26 @@ _BLOCKED_PATHS = {
     "/api/terminal",
 }
 
+# Legacy commands that are read-only on GET. Historically many CMD_API_*
+# commands perform their action on GET too, so "method=GET" proves nothing —
+# everything NOT on this list is treated as a write and needs ENABLE_DA_WRITE
+# plus confirm (K-06). Keep the list deliberately tight; extend only for
+# commands verified to be pure reads.
+_LEGACY_READ_COMMANDS = frozenset(
+    {
+        "CMD_API_SHOW_ALL_USERS",
+        "CMD_API_SHOW_RESELLERS",
+        "CMD_API_SHOW_ADMINS",
+        "CMD_API_USER_USAGE",
+        "CMD_API_USER_STATS",
+        "CMD_API_PACKAGES_USER",
+        "CMD_API_PACKAGES_RESELLER",
+        "CMD_API_SYSTEM_INFO",
+        "CMD_API_LICENSE",
+        "CMD_API_DNS_ADMIN",
+    }
+)
+
 
 @lru_cache(maxsize=1)
 def _spec() -> Dict[str, Any]:
@@ -191,14 +211,19 @@ async def da_legacy(
 ) -> Dict[str, Any]:
     """Call a legacy CMD_API_* / CMD_* endpoint.
 
-    Only commands that start with CMD_API_ or CMD_ are accepted.
+    Only commands that start with CMD_API_ or CMD_ are accepted. GET is only
+    honour-system read-only: many legacy commands act on GET, so writes are
+    decided by command, not method. Commands on the read-only allowlist
+    (_LEGACY_READ_COMMANDS, e.g. CMD_API_SHOW_ALL_USERS) stay open for GET;
+    everything else — any POST, and any GET to a non-allowlisted command —
+    needs ENABLE_DA_WRITE and confirm=true.
 
     Args:
         command: e.g. CMD_API_SHOW_ALL_USERS or /CMD_API_SSL
         method: GET or POST
         data: Form fields. json=yes is added automatically.
         impersonate: Optional user.
-        confirm: Required for POST.
+        confirm: Required unless the command is an allowlisted read.
     """
     name = command.strip().lstrip("/")
     if not (name.startswith("CMD_API_") or name.startswith("CMD_")):
@@ -207,10 +232,12 @@ async def da_legacy(
         return format_error("Login/logout commands are not allowed through the MCP")
     if ".." in name:
         return format_error("Path traversal is not allowed in legacy commands")
-    if method.upper() != "GET":
+    is_read = method.upper() == "GET" and name.upper() in _LEGACY_READ_COMMANDS
+    if not is_read:
         if not settings.ENABLE_DA_WRITE:
             return format_error(
                 "Generic legacy writes are disabled (ENABLE_DA_WRITE=false). "
+                "Only allowlisted read-only CMD_API_* commands run via GET. "
                 "Use a curated tool, or set the flag if you accept the extra risk."
             )
         rejected = guard_confirm("da_legacy", confirm, extra=True)

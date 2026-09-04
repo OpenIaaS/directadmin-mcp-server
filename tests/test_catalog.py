@@ -88,3 +88,63 @@ def test_destructive_flags_match_policy():
     for rows in doc["modules"].values():
         for row in rows:
             assert row["destructive"] == bool(needs_confirm(row["name"])), row["name"]
+
+
+def _run_da_legacy(monkeypatch, command, method, confirm=False, enable_write=False):
+    """Drive da_legacy through the decorator with a mocked transport."""
+    import asyncio
+
+    import da
+    from config import settings
+    from security import current_profile
+    from tools.catalog import da_legacy
+
+    monkeypatch.setattr(settings, "AUDIT_LOG", "")
+    monkeypatch.setattr(settings, "ENABLE_DA_WRITE", enable_write)
+    token = current_profile.set("break-glass")
+    calls = []
+
+    async def fake_request(*args, **kwargs):
+        calls.append((args, kwargs))
+        return {"ok": True}
+
+    monkeypatch.setattr(da.client, "request", fake_request)
+    try:
+        result = asyncio.run(
+            da_legacy(command, method=method, confirm=confirm, reason="DA-9 test")
+        )
+    finally:
+        current_profile.reset(token)
+    return result, calls
+
+
+def test_da_legacy_allowlisted_get_is_read(monkeypatch):
+    result, calls = _run_da_legacy(monkeypatch, "CMD_API_SHOW_ALL_USERS", "GET")
+    assert result.get("success") is True, result
+    assert len(calls) == 1
+
+
+def test_da_legacy_non_allowlisted_get_is_treated_as_write(monkeypatch):
+    """K-06: legacy CMD_API_* historically act on GET, so GET proves nothing."""
+    result, calls = _run_da_legacy(monkeypatch, "CMD_API_ACCOUNT_USER", "GET")
+    assert result.get("error") is True and "ENABLE_DA_WRITE" in result["message"]
+    assert calls == []
+    # Flag on but not confirmed -> confirm gate.
+    result, calls = _run_da_legacy(
+        monkeypatch, "CMD_API_ACCOUNT_USER", "GET", enable_write=True
+    )
+    assert result.get("needs_confirm") is True, result
+    assert calls == []
+    # Flag on + confirmed -> reaches the panel.
+    result, calls = _run_da_legacy(
+        monkeypatch, "CMD_API_ACCOUNT_USER", "GET", confirm=True, enable_write=True
+    )
+    assert result.get("success") is True, result
+    assert len(calls) == 1
+
+
+def test_da_legacy_post_always_needs_write_flag(monkeypatch):
+    """An allowlisted read command via POST is still a write."""
+    result, calls = _run_da_legacy(monkeypatch, "CMD_API_SHOW_ALL_USERS", "POST")
+    assert result.get("error") is True and "ENABLE_DA_WRITE" in result["message"]
+    assert calls == []
