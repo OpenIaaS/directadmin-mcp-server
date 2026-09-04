@@ -199,12 +199,13 @@ class _RedactingFormatter(logging.Formatter):
 
     def format(self, record: logging.LogRecord) -> str:
         message = super().format(record)
-        key = settings.DA_LOGIN_KEY.get_secret_value()
-        token = settings.MCP_AUTH_TOKEN.get_secret_value()
-        if key and key != "unset":
-            message = message.replace(key, "********")
-        if token:
-            message = message.replace(token, "********")
+        for secret in (
+            settings.DA_LOGIN_KEY.get_secret_value(),
+            settings.MCP_AUTH_TOKEN.get_secret_value(),
+            settings.APPROVAL_TOKEN.get_secret_value(),
+        ):
+            if secret and secret != "unset":
+                message = message.replace(secret, "********")
         return message
 
 
