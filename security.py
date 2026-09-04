@@ -711,9 +711,17 @@ def window_status(now: Optional[datetime] = None) -> dict:
 def window_denied(tool_name: str, now: Optional[datetime] = None) -> Optional[dict]:
     if not settings.WINDOW_ENFORCE or not settings.MAINTENANCE_WINDOW.strip():
         return None
-    # Helpdesk 24/7: SSL reissue + CSF unblock have no capability flag.
-    # Window applies to opt-in mutating families (restart, updates, deletes…).
-    if capability_for(tool_name) is None:
+    from tokens import helpdesk_write
+
+    # A mutating action is anything with a capability flag OR a confirm
+    # requirement — gating on capability_for() alone let every confirm-only
+    # write (dns_record_add, db_create, cron_create, …) mutate outside the
+    # window (K-05). The helpdesk 24/7 family (SSL reissue, CSF/BFM unblock)
+    # stays exempt so locked-out customers can be rescued at 3 AM — that is
+    # what the denial message promises.
+    if capability_for(tool_name) is None and not needs_confirm(tool_name):
+        return None
+    if helpdesk_write(tool_name):
         return None
     status = window_status(now)
     if status["open"]:

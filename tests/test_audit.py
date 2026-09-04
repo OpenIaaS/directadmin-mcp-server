@@ -42,6 +42,30 @@ def test_window_open_and_closed(monkeypatch):
     assert window_denied("services_restart", now=inside) is None
 
 
+def test_window_covers_confirm_only_writes(monkeypatch):
+    """K-05: window gating keys on capability_for OR needs_confirm.
+
+    700b2ea made dns_record_add / db_create / cron_create confirm-only (no
+    ENABLE_* flag); before this fix they mutated freely outside the window.
+    The helpdesk 24/7 family (SSL reissue, CSF/BFM unblock) stays exempt —
+    the denial message promises it.
+    """
+    from config import settings
+
+    monkeypatch.setattr(settings, "MAINTENANCE_WINDOW", "Tue 01:00-05:00 Europe/Sofia")
+    monkeypatch.setattr(settings, "WINDOW_ENFORCE", True)
+    monkeypatch.setattr(settings, "REQUIRE_CONFIRM", True)
+    inside = datetime(2026, 8, 18, 2, 30, tzinfo=ZoneInfo("Europe/Sofia"))
+    outside = datetime(2026, 8, 18, 12, 0, tzinfo=ZoneInfo("Europe/Sofia"))
+    for name in ("dns_record_add", "db_create", "cron_create", "profile_settings_update"):
+        denied = window_denied(name, now=outside)
+        assert denied and denied["denied_by"] == "MAINTENANCE_WINDOW", name
+        assert window_denied(name, now=inside) is None, name
+    # 24/7 helpdesk writes and plain reads stay open even outside the window.
+    for name in ("ssl_reissue_domain", "csf_unblock_ip", "bfm_unblock_ip", "users_list"):
+        assert window_denied(name, now=outside) is None, name
+
+
 def test_audit_line_includes_actor(tmp_path, monkeypatch):
     from config import settings
 
