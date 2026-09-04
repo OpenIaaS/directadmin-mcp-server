@@ -7,7 +7,7 @@ from typing import Any, Dict
 
 from da import call_da_api
 from mcp_instance import mcp
-from security import validate_domain
+from security import validate_domain, validate_email_local
 from tools.common import format_error, format_response, guard_confirm, log_tool_call
 
 
@@ -54,6 +54,7 @@ async def email_vacation_get(domain: str, user: str) -> Dict[str, Any]:
         user: Local part.
     """
     domain = validate_domain(domain)
+    user = validate_email_local(user)
     return format_response(await call_da_api(f"/api/emailvacation/{domain}/{user}"))
 
 
@@ -74,6 +75,7 @@ async def email_vacation_set(
     if rejected:
         return rejected
     domain = validate_domain(domain)
+    user = validate_email_local(user)
     return format_response(
         await call_da_api(f"/api/emailvacation/{domain}/{user}", method="PUT", data=values)
     )
@@ -93,6 +95,7 @@ async def email_vacation_delete(domain: str, user: str, confirm: bool = False) -
     if rejected:
         return rejected
     domain = validate_domain(domain)
+    user = validate_email_local(user)
     return format_response(
         await call_da_api(f"/api/emailvacation/{domain}/{user}", method="DELETE")
     )

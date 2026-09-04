@@ -1,32 +1,16 @@
 import json
-import re
 from pathlib import Path
 
 import pytest
 
 from security import SecurityError
+from tools.catalog import _fill_path
 
 _SPEC_PATH = Path(__file__).resolve().parents[1] / "tools" / "api_spec.json"
-_PATH_PARAM = re.compile(r"\{([^}]+)\}")
 
 
 def _spec():
     return json.loads(_SPEC_PATH.read_text())
-
-
-def _fill_path(template: str, path_params):
-    params = path_params or {}
-
-    def repl(match):
-        key = match.group(1)
-        if key not in params:
-            raise SecurityError(f"Missing path parameter '{key}' for {template}")
-        value = str(params[key])
-        if "/" in value or ".." in value or value.startswith("."):
-            raise SecurityError(f"Illegal path parameter '{key}'")
-        return value
-
-    return _PATH_PARAM.sub(repl, template)
 
 
 def _lookup(method: str, path: str):
@@ -63,3 +47,17 @@ def test_fill_path_rejects_traversal():
         _fill_path("/api/users/{username}/config", {"username": "../admin"})
     with pytest.raises(SecurityError):
         _fill_path("/api/users/{username}/config", {"username": "a/b"})
+
+
+def test_fill_path_encodes_url_meta_characters():
+    """A path parameter must not be able to split the URL with ? # & or spaces."""
+    filled = _fill_path(
+        "/api/users/{username}/config", {"username": "ad?min&x=1#frag ment"}
+    )
+    assert filled == "/api/users/ad%3Fmin%26x%3D1%23frag%20ment/config"
+    assert "?" not in filled and "#" not in filled and "&" not in filled
+
+
+def test_fill_path_keeps_ascii_identifiers_readable():
+    filled = _fill_path("/api/users/{username}/config", {"username": "alice-01"})
+    assert filled == "/api/users/alice-01/config"

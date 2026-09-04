@@ -6,6 +6,7 @@ from typing import Any, Dict, Optional
 
 from da import call_da_api, client
 from mcp_instance import mcp
+from security import validate_domain, validate_path_segment
 from tools.common import format_response, guard_confirm, log_tool_call
 
 
@@ -114,6 +115,7 @@ async def modsecurity_host_config(hostname: str) -> Dict[str, Any]:
     Args:
         hostname: vhost name.
     """
+    hostname = validate_domain(hostname)
     return format_response(await call_da_api(f"/api/modsecurity/configs/{hostname}"))
 
 
@@ -171,6 +173,7 @@ async def clamav_kill(pid: str, confirm: bool = False) -> Dict[str, Any]:
     rejected = guard_confirm("clamav_kill", confirm)
     if rejected:
         return rejected
+    pid = validate_path_segment(pid, "scan process id", max_len=64)
     return format_response(await call_da_api(f"/api/clamav/{pid}", method="DELETE"))
 
 

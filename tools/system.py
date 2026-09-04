@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional
 
 from da import call_da_api
 from mcp_instance import mcp
+from security import validate_path_segment, validate_username
 from tools.common import format_response, guard_confirm, log_tool_call
 
 
@@ -137,6 +138,7 @@ async def system_global_usage_history(user: str) -> Dict[str, Any]:
     Args:
         user: Username.
     """
+    user = validate_username(user)
     return format_response(await call_da_api(f"/api/global-resource-usage/history/{user}"))
 
 
@@ -238,6 +240,7 @@ async def maintenance_check(task: str) -> Dict[str, Any]:
     Args:
         task: Task id from maintenance_list.
     """
+    task = validate_path_segment(task, "maintenance task", max_len=64)
     return format_response(await call_da_api(f"/api/maintenance/{task}/check", method="POST"))
 
 
@@ -253,4 +256,5 @@ async def maintenance_fix(task: str, confirm: bool = False) -> Dict[str, Any]:
     rejected = guard_confirm("maintenance_fix", confirm)
     if rejected:
         return rejected
+    task = validate_path_segment(task, "maintenance task", max_len=64)
     return format_response(await call_da_api(f"/api/maintenance/{task}/fix", method="POST"))

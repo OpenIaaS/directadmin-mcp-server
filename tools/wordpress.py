@@ -6,6 +6,7 @@ from typing import Any, Dict
 
 from da import call_da_api
 from mcp_instance import mcp
+from security import validate_path_segment
 from tools.common import format_response, guard_confirm, log_tool_call
 
 
@@ -56,6 +57,7 @@ async def wp_get(location_id: str) -> Dict[str, Any]:
     Args:
         location_id: Location id.
     """
+    location_id = validate_path_segment(location_id, "WordPress location id", max_len=64)
     return format_response(await call_da_api(f"/api/wordpress/locations/{location_id}/wordpress"))
 
 
@@ -71,4 +73,5 @@ async def wp_delete(location_id: str, confirm: bool = False) -> Dict[str, Any]:
     rejected = guard_confirm("wp_delete", confirm)
     if rejected:
         return rejected
+    location_id = validate_path_segment(location_id, "WordPress location id", max_len=64)
     return format_response(await call_da_api(f"/api/wordpress/locations/{location_id}", method="DELETE"))

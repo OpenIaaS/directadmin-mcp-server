@@ -189,6 +189,31 @@ def validate_fs_path(value: str) -> str:
     return value
 
 
+_PATH_SEGMENT_BAD = re.compile(r"[^A-Za-z0-9._@:+-]")
+
+
+def validate_path_segment(value: str, what: str = "identifier", max_len: int = 128) -> str:
+    """One URL path component interpolated into a DirectAdmin API path.
+
+    Blocks traversal (..), separators (/ \\), and query/fragment injection
+    (? # & = %). Ids come from previous list responses, so this strict set is
+    enough and keeps f-string paths from reaching arbitrary API endpoints.
+    """
+    if not value or not isinstance(value, str) or len(value) > max_len:
+        raise SecurityError(f"Invalid {what}")
+    if _PATH_SEGMENT_BAD.search(value) or value in {".", ".."}:
+        raise SecurityError(f"Invalid {what}")
+    return value
+
+
+def validate_label(value: str, what: str = "subdomain label") -> str:
+    """A single DNS label (left-most subdomain component)."""
+    cleaned = (value or "").strip().lower()
+    if not cleaned or not re.fullmatch(r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?", cleaned):
+        raise SecurityError(f"Invalid {what}")
+    return cleaned
+
+
 def validate_service(value: str) -> str:
     """systemd / DirectAdmin service name (httpd, php-fpm83, named, …)."""
     if not value or not _SERVICE.fullmatch(value):

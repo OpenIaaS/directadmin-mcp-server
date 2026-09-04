@@ -6,6 +6,7 @@ from typing import Any, Dict
 
 from da import call_da_api, call_da_legacy
 from mcp_instance import mcp
+from security import validate_path_segment
 from tools.common import format_response, guard_confirm, log_tool_call
 
 
@@ -43,6 +44,8 @@ async def packages_reseller_new_api(package: str = "") -> Dict[str, Any]:
     Args:
         package: Optional package name for /api/reseller-packages/{package}.
     """
+    if package:
+        package = validate_path_segment(package, "package name", max_len=64)
     path = f"/api/reseller-packages/{package}" if package else "/api/reseller-packages"
     return format_response(await call_da_api(path))
 

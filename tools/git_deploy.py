@@ -6,7 +6,7 @@ from typing import Any, Dict
 
 from da import call_da_api
 from mcp_instance import mcp
-from security import validate_domain, validate_username
+from security import validate_domain, validate_path_segment, validate_username
 from tools.common import format_response, guard_confirm, log_tool_call
 
 
@@ -30,6 +30,7 @@ async def git_get(uuid: str) -> Dict[str, Any]:
     Args:
         uuid: Application uuid.
     """
+    uuid = validate_path_segment(uuid, "git application uuid", max_len=64)
     return format_response(await call_da_api(f"/api/git/uuid/{uuid}"))
 
 
@@ -45,6 +46,7 @@ async def git_deploy(uuid: str, confirm: bool = False) -> Dict[str, Any]:
     rejected = guard_confirm("git_deploy", confirm)
     if rejected:
         return rejected
+    uuid = validate_path_segment(uuid, "git application uuid", max_len=64)
     return format_response(await call_da_api(f"/api/git/uuid/{uuid}/deploy", method="POST"))
 
 
@@ -56,6 +58,7 @@ async def git_fetch(uuid: str) -> Dict[str, Any]:
     Args:
         uuid: Application uuid.
     """
+    uuid = validate_path_segment(uuid, "git application uuid", max_len=64)
     return format_response(await call_da_api(f"/api/git/uuid/{uuid}/fetch", method="POST"))
 
 
@@ -73,6 +76,7 @@ async def git_webhook(username: str, uuid: str, confirm: bool = False) -> Dict[s
     if rejected:
         return rejected
     username = validate_username(username)
+    uuid = validate_path_segment(uuid, "git application uuid", max_len=64)
     return format_response(
         await call_da_api(f"/api/git/user/{username}/uuid/{uuid}/webhook", method="POST")
     )

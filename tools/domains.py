@@ -6,7 +6,7 @@ from typing import Any, Dict
 
 from da import call_da_legacy
 from mcp_instance import mcp
-from security import validate_domain, validate_username
+from security import validate_domain, validate_label, validate_username
 from tools.common import format_response, guard_confirm, log_tool_call
 
 
@@ -141,7 +141,8 @@ async def subdomains_create(
     if rejected:
         return rejected
     domain = validate_domain(domain)
-    payload = {"action": "create", "domain": domain, "subdomain": subdomain.strip().lower()}
+    subdomain = validate_label(subdomain)
+    payload = {"action": "create", "domain": domain, "subdomain": subdomain}
     return format_response(
         await call_da_legacy(
             "CMD_API_SUBDOMAINS",
@@ -174,10 +175,11 @@ async def subdomains_delete(
     if rejected:
         return rejected
     domain = validate_domain(domain)
+    subdomain = validate_label(subdomain)
     payload = {
         "action": "delete",
         "domain": domain,
-        "select0": subdomain.strip().lower(),
+        "select0": subdomain,
         "contents": "yes" if contents else "no",
     }
     return format_response(

@@ -6,6 +6,7 @@ from typing import Any, Dict
 
 from da import call_da_api
 from mcp_instance import mcp
+from security import validate_path_segment
 from tools.common import format_response, guard_confirm, log_tool_call
 
 
@@ -57,7 +58,11 @@ async def plugins_activate(plugin_id: str, confirm: bool = False) -> Dict[str, A
     if rejected:
         return rejected
     return format_response(
-        await call_da_api(f"/api/plugin-manager/plugins/{plugin_id}/activate", method="POST", data={})
+        await call_da_api(
+            f"/api/plugin-manager/plugins/{validate_path_segment(plugin_id, 'plugin id')}/activate",
+            method="POST",
+            data={},
+        )
     )
 
 
@@ -74,7 +79,11 @@ async def plugins_deactivate(plugin_id: str, confirm: bool = False) -> Dict[str,
     if rejected:
         return rejected
     return format_response(
-        await call_da_api(f"/api/plugin-manager/plugins/{plugin_id}/deactivate", method="POST", data={})
+        await call_da_api(
+            f"/api/plugin-manager/plugins/{validate_path_segment(plugin_id, 'plugin id')}/deactivate",
+            method="POST",
+            data={}
+        )
     )
 
 
@@ -91,7 +100,11 @@ async def plugins_update(plugin_id: str, confirm: bool = False) -> Dict[str, Any
     if rejected:
         return rejected
     return format_response(
-        await call_da_api(f"/api/plugin-manager/plugins/{plugin_id}/update", method="POST", data={})
+        await call_da_api(
+            f"/api/plugin-manager/plugins/{validate_path_segment(plugin_id, 'plugin id')}/update",
+            method="POST",
+            data={}
+        )
     )
 
 
@@ -108,5 +121,9 @@ async def plugins_delete(plugin_id: str, confirm: bool = False) -> Dict[str, Any
     if rejected:
         return rejected
     return format_response(
-        await call_da_api(f"/api/plugin-manager/plugins/{plugin_id}/delete", method="POST", data={})
+        await call_da_api(
+            f"/api/plugin-manager/plugins/{validate_path_segment(plugin_id, 'plugin id')}/delete",
+            method="POST",
+            data={}
+        )
     )

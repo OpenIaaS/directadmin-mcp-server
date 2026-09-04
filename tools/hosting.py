@@ -6,7 +6,7 @@ from typing import Any, Dict
 
 from da import call_da_legacy
 from mcp_instance import mcp
-from security import validate_cron_field, validate_domain, validate_username
+from security import validate_cron_field, validate_domain, validate_fs_path, validate_username
 from tools.common import format_response, guard_confirm, log_tool_call
 
 
@@ -66,7 +66,7 @@ async def ftp_create(
         "type": path_type,
     }
     if path_type == "custom" and custom_path:
-        payload["custom_val"] = custom_path
+        payload["custom_val"] = validate_fs_path(custom_path)
     return format_response(
         await call_da_legacy(
             "CMD_API_FTP", method="POST", data=payload, impersonate=impersonate or None

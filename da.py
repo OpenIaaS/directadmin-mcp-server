@@ -260,7 +260,11 @@ class DirectAdminClient:
                 raw=False,
             )
         except DirectAdminError:
-            # Some skins return HTML; retry as raw text so the tool can still report.
+            # Some skins return HTML; retry as raw text so the tool can still
+            # report. Only for reads — never resend a mutating POST: the first
+            # attempt may have been applied before the response was parsed.
+            if method.upper() != "GET":
+                raise
             return await self.request(
                 plugin_path,
                 method=method,

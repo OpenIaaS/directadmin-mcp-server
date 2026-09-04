@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Optional
 
 from da import call_da_api, call_da_legacy
 from mcp_instance import mcp
-from security import validate_domain
+from security import validate_domain, validate_path_segment
 from tools.common import format_error, format_response, guard_confirm, log_tool_call
 
 
@@ -172,7 +172,7 @@ async def ssl_reissue_domain_legacy(
     if rejected:
         return rejected
     domain = validate_domain(domain)
-    names = entries or [domain, f"www.{domain}"]
+    names = [validate_domain(item) for item in (entries or [domain, f"www.{domain}"])]
     if wildcard and f"*.{domain}" not in names:
         names.append(f"*.{domain}")
     payload = {
@@ -216,6 +216,7 @@ async def ssl_delete_domain_cert(
     if rejected:
         return rejected
     domain = validate_domain(domain)
+    cert_id = validate_path_segment(cert_id, "certificate id")
     path = f"/api/domain-tls/{domain}/certs/{cert_id}"
     params = {"update-acme-skiplist": "true"} if update_acme_skiplist else None
     from da import client
@@ -241,6 +242,7 @@ async def ssl_get_cert_files(
         impersonate: Owning user.
     """
     domain = validate_domain(domain)
+    cert_id = validate_path_segment(cert_id, "certificate id")
     data = await call_da_api(
         f"/api/domain-tls/{domain}/certs/{cert_id}/files",
         method="GET",
@@ -280,6 +282,7 @@ async def ssl_upload_cert_files(
         if rejected:
             return rejected
     domain = validate_domain(domain)
+    cert_id = validate_path_segment(cert_id, "certificate id")
     from da import client
 
     data = await client.request(
@@ -309,6 +312,7 @@ async def ssl_create_csr(
         impersonate: Owning user.
     """
     domain = validate_domain(domain)
+    cert_id = validate_path_segment(cert_id, "certificate id")
     data = await call_da_api(
         f"/api/domain-tls/{domain}/certs/{cert_id}/create-csr",
         method="POST",
@@ -344,6 +348,7 @@ async def ssl_install_self_signed(
     if rejected:
         return rejected
     domain = validate_domain(domain)
+    cert_id = validate_path_segment(cert_id, "certificate id")
     from da import client
 
     data = await client.request(

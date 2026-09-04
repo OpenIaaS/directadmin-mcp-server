@@ -6,6 +6,7 @@ from typing import Any, Dict, Optional
 
 from da import call_da_api
 from mcp_instance import mcp
+from security import validate_path_segment
 from tools.common import format_response, guard_confirm, log_tool_call
 
 
@@ -31,6 +32,7 @@ async def login_keys_get(key_id: str) -> Dict[str, Any]:
     Args:
         key_id: Key id.
     """
+    key_id = validate_path_segment(key_id, "login key id")
     return format_response(await call_da_api(f"/api/login-keys/keys/{key_id}"))
 
 
@@ -42,6 +44,7 @@ async def login_keys_history(key_id: str) -> Dict[str, Any]:
     Args:
         key_id: Key id.
     """
+    key_id = validate_path_segment(key_id, "login key id")
     return format_response(await call_da_api(f"/api/login-keys/keys/{key_id}/history"))
 
 
@@ -75,6 +78,7 @@ async def login_keys_update(
     rejected = guard_confirm("login_keys_update", confirm)
     if rejected:
         return rejected
+    key_id = validate_path_segment(key_id, "login key id")
     return format_response(
         await call_da_api(f"/api/login-keys/keys/{key_id}", method="PATCH", data=payload)
     )
@@ -92,6 +96,7 @@ async def login_keys_delete(key_id: str, confirm: bool = False) -> Dict[str, Any
     rejected = guard_confirm("login_keys_delete", confirm)
     if rejected:
         return rejected
+    key_id = validate_path_segment(key_id, "login key id")
     return format_response(await call_da_api(f"/api/login-keys/keys/{key_id}", method="DELETE"))
 
 
@@ -129,6 +134,7 @@ async def login_urls_delete(url_id: str, confirm: bool = False) -> Dict[str, Any
     rejected = guard_confirm("login_urls_delete", confirm)
     if rejected:
         return rejected
+    url_id = validate_path_segment(url_id, "login URL id")
     return format_response(await call_da_api(f"/api/login-keys/urls/{url_id}", method="DELETE"))
 
 

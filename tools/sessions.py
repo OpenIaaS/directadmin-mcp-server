@@ -6,6 +6,7 @@ from typing import Any, Dict
 
 from da import call_da_api
 from mcp_instance import mcp
+from security import validate_domain, validate_path_segment, validate_query, validate_username
 from tools.common import format_response, guard_confirm, log_tool_call
 
 
@@ -52,6 +53,7 @@ async def session_switch_domain(domain: str) -> Dict[str, Any]:
     Args:
         domain: Domain to select.
     """
+    domain = validate_domain(domain)
     return format_response(
         await call_da_api(
             "/api/session/switch-active-domain", method="POST", data={"domain": domain}
@@ -74,6 +76,7 @@ async def session_login_as(username: str, confirm: bool = False) -> Dict[str, An
     rejected = guard_confirm("session_login_as", confirm)
     if rejected:
         return rejected
+    username = validate_username(username)
     return format_response(
         await call_da_api(
             "/api/session/login-as/switch", method="POST", data={"username": username}
@@ -97,6 +100,8 @@ async def session_login_as_users(q: str = "", limit: int = 20) -> Dict[str, Any]
         q: Query.
         limit: Max rows.
     """
+    q = validate_query(q) if q else ""
+    limit = max(1, min(int(limit), 200))
     return format_response(
         await call_da_api("/api/session/login-as/user-list", method="GET", data={"q": q, "limit": limit})
     )
@@ -121,6 +126,7 @@ async def sessions_destroy(public_id: str, confirm: bool = False) -> Dict[str, A
     rejected = guard_confirm("sessions_destroy", confirm)
     if rejected:
         return rejected
+    public_id = validate_path_segment(public_id, "session id")
     return format_response(
         await call_da_api(f"/api/sessions/destroy/{public_id}", method="POST")
     )
@@ -180,6 +186,7 @@ async def messages_get(message_id: str) -> Dict[str, Any]:
     Args:
         message_id: Message id.
     """
+    message_id = validate_path_segment(message_id, "message id")
     return format_response(await call_da_api(f"/api/messages/id/{message_id}"))
 
 

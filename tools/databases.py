@@ -6,6 +6,7 @@ from typing import Any, Dict
 
 from da import call_da_api
 from mcp_instance import mcp
+from security import validate_path_segment
 from tools.common import format_response, guard_confirm, log_tool_call
 
 
@@ -31,6 +32,7 @@ async def db_get(database: str) -> Dict[str, Any]:
     Args:
         database: Database name.
     """
+    database = validate_path_segment(database, "database name", max_len=64)
     return format_response(await call_da_api(f"/api/db-show/databases/{database}"))
 
 
@@ -49,6 +51,7 @@ async def db_user_get(dbuser: str) -> Dict[str, Any]:
     Args:
         dbuser: DB username.
     """
+    dbuser = validate_path_segment(dbuser, "database user", max_len=64)
     return format_response(await call_da_api(f"/api/db-show/users/{dbuser}"))
 
 
@@ -111,6 +114,7 @@ async def db_delete(database: str, confirm: bool = False) -> Dict[str, Any]:
     rejected = guard_confirm("db_delete", confirm)
     if rejected:
         return rejected
+    database = validate_path_segment(database, "database name", max_len=64)
     return format_response(await call_da_api(f"/api/db-manage/databases/{database}", method="DELETE"))
 
 
@@ -126,6 +130,7 @@ async def db_delete_user(dbuser: str, confirm: bool = False) -> Dict[str, Any]:
     rejected = guard_confirm("db_delete_user", confirm)
     if rejected:
         return rejected
+    dbuser = validate_path_segment(dbuser, "database user", max_len=64)
     return format_response(await call_da_api(f"/api/db-manage/users/{dbuser}", method="DELETE"))
 
 
@@ -144,6 +149,7 @@ async def db_change_user_password(
     rejected = guard_confirm("db_change_user_password", confirm, extra=True)
     if rejected:
         return rejected
+    dbuser = validate_path_segment(dbuser, "database user", max_len=64)
     return format_response(
         await call_da_api(
             f"/api/db-manage/users/{dbuser}/change-password",
@@ -165,6 +171,7 @@ async def db_repair(database: str, confirm: bool = False) -> Dict[str, Any]:
     rejected = guard_confirm("db_repair", confirm)
     if rejected:
         return rejected
+    database = validate_path_segment(database, "database name", max_len=64)
     return format_response(
         await call_da_api(f"/api/db-manage/databases/{database}/repair", method="POST")
     )
@@ -182,6 +189,7 @@ async def db_optimize(database: str, confirm: bool = False) -> Dict[str, Any]:
     rejected = guard_confirm("db_optimize", confirm)
     if rejected:
         return rejected
+    database = validate_path_segment(database, "database name", max_len=64)
     return format_response(
         await call_da_api(f"/api/db-manage/databases/{database}/optimize", method="POST")
     )
@@ -195,6 +203,7 @@ async def db_check(database: str) -> Dict[str, Any]:
     Args:
         database: Name.
     """
+    database = validate_path_segment(database, "database name", max_len=64)
     return format_response(
         await call_da_api(f"/api/db-manage/databases/{database}/check", method="POST")
     )
@@ -219,7 +228,9 @@ async def db_kill_process(process_id: str, confirm: bool = False) -> Dict[str, A
     rejected = guard_confirm("db_kill_process", confirm)
     if rejected:
         return rejected
-    if not process_id or "/" in process_id or ".." in process_id:
+    try:
+        process_id = validate_path_segment(process_id, "process id", max_len=64)
+    except Exception:
         from tools.common import format_error
 
         return format_error("Invalid process id")

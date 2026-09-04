@@ -7,6 +7,7 @@ import os
 import re
 from functools import lru_cache
 from typing import Any, Dict, Optional
+from urllib.parse import quote
 
 from config import settings
 from da import client
@@ -44,7 +45,9 @@ def _fill_path(template: str, path_params: Optional[Dict[str, str]]) -> str:
         value = str(params[key])
         if "/" in value or ".." in value or value.startswith("."):
             raise SecurityError(f"Illegal path parameter '{key}'")
-        return value
+        # Percent-encode so ? # & or spaces inside a parameter cannot split the
+        # path into a different URL once httpx assembles the request.
+        return quote(value, safe="")
 
     return _PATH_PARAM.sub(repl, template)
 
@@ -202,6 +205,8 @@ async def da_legacy(
         return format_error("Only CMD_* / CMD_API_* commands are allowed")
     if any(bad in name.upper() for bad in ("CMD_API_LOGIN", "CMD_LOGIN", "CMD_LOGOUT")):
         return format_error("Login/logout commands are not allowed through the MCP")
+    if ".." in name:
+        return format_error("Path traversal is not allowed in legacy commands")
     if method.upper() != "GET":
         if not settings.ENABLE_DA_WRITE:
             return format_error(

@@ -6,6 +6,7 @@ from typing import Any, Dict
 
 from da import call_da_api
 from mcp_instance import mcp
+from security import validate_path_segment, validate_query
 from tools.common import format_response, log_tool_call
 
 
@@ -17,6 +18,7 @@ async def search_resources(q: str) -> Dict[str, Any]:
     Args:
         q: Query.
     """
+    q = validate_query(q)
     return format_response(await call_da_api("/api/search/resources", method="GET", data={"q": q}))
 
 
@@ -56,6 +58,7 @@ async def phpmyadmin_sso(database: str = "") -> Dict[str, Any]:
         database: Optional database name for database-scoped SSO.
     """
     if database:
+        database = validate_path_segment(database, "database name", max_len=64)
         return format_response(
             await call_da_api(f"/api/phpmyadmin-sso/database-access/{database}", method="POST")
         )
