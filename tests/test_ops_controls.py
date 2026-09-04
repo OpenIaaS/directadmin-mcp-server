@@ -3,6 +3,61 @@ from security import backup_denied, reason_denied
 from truncate import cap_payload
 
 
+def test_distinct_password_change_under_one_key_is_not_silently_skipped(monkeypatch):
+    """K-04 regression: the fingerprint covers RAW args, not the redacted copy.
+
+    Pre-fix, both redacted dicts had password='********' -> identical digests,
+    and the second change replayed the cached success without touching the
+    panel. The retried identical call must still replay; a different password
+    under the same key must error loudly.
+    """
+    import asyncio
+
+    import da
+    from config import settings
+    from security import current_profile
+    from tools.accounts import users_change_password
+
+    monkeypatch.setattr(settings, "ENABLE_ACCOUNT_WRITE", True)
+    monkeypatch.setattr(settings, "AUDIT_LOG", "")
+    token = current_profile.set("break-glass")
+    calls = []
+
+    async def fake_request(*args, **kwargs):
+        calls.append((args, kwargs))
+        return {"changed": True}
+
+    monkeypatch.setattr(da.client, "request", fake_request)
+    reset_idempotency()
+    try:
+        first = asyncio.run(
+            users_change_password(
+                "alice", "sup3r-secret-one", confirm=True,
+                reason="DA-1 reset", idempotency_key="pw-reset-1",
+            )
+        )
+        assert first.get("success") is True, first
+        second = asyncio.run(
+            users_change_password(
+                "alice", "sup3r-secret-TWO", confirm=True,
+                reason="DA-1 reset", idempotency_key="pw-reset-1",
+            )
+        )
+        assert second.get("error") is True, second
+        assert "reused with different arguments" in second["message"]
+        replay = asyncio.run(
+            users_change_password(
+                "alice", "sup3r-secret-one", confirm=True,
+                reason="DA-1 reset", idempotency_key="pw-reset-1",
+            )
+        )
+        assert replay.get("success") is True and replay.get("idempotent_replay") is True
+        assert len(calls) == 1  # only the first call actually reached the panel
+    finally:
+        reset_idempotency()
+        current_profile.reset(token)
+
+
 def test_reason_required_for_unblock(monkeypatch):
     from config import settings
 

@@ -96,7 +96,12 @@ def log_tool_call(func: T) -> T:
         if reason:
             safe["reason"] = sanitize_reason(reason)
 
-        cached, idem_err = check_idempotency(str(idem_key or ""), name, safe)
+        # Idempotency fingerprints the RAW bound arguments, never the redacted
+        # copy: under redaction two users_change_password calls with different
+        # passwords hash identically, so the second would silently replay the
+        # cached success instead of running (K-04). Secrets stay out of the
+        # audit log either way — the fingerprint is a sha256, `safe` is logged.
+        cached, idem_err = check_idempotency(str(idem_key or ""), name, raw)
         if idem_err:
             return idem_err
         if cached is not None:
@@ -130,7 +135,7 @@ def log_tool_call(func: T) -> T:
                     )
                     write_audit("tool_truncated", tool=name)
             write_audit("tool_ok", tool=name)
-            store_idempotency(str(idem_key or ""), name, safe, result)
+            store_idempotency(str(idem_key or ""), name, raw, result)
             return result
         except DirectAdminError as exc:
             logger.error("DirectAdmin error in %s: %s", name, exc)
