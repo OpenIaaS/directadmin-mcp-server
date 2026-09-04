@@ -22,8 +22,12 @@ from config import settings
 
 logger = logging.getLogger(__name__)
 
+# Match the sensitive word ANYWHERE in the key, not just as a suffix: a suffix
+# anchor lets a future `password_hash` / `token_id` / `api_key_id` parameter
+# reach the audit log in cleartext (K-08). This over-redacts a few benign ids
+# (key_id, key_type, keysize) — fail-closed is the right side to err on.
 _SENSITIVE_KEY = re.compile(
-    r"(pass(word|wd)?|secret|token|key|authorization|cookie|login_key|certificate|private)$",
+    r"pass(word|wd)?|secret|token|key|authorization|cookie|login_key|certificate|private",
     re.IGNORECASE,
 )
 
