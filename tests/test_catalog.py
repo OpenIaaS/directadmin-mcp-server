@@ -1,3 +1,4 @@
+import ast
 import json
 from pathlib import Path
 
@@ -61,3 +62,29 @@ def test_fill_path_encodes_url_meta_characters():
 def test_fill_path_keeps_ascii_identifiers_readable():
     filled = _fill_path("/api/users/{username}/config", {"username": "alice-01"})
     assert filled == "/api/users/alice-01/config"
+
+
+def test_tools_json_in_sync_with_registry():
+    """docs/tools.json must list exactly the registered tools (no drift)."""
+    doc = json.loads((_SPEC_PATH.parent.parent / "docs" / "tools.json").read_text())
+    assert doc["count"] == sum(len(rows) for rows in doc["modules"].values())
+
+    live = {
+        node.name
+        for path in _SPEC_PATH.parent.glob("*.py")
+        if not path.name.startswith("_")
+        for node in ast.parse(path.read_text()).body
+        if isinstance(node, ast.AsyncFunctionDef)
+        and any("tool()" in ast.unparse(d) for d in node.decorator_list)
+    }
+    listed = {row["name"] for rows in doc["modules"].values() for row in rows}
+    assert listed == live, (sorted(listed - live), sorted(live - listed))
+
+
+def test_destructive_flags_match_policy():
+    from security import needs_confirm
+
+    doc = json.loads((_SPEC_PATH.parent.parent / "docs" / "tools.json").read_text())
+    for rows in doc["modules"].values():
+        for row in rows:
+            assert row["destructive"] == bool(needs_confirm(row["name"])), row["name"]
