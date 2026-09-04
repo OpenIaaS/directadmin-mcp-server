@@ -1,5 +1,31 @@
 # Changelog
 
+## 2.7.0 — 2026-09-04
+
+Security:
+- Write-shaped tools (verbs like `add`/`set`/`update`/`import`/`deploy` buried
+  mid-name) now require `confirm=true` and are denied for readonly/helpdesk
+  profiles — 51 more baseline tools are gated, `login_url_one_shot` requires
+  `ENABLE_ACCOUNT_WRITE`.
+- Identifiers interpolated into `da_api` / `da_legacy` paths are validated
+  (`validate_path_segment`, `validate_label`) and percent-encoded; `..` is
+  rejected in legacy `CMD_*` commands.
+- A mutating plugin POST is never re-sent as raw text on error (no double
+  application); only GETs are retried.
+- `MCP_TOKENS_FILE` hot-reloads on mtime/size change — revoking a token no
+  longer needs a restart.
+- `APPROVAL_TOKEN` is redacted in log lines like the other secrets.
+- DoS hardening: idempotency cache capped at 10,000 entries, webhook alert
+  threads capped at 8, `audit_search` reads only the last 1 MB of the log.
+- Dependency floors raised: `fastapi>=0.115.0`, `starlette>=0.40.0`,
+  `httpx>=0.28.0`, `python-multipart>=0.0.18`.
+
+Documentation:
+- `docs/tools.json` resynced with the registered tool catalog (303 curated
+  tools; 27 were missing) with consistent `destructive` flags, enforced by
+  new catalog-sync tests.
+- See [AUDIT_REPORT.md](AUDIT_REPORT.md) for the full 2026-09-04 audit.
+
 ## 2.6.0 — 2026-08-19
 
 - Named hashed tokens (`MCP_TOKENS_FILE`). Audit `actor` is the token name.
