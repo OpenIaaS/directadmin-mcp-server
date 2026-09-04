@@ -276,6 +276,8 @@ _CAPABILITY_EXACT: dict[str, str] = {
     "login_keys_delete": "ENABLE_ACCOUNT_WRITE",
     "login_urls_create": "ENABLE_ACCOUNT_WRITE",
     "login_urls_delete": "ENABLE_ACCOUNT_WRITE",
+    # One-shot admin login URL = minting panel credentials. Same family.
+    "login_url_one_shot": "ENABLE_ACCOUNT_WRITE",
     "cb_run": "ENABLE_CUSTOMBUILD",
     "cb_options_update": "ENABLE_CUSTOMBUILD",
     "cb_kill": "ENABLE_CUSTOMBUILD",
@@ -304,6 +306,78 @@ _CAPABILITY_EXACT: dict[str, str] = {
 _DELETE_MARKERS = ("_delete", "_remove", "_destroy", "_drop", "_trash", "uninstall")
 _SERVICE_MARKERS = ("_restart", "_stop", "_start", "_reload", "_kill")
 _FM_WRITE_PREFIXES = ("fm_", "filemanager_")
+
+# Whole-segment write verbs. A tool whose name contains one of these segments
+# mutates panel state even when no ENABLE_* flag covers it — it still needs
+# confirm=true and is denied for readonly / helpdesk profiles.
+_WRITE_SEGMENTS = frozenset(
+    {
+        "add",
+        "assign",
+        "cancel",
+        "chmod",
+        "copy",
+        "create",
+        "deactivate",
+        "deploy",
+        "disable",
+        "enable",
+        "export",
+        "fetch",
+        "fix",
+        "flush",
+        "import",
+        "install",
+        "mkdir",
+        "modify",
+        "move",
+        "obtain",
+        "optimize",
+        "patch",
+        "provision",
+        "reissue",
+        "repair",
+        "restore",
+        "run",
+        "save",
+        "scan",
+        "set",
+        "skip",
+        "start",
+        "stop",
+        "suspend",
+        "switch",
+        "unblock",
+        "uninstall",
+        "update",
+        "upload",
+        "watchdog",
+        "webhook",
+    }
+)
+
+# Odd names the segment/hint rules cannot see: always confirm-gated.
+_ALWAYS_CONFIRM = frozenset(
+    {
+        "backups_admin_now",  # server-wide backup run
+        "login_url_one_shot",  # mints a one-shot admin login URL
+        "phpmyadmin_sso",  # mints a database SSO session
+        "session_login_as",  # switches the shared admin session
+        "cpanel_import_check_remote",  # makes the panel dial an arbitrary host
+    }
+)
+
+# Read-shaped names that merely contain a write verb segment.
+_READ_EXEMPT = frozenset(
+    {
+        "system_packages_update_test",  # dry-run only
+        "cpanel_import_tasks",  # list of import tasks
+    }
+)
+
+
+def _segments(name: str) -> set[str]:
+    return {segment for segment in re.split(r"[_\-]+", name.lower()) if segment}
 
 
 def capability_for(tool_name: str) -> Optional[str]:
@@ -384,10 +458,18 @@ def confirm_accepted(confirm: Any) -> tuple[bool, str]:
 def needs_confirm(tool_name: str, extra_flag: bool = False) -> bool:
     if not settings.REQUIRE_CONFIRM:
         return False
-    lowered = tool_name.lower()
-    if extra_flag:
+    if extra_flag or tool_name in _ALWAYS_CONFIRM:
         return True
-    return any(hint in lowered for hint in DESTRUCTIVE_HINTS)
+    if tool_name in _READ_EXEMPT:
+        return False
+    lowered = tool_name.lower()
+    if any(hint in lowered for hint in DESTRUCTIVE_HINTS):
+        return True
+    # Substring hints miss verbs buried mid-name (dns_record_add, ssl_set_*,
+    # imapsync_import, git_deploy…). Match whole name segments instead so a
+    # write-shaped tool is never treated as a read. Segment equality keeps
+    # plural reads (cb_updates, system_packages_updates) out of the net.
+    return bool(_segments(tool_name) & _WRITE_SEGMENTS)
 
 
 def confirm_or_reject(tool_name: str, confirm: Any, extra_flag: bool = False) -> Optional[dict]:
