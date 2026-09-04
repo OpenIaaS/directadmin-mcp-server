@@ -1,0 +1,4 @@
+# CHANGES — v2.7.1 (final round)
+
+- `5d2225f` fix(security): `security.py` `_SENSITIVE_KEY` regex old `r"(pass(word|wd)?|secret|token|key|authorization|cookie|login_key|certificate|private)$"` → new `r"pass(word|wd)?|secret|token|key|authorization|cookie|login_key|certificate|private"` — dropped the `$` suffix anchor so sensitive words redact anywhere in the key (K-08).
+- `ce90f7b` chore(release): v2.7.1 — `config.py` VERSION and `pyproject.toml` version `"2.7.0"` → `"2.7.1"`; `README.md` badge `version-2.7.0` → `version-2.7.1`; `CHANGELOG.md` new `## 2.7.1 — 2026-09-04` entry listing the seven K-01–K-08 fixes; `AUDIT_KIMI.md` added (the second-opinion audit the entry references); `README.md` dev section old "and call `guard_confirm` if the call mutates state" → new "`@log_tool_call` itself gates the call on `confirm=true` when `needs_confirm()` says so — no per-tool `guard_confirm` to remember."
