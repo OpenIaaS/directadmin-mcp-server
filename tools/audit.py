@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
@@ -12,6 +13,11 @@ from security import validate_query, window_status
 from tools.common import format_error, format_response, log_tool_call
 
 _MAX = 200
+
+# Read only the tail of the audit log for queries. The file rotates at
+# AUDIT_MAX_BYTES (20 MB default); slurping it whole per search is a DoS
+# against the MCP process itself. 1 MB ≈ 6-8k JSON lines, far above _MAX.
+_TAIL_BYTES = 1_048_576
 
 
 def _parse_ts(value: str) -> Optional[datetime]:
@@ -29,14 +35,18 @@ def read_audit_records(limit: int = 5000) -> List[Dict[str, Any]]:
     if not path:
         return []
     try:
-        with open(path, encoding="utf-8") as handle:
-            lines = handle.readlines()
+        size = os.path.getsize(path)
+        with open(path, "rb") as handle:
+            if size > _TAIL_BYTES:
+                handle.seek(-_TAIL_BYTES, os.SEEK_END)
+                handle.readline()  # drop the partial line cut by the seek
+            raw = handle.read()
     except FileNotFoundError:
         return []
     except OSError:
         return []
     records: List[Dict[str, Any]] = []
-    for line in lines[-limit:]:
+    for line in raw.decode("utf-8", errors="replace").splitlines()[-limit:]:
         line = line.strip()
         if not line:
             continue

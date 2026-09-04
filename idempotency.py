@@ -13,6 +13,10 @@ from config import settings
 _lock = threading.Lock()
 _store: Dict[str, Dict[str, Any]] = {}
 
+# Hard cap so a client that spams unique Idempotency-Key headers cannot grow
+# the cache without limit. Oldest entries are evicted first.
+_MAX_ENTRIES = 10_000
+
 
 def _fingerprint(tool: str, args: Dict[str, Any]) -> str:
     skip = {"confirm", "reason", "idempotency_key", "approval"}
@@ -26,6 +30,14 @@ def _purge(now: float) -> None:
     stale = [key for key, row in _store.items() if now - float(row.get("ts") or 0) > ttl]
     for key in stale:
         del _store[key]
+    _evict_overflow()
+
+
+def _evict_overflow() -> None:
+    if len(_store) > _MAX_ENTRIES:
+        ordered = sorted(_store.items(), key=lambda kv: float(kv[1].get("ts") or 0))
+        for key, _ in ordered[: len(_store) - _MAX_ENTRIES]:
+            del _store[key]
 
 
 def check_idempotency(key: str, tool: str, args: Dict[str, Any]) -> Tuple[Optional[dict], Optional[dict]]:
@@ -47,6 +59,7 @@ def check_idempotency(key: str, tool: str, args: Dict[str, Any]) -> Tuple[Option
         row = _store.get(slot)
         if not row:
             _store[slot] = {"ts": now, "fingerprint": digest, "result": None}
+            _evict_overflow()
             return None, None
         if row.get("fingerprint") != digest:
             return None, {
@@ -69,6 +82,7 @@ def store_idempotency(key: str, tool: str, args: Dict[str, Any], result: Any) ->
     digest = _fingerprint(tool, args)
     with _lock:
         _store[slot] = {"ts": time.time(), "fingerprint": digest, "result": result}
+        _purge(time.time())
 
 
 def reset_idempotency() -> None:
