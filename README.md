@@ -1,7 +1,7 @@
 # DirectAdmin MCP Server
 
 [![ci](https://github.com/OpenIaaS/directadmin-mcp-server/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenIaaS/directadmin-mcp-server/actions/workflows/ci.yml)
-[![version](https://img.shields.io/badge/version-2.6.0-0b6bcb.svg)](https://github.com/OpenIaaS/directadmin-mcp-server)
+[![version](https://img.shields.io/badge/version-2.7.0-0b6bcb.svg)](https://github.com/OpenIaaS/directadmin-mcp-server)
 [![license](https://img.shields.io/badge/license-MIT-0b6bcb.svg)](LICENSE)
 
 A production [Model Context Protocol](https://modelcontextprotocol.io) control
@@ -51,8 +51,9 @@ before pointing a model at production.
 | “Restart php-fpm74” | `services_restart` (needs `ENABLE_SERVICE_CONTROL=true`) |
 | Anything else in `/api/*` | `da_list_endpoints` → `da_api` |
 
-Destructive calls (`delete`, `deny`, `restart`, `reissue`, `unblock`, …)
-**require `confirm=true`**. The model must get an explicit go-ahead.
+Write-shaped calls (`delete`, `deny`, `restart`, `reissue`, `unblock`, but
+also `add`, `set`, `update`, `import`, `deploy`, …) **require `confirm=true`**.
+The model must get an explicit go-ahead.
 
 ## Requirements
 
@@ -192,7 +193,7 @@ Curated tools are grouped by module. Everything else is reachable with
 [docs/csf.md](docs/csf.md), [docs/propack.md](docs/propack.md),
 [docs/cloudlinux.md](docs/cloudlinux.md), [docs/hardening.md](docs/hardening.md),
 [docs/audit.md](docs/audit.md), [docs/tokens.md](docs/tokens.md).
-Inventory: [docs/tools.json](docs/tools.json) (273 curated tools + 320 swagger ops).
+Inventory: [docs/tools.json](docs/tools.json) (303 curated tools + 320 swagger ops).
 
 | Module | Tools (prefix) | Notes |
 | --- | --- | --- |

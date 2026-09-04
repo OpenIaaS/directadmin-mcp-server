@@ -33,6 +33,10 @@ MCP_PROFILE=helpdesk
 
 `MCP_AUTH_TOKEN` still works as a single legacy token (profile = `MCP_PROFILE`).
 
+Editing `MCP_TOKENS_FILE` (revoking a hash, changing a profile) takes effect
+on the **next request** — the file is watched by mtime/size, no restart.
+The legacy `MCP_AUTH_TOKEN` still needs a restart to rotate.
+
 Emergency sysadmin: a second hash with `"name": "emergency", "profile": "break-glass"`
 in the write listener’s file — or a separate compose env. Do not share the
 helpdesk secret with the break-glass agent.
