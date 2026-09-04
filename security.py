@@ -126,6 +126,40 @@ def validate_da_url(url: str, allow_insecure_http: bool = False) -> str:
     return url.rstrip("/")
 
 
+def validate_remote_host(value: str, what: str = "remote host") -> str:
+    """Host the *panel* is told to dial (cpanel_import_check_remote & friends).
+
+    The server-side request never leaves this process — DirectAdmin makes it —
+    so this process's SSRF checks cannot see it. Belt-and-suspenders on the
+    payload instead: https only when a scheme is given, no embedded
+    credentials, and IP literals must be public (no loopback, link-local,
+    RFC1918, unspecified or multicast addresses). Hostnames are NOT resolved
+    here (no resolver on this path): a hostname that resolves to a private
+    address at the panel remains a panel-side (DNS-rebind) risk.
+    """
+    candidate = (value or "").strip()
+    if not candidate or len(candidate) > 253:
+        raise SecurityError(f"Invalid {what}")
+    parsed = urlparse(candidate if "://" in candidate else f"https://{candidate}")
+    if parsed.scheme != "https":
+        raise SecurityError(f"{what} must use https:// — plaintext creds leak otherwise")
+    authority = candidate.split("://", 1)[-1].split("/")[0]
+    if parsed.username or parsed.password or "@" in authority:
+        raise SecurityError(f"Do not embed credentials in the {what}")
+    if authority.count(":") > 1 and not authority.startswith("["):
+        raise SecurityError(f"{what} must bracket IPv6 literals: [addr]")
+    host = parsed.hostname
+    if not host:
+        raise SecurityError(f"Invalid {what}")
+    try:
+        ip = ipaddress.ip_address(host)
+    except ValueError:
+        ip = None
+    if ip is not None and not ip.is_global:
+        raise SecurityError(f"{what} must be a public address, not {host}")
+    return candidate
+
+
 def validate_ip(value: str) -> str:
     """Accept a single IPv4/IPv6 address or CIDR. Reject anything else."""
     if not value or not isinstance(value, str):

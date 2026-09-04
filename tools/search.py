@@ -6,8 +6,13 @@ from typing import Any, Dict
 
 from da import call_da_api
 from mcp_instance import mcp
-from security import validate_path_segment, validate_query
-from tools.common import format_response, log_tool_call
+from security import (
+    SecurityError,
+    validate_path_segment,
+    validate_query,
+    validate_remote_host,
+)
+from tools.common import format_error, format_response, log_tool_call
 
 
 @mcp.tool()
@@ -36,15 +41,34 @@ async def cpanel_import_tasks() -> Dict[str, Any]:
     return format_response(await call_da_api("/api/cpanel-import/tasks"))
 
 
+# Payload keys that name the host the panel will dial (case-insensitive).
+_REMOTE_HOST_KEYS = ("host", "hostname", "server", "url", "address")
+
+
 @mcp.tool()
 @log_tool_call
 async def cpanel_import_check_remote(payload: Dict[str, Any], confirm: bool = False) -> Dict[str, Any]:
     """Check a remote cPanel server before import.
 
+    Panel-side request forgery surface: the panel dials whatever host the
+    payload names, with the credentials the payload carries. Host-like fields
+    (host/hostname/server/url/address) must therefore be https (when a scheme
+    is given), carry no embedded user:pass@ credentials, and point at public
+    IP literals. Hostnames are not resolved here — the panel resolves them —
+    so a hostname that maps to a private address remains a panel-side risk.
+
     Args:
         payload: Host / credentials body.
         confirm: Required — the panel dials an arbitrary host.
     """
+    if not isinstance(payload, dict) or not payload:
+        return format_error("payload with the remote host is required")
+    for key, value in payload.items():
+        if str(key).lower() in _REMOTE_HOST_KEYS and isinstance(value, str):
+            try:
+                validate_remote_host(value, what=f"cpanel-import {key}")
+            except SecurityError as exc:
+                return format_error(str(exc))
     return format_response(
         await call_da_api("/api/cpanel-import/check-remote", method="POST", data=payload)
     )

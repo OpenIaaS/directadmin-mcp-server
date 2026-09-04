@@ -16,9 +16,49 @@ from security import (
     validate_impersonate,
     validate_ip,
     validate_query,
+    validate_remote_host,
     validate_service,
     validate_username,
 )
+
+
+@pytest.mark.parametrize(
+    "good",
+    [
+        "cpanel.example.com",
+        "cpanel.example.com:2083",
+        "https://cpanel.example.com:2083/",
+        "8.8.8.8",
+        "93.184.216.34:2087",
+        "https://[2606:2800:220:1:248:1893:25c8:1946]:2083",
+    ],
+)
+def test_validate_remote_host_accepts_public(good):
+    assert validate_remote_host(good) == good
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [
+        "",
+        "http://cpanel.example.com",  # plaintext creds
+        "ftp://cpanel.example.com",
+        "https://user:pass@cpanel.example.com",
+        "user@cpanel.example.com",
+        "192.168.1.10",  # RFC1918
+        "10.0.0.5",
+        "127.0.0.1",
+        "169.254.169.254",  # link-local metadata
+        "0.0.0.0",
+        "::1",
+        "fe80::1",
+        "https://172.16.0.9:2083",
+        "https://",  # no host
+    ],
+)
+def test_validate_remote_host_rejects(bad):
+    with pytest.raises(SecurityError):
+        validate_remote_host(bad)
 
 
 def test_validate_ip_v4():

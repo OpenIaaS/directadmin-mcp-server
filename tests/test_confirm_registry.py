@@ -131,3 +131,28 @@ def test_central_gate_matches_guard_confirm_message_shape(open_gates):
     via_policy = confirm_or_reject(name, False)
     assert via_gate == via_policy
     assert open_gates.calls == []
+
+
+def test_cpanel_import_check_remote_validates_the_dialed_host(open_gates):
+    """K-01: the panel-side request forgery is gated AND the payload checked."""
+    fn = REGISTRY["cpanel_import_check_remote"].fn
+    bad_payloads = (
+        {"hostname": "http://cpanel.example.com"},  # plaintext creds
+        {"hostname": "https://root:hunter2@cpanel.example.com"},  # creds in URL
+        {"hostname": "192.168.1.10"},  # RFC1918
+        {"host": "169.254.169.254"},  # link-local metadata endpoint
+        {"host": "127.0.0.1:2222"},  # loopback
+    )
+    for payload in bad_payloads:
+        result = asyncio.run(fn(payload=payload, confirm=True))
+        assert result.get("error") is True, payload
+        assert result.get("needs_confirm") is not True, payload  # gate passed, validation spoke
+    assert open_gates.calls == []
+    ok = asyncio.run(
+        fn(
+            payload={"hostname": "https://cpanel.example.com", "user": "root", "password": "x"},
+            confirm=True,
+        )
+    )
+    assert ok.get("success") is True, ok
+    assert len(open_gates.calls) == 1
